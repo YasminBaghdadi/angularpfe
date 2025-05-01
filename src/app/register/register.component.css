@@ -1,0 +1,33 @@
+body {
+    background-color: #d9e3eb;
+    margin: 0;
+    padding: 0;
+}
+
+.form-center {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.card-login {
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border: none;
+}
+
+.btn-danger:hover {
+    background-color: #662229;
+}
+
+input.form-control:focus {
+    border: 2px solid #007bff !important; /* azraq */
+    box-shadow: 0 0 5px rgba(30, 57, 86, 0.5); /* halo azraq */
+    background-color: #f0f3f4;
+    color: #342d2d;
+}

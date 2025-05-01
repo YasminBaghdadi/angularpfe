@@ -1,0 +1,128 @@
+<section class="vh-100" style="background-color: #eee;">
+  <div class="container h-100">
+      <div class="row d-flex justify-content-center align-items-center h-100">
+          <div class="col-lg-12 col-xl-11">
+              <div class="card text-black" style="border-radius: 25px; max-width: 7000px; margin: 70px;">
+                  <div class="card-body p-md-4">
+                      <div class="row justify-content-center">
+                          <div class="col-md-10 col-lg-6 col-xl-5 order-2 order-lg-1">
+                              <p class="text-center h1 fw-bold mb-4 mx-1 mx-md-4 mt-4">Sign up</p>
+                              <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="mx-1 mx-md-4">
+                                <!-- Username -->
+                                <div class="d-flex flex-row align-items-center mb-3">
+                                  <i class="fas fa-user fa-lg me-3 fa-fw"></i>
+                                  <div data-mdb-input-init class="form-outline flex-fill mb-0">
+                                    <input 
+                                      type="text" 
+                                      id="username" 
+                                      class="form-control" 
+                                      formControlName="username"
+                                      [ngClass]="{'is-invalid': userForm.get('username')?.invalid && userForm.get('username')?.touched}"
+                                    />
+                                    <label class="form-label" for="username">Username</label>
+                                    <div *ngIf="userForm.get('username')?.invalid && userForm.get('username')?.touched" class="invalid-feedback">
+                                      <div *ngIf="userForm.get('username')?.errors?.['required']">Username is required</div>
+                                      <div *ngIf="userForm.get('username')?.errors?.['minlength']">
+                                        Username must be at least 3 characters
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              
+                                <!-- Email -->
+                                <div class="d-flex flex-row align-items-center mb-3">
+                                  <i class="fas fa-envelope fa-lg me-3 fa-fw"></i>
+                                  <div data-mdb-input-init class="form-outline flex-fill mb-0">
+                                    <input 
+                                      type="email" 
+                                      id="email" 
+                                      class="form-control" 
+                                      formControlName="email"
+                                      [ngClass]="{'is-invalid': userForm.get('email')?.invalid && userForm.get('email')?.touched}"
+                                    />
+                                    <label class="form-label" for="email">Your Email</label>
+                                    <div *ngIf="userForm.get('email')?.invalid && userForm.get('email')?.touched" class="invalid-feedback">
+                                      <div *ngIf="userForm.get('email')?.errors?.['required']">Email is required</div>
+                                      <div *ngIf="userForm.get('email')?.errors?.['email']">Please enter a valid email</div>
+                                    </div>
+                                  </div>
+                                </div>
+                              
+                                <!-- Password -->
+                                <div class="d-flex flex-row align-items-center mb-3">
+                                  <i class="fas fa-lock fa-lg me-3 fa-fw"></i>
+                                  <div data-mdb-input-init class="form-outline flex-fill mb-0">
+                                    <input 
+                                      type="password" 
+                                      id="password" 
+                                      class="form-control" 
+                                      formControlName="password"
+                                      [ngClass]="{'is-invalid': userForm.get('password')?.invalid && userForm.get('password')?.touched}"
+                                    />
+                                    <label class="form-label" for="password">Password</label>
+                                    <div *ngIf="userForm.get('password')?.invalid && userForm.get('password')?.touched" class="invalid-feedback">
+                                      <div *ngIf="userForm.get('password')?.errors?.['required']">Password is required</div>
+                                      <div *ngIf="userForm.get('password')?.errors?.['minlength']">
+                                        Password must be at least 6 characters
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              
+                                <!-- Confirm Password -->
+                                <div class="d-flex flex-row align-items-center mb-3">
+                                  <i class="fas fa-key fa-lg me-3 fa-fw"></i>
+                                  <div data-mdb-input-init class="form-outline flex-fill mb-0">
+                                    <input 
+                                      type="password" 
+                                      id="confirmPassword" 
+                                      class="form-control" 
+                                      formControlName="confirmPassword"
+                                      [ngClass]="{'is-invalid': (userForm.get('confirmPassword')?.invalid || userForm.hasError('mismatch')) && userForm.get('confirmPassword')?.touched}"
+                                    />
+                                    <label class="form-label" for="confirmPassword">Repeat your password</label>
+                                    <div *ngIf="(userForm.get('confirmPassword')?.invalid || userForm.hasError('mismatch')) && userForm.get('confirmPassword')?.touched" class="invalid-feedback">
+                                      <div *ngIf="userForm.get('confirmPassword')?.errors?.['required']">
+                                        Please confirm your password
+                                      </div>
+                                      <div *ngIf="userForm.hasError('mismatch') && userForm.get('confirmPassword')?.touched">
+                                        Passwords do not match
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              
+                                <!-- Login Link -->
+                                <div class="form-check d-flex justify-content-center mb-4">
+                                  <label class="form-check-label" for="form2Example3">
+                                    Already have an account? <a routerLink="/login">Click me to Log in</a>
+                                  </label>
+                                </div>
+                              
+                                <!-- Submit Button -->
+                                <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
+                                  <button 
+                                    type="submit" 
+                                    data-mdb-button-init 
+                                    data-mdb-ripple-init 
+                                    class="btn btn-primary btn-lg"
+                                    [disabled]="userForm.invalid"
+                                  >
+                                    Register
+                                  </button>
+                                </div>
+                              </form>
+                          </div>
+
+                          <!-- Image -->
+                          <div class="col-md-10 col-lg-6 col-xl-7 d-flex align-items-center order-1 order-lg-2">
+                              <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-registration/draw1.webp" class="img-fluid" alt="Sample image">
+                          </div>
+
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</section>

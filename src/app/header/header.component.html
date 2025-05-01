@@ -1,0 +1,70 @@
+<header>
+    <div id="header-sticky" class="header__area header-3">
+        <div class="container">
+            <div class="mega__menu-wrapper p-relative">
+                <div class="header__main">
+                    <div class="header__logo">
+                        <a>
+                            <div class="logo">
+                                <img src="/assets/imgs/logo/restau.png" alt="logo not found">
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="mean__menu-wrapper d-none d-lg-block">
+                        <div class="main-menu main-menu-3">
+                            <nav id="mobile-menu">
+                                <ul>
+                                    <li class="has-dropdown has-mega-menu active">
+                                        <a routerLink="/accueil" routerLinkActive="active">Home</a>
+                                        
+                                    </li>
+                                
+                                     <li class="has-dropdown">
+                                         <a routerLink="/plat" routerLinkActive="active">Dishes</a>
+                                           
+                                    </li>
+                                    <li class="has-dropdown">
+                                        <a routerLink="/reservation" routerLinkActive="active">Reservation</a>
+                                   </li>
+                                   <li class="has-dropdown">
+                                    <a  routerLinkActive="active">Delivery</a>
+                                   </li>
+                                    <li class="has-dropdown">
+                                        <a  routerLinkActive="active">Contact</a>
+                                        <ul class="submenu">
+                                            <li><a routerLink="/register" routerLinkActive="active">Register</a></li>
+                                            <li><a routerLink="/login" routerLinkActive="active">Login</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+
+                    <div class="header__right">
+                        <div class="header__action d-flex align-items-center">
+                            <ul class="d-none d-sm-inline-flex">
+                                
+
+                                <li>
+                                    <a class="cart" routerLink="/panier" routerLinkActive="active">
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="21" viewBox="0 0 20 21" fill="none">
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M5.78741 20.222H14.1352C17.2016 20.222 19.554 19.1144 18.8858 14.6567L18.1078 8.61555C17.6959 6.3913 16.2771 5.54004 15.0323 5.54004H4.85377C3.59061 5.54004 2.25422 6.45537 1.77825 8.61555L1.00022 14.6567C0.432714 18.611 2.72104 20.222 5.78741 20.222Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M5.65053 5.32041C5.65053 2.93433 7.58483 1.00004 9.9709 1.00004V1.00004C11.1199 0.99517 12.2235 1.4482 13.0377 2.25895C13.8519 3.06971 14.3096 4.17139 14.3096 5.32041V5.32041" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M7.0048 9.82388H7.05057" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M12.8359 9.82388H12.8816" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                      </svg>
+                                      <span>{{ nombreArticles }}</span>  <!-- Affichage du nombre d'articles -->
+                                    </a>
+                                  </li>
+                            </ul>
+
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>

@@ -1,0 +1,95 @@
+<section class="food-menu-tab food-menu-tab-2 overflow-hidden section-space-120 overflow-hidden">
+  <div class="container">
+      <div class="row">
+          <div class="col-12">
+              <div class="food-menu-tab__nav-tabs">
+                <nav class="nav" id="nav-tab" role="tablist">
+                  <button class="nav-link active" id="morning-tab" data-bs-toggle="tab" data-bs-target="#morning-food" type="button" role="tab" aria-controls="morning-food" aria-selected="true" (click)="onCategorieChange('Morning')">Morning</button>
+                  <button class="nav-link" id="nav-lunch-tab" data-bs-toggle="tab" data-bs-target="#nav-lunch" type="button" role="tab" aria-controls="nav-lunch" aria-selected="false" (click)="onCategorieChange('Lunch')">Lunch</button>
+                  <button class="nav-link" id="nav-dinner-tab" data-bs-toggle="tab" data-bs-target="#nav-dinner" type="button" role="tab" aria-controls="nav-dinner" aria-selected="false" (click)="onCategorieChange('Dinner')">Dinner</button>
+                  <button class="nav-link" id="nav-fast-food-tab" data-bs-toggle="tab" data-bs-target="#nav-fast-food" type="button" role="tab" aria-controls="nav-fast-food" aria-selected="false" (click)="onCategorieChange('Fast Food')">Fast Food</button>
+                  <button class="nav-link" id="nav-beverage-tab" data-bs-toggle="tab" data-bs-target="#nav-beverage" type="button" role="tab" aria-controls="nav-beverage" aria-selected="false" (click)="onCategorieChange('Beverage')">Beverage</button>
+                </nav>
+              </div>
+          </div>
+      </div>
+
+
+
+
+<div class="row mb-minus-30 fade-wrapper">
+    <!-- Colonne de gauche (première moitié des plats) -->
+    <div class="col-xl-6">
+      <div class="food-menu-tab__left">
+        <ng-container *ngFor="let plat of plats | slice:(plats.length / 2-1):plats.length; let i = index">
+          <div *ngIf="plat.categorie === selectedCategory" class="food-menu-tab__item fade-top">
+            <div class="food-menu-tab__item-media">
+              <img [src]="plat.imageUrl || 'assets/imgs/food-menu-tab/default-food.jpg'" alt="plat" class="img-fluid" />
+            </div>
+            <div class="food-menu-tab__item-wrapper">
+              <div class="food-menu-tab__item-text">
+                <h6 style="margin-bottom: 5px;"><a>{{ plat.name }}</a></h6>
+                
+                <div style="display: flex; align-items: center; margin-top: 8px;">
+                  <span style="font-size: 14px; font-weight: bold; margin-right: 15px;">{{ plat.prix }} TND</span>
+                  <input type="number" [(ngModel)]="plat.quantite" min="1" value="1" 
+                         style="width: 40px; padding: 2px; border: 1px solid #ddd; margin-right: 5px;">
+                 
+                       <button (click)="commander(plat)" style="background: none; border: none; cursor: pointer;">
+                        <img src="assets/imgs/Panier/panier.png" alt="Panier" 
+                        style="width: 18px; height: 18px; cursor: pointer;" />
+                      </button>
+                </div>
+              </div>
+              <p style="font-size: 12px; color: #666; margin-bottom: 10px;">{{ plat.description || 'Pas de description' }}</p>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  
+    <!-- Colonne de droite (deuxième moitié des plats) - CORRIGÉE -->
+    <div class="col-xl-6">
+      <div class="food-menu-tab__right">
+        <ng-container *ngFor="let plat of plats | slice:0:(plats.length / 2)-1; let i = index" >
+          <div *ngIf="plat.categorie === selectedCategory" class="food-menu-tab__item fade-top">
+            <div class="food-menu-tab__item-media">
+              <img [src]="plat.imageUrl || 'assets/imgs/food-menu-tab/default-food.jpg'" alt="plat" class="img-fluid" />
+          </div>
+            <div class="food-menu-tab__item-wrapper">
+              <div class="food-menu-tab__item-text">
+                <h6 style="margin-bottom: 5px;"><a>{{ plat.name }}</a></h6>
+                
+                <div style="display: flex; align-items: center; margin-top: 8px;">
+                  <span style="font-size: 14px; font-weight: bold; margin-right: 15px;">{{ plat.prix }} TND</span>
+                  <input type="number" [(ngModel)]="plat.quantite" min="1" value="1" 
+                         style="width: 40px; padding: 2px; border: 1px solid #ddd; margin-right: 5px;">
+                         <button (click)="commander(plat)" style="background: none; border: none; cursor: pointer;">
+                            <img src="assets/imgs/Panier/panier.png" alt="Panier" 
+                            style="width: 18px; height: 18px; cursor: pointer;" />
+                          </button>
+                </div>
+              </div>
+              <p style="font-size: 12px; color: #666; margin-bottom: 10px;">{{ plat.description || 'Pas de description' }}</p>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+      
+      
+    
+      <!-- Message si aucun plat trouvé -->
+      <div *ngIf="!loading && !error && plats.length === 0" class="text-center mt-5">
+        <div class="alert alert-info">
+          No dishes available for this category.
+        </div>
+      </div>
+  </div>
+
+
+
+
+  
+</section>

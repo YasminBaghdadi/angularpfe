@@ -1,0 +1,106 @@
+<section class="cart section-space-120 overflow-hidden">
+    <div class="container">
+      <div class="row g-24">
+        <div class="col-12">
+          <div class="table-content cart-table">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th class="product-remove"></th>
+                  <th class="product-name">Products</th>
+                  <th class="product-price">Price</th>
+                  <th class="product-quantity">Quantity</th>
+                  <th class="product-subtotal">Subtotal</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let plat of platsDansPanier; let i = index">
+                  <td class="product-remove">
+                    <button (click)="supprimerDuPanier(i)">
+                      <svg width="11" height="10" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M8.63551 0L5.57196 4.07L2.57009 0H0.514019L4.68785 5.23286L0 11H2.05607L5.5514 6.39571L8.94393 11H11L6.43551 5.23286L10.6916 0H8.63551Z" fill="#74787C"/>
+                      </svg>
+                    </button>
+                  </td>
+                  <td class="product__wrapper">
+                    <a  class="product__thumbnail" href="javascript:void(0)">
+                      <img [src]="plat.imageUrl || 'assets/imgs/blog-details/post-1.png'" [alt]="plat.name">
+                    </a>
+                    <div class="product__name">
+                      <h6 class="title text-uppercase">{{ plat.name }}</h6>
+                    </div>
+                  </td>
+                  <td class="product__price">
+                    <span class="amount">{{ plat.prix }} TND</span>
+                  </td>
+                  <td class="product__quantity">
+                    <div class="product__quantity__group">
+                      <div class="product__quantity__control">
+                        <span class="minus" (click)="mettreAJourQuantite(i, plat.quantite - 1)">
+                          <i class="fa-solid fa-minus"></i>
+                        </span>
+                      </div>
+                      <input type="number" class="input-text qty text" 
+                            [(ngModel)]="plat.quantite" 
+                            (change)="mettreAJourQuantite(i, plat.quantite)"
+                            min="1" max="100">
+                      <div class="product__quantity__control">
+                        <span class="plus" (click)="mettreAJourQuantite(i, plat.quantite + 1)">
+                          <i class="fa-solid fa-plus"></i>
+                        </span>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="product__subtotal">
+                    <span>{{ calculerSousTotal(plat) }} TND</span>
+                  </td>
+                </tr>
+                <tr *ngIf="platsDansPanier.length === 0">
+                  <td colspan="5" class="text-center py-4">Votre panier est vide</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="cart__btn-wrap">
+              <button type="button" class="rr-btn hover-anim" (click)="updatePanier()">
+                Update Cart<span class="hover-bg"></span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <section class="checkout section-space__bottom overflow-hidden">
+    <div class="container">
+      <div class="row">
+        <div class="col-xl-6 offset-xl-6">
+          <div class="checkout__content">
+            <h3 class="mb-30 text-uppercase">Cart Totals</h3>
+            <div class="checkout__wrapper mb-40">
+              <div class="checkout__top checkout__item">
+                <h6 class="title">Subtotal</h6>
+                <span class="price">{{ calculerTotal() - fraisLivraison + remise }} TND</span>
+              </div>
+              
+              <div *ngIf="remise > 0" class="checkout__discount checkout__item">
+                <h6 class="title">Discount</h6>
+                <span class="price">-{{ remise }} TND</span>
+              </div>
+              
+              <div class="checkout__total checkout__item">
+                <h6 class="title">Total</h6>
+                <span>{{ calculerTotal() }} TND</span>
+              </div>
+            </div>
+            
+            <div class="checkout-proceed">
+              
+              <button  type="button" class="rr-btn hover-anim"  (click)="procederAuPaiement()" [disabled]="platsDansPanier.length === 0"></button>Proceed To Checkout<span class="hover-bg"></span>
+           
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
