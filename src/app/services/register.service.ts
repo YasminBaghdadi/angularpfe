@@ -12,16 +12,27 @@ export class RegisterService {
   constructor(private http: HttpClient) {}
 
   addUserWithConfirmPassword(user: any): Observable<string> {
+    // Formattez les données EXACTEMENT comme le backend les attend
+    const formattedUser = {
+      username: user.username,
+      firstname: user.firstname, // Notez l'orthographe exacte
+      lastname: user.lastname,
+      email: user.email,
+      password: user.password,
+      confirmPassword: user.confirmPassword // Doit correspondre exactement au champ de l'entité Java
+    };
+  
     return this.http.post(
       `${this.baseUrl}/addwithconfpassword`,
-      user,
-      { responseType: 'text' as const }  // important !
+      formattedUser,
+      { responseType: 'text' }
     ).pipe(
       catchError((error: HttpErrorResponse) => {
-        const errorMsg = typeof error.error === 'string' ? error.error : 'Erreur inconnue !';
+        // Log complet pour débogage
+        console.error('Erreur complète:', error);
+        const errorMsg = error.error?.message || error.message || 'Erreur inconnue';
         return throwError(() => new Error(errorMsg));
       })
     );
   }
-  
 }

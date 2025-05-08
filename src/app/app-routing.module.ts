@@ -1,12 +1,17 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { HeaderfooterComponent } from './headerfooter/headerfooter.component';
+import { HeaderfooterComponent } from './public/headerfooter/headerfooter.component';
 import { HomeComponent } from './home/home.component';
 import { PlatComponent } from './plat/plat.component';
-import { RegisterComponent } from './register/register.component';
-import { LoginComponent } from './login/login.component';
+import { RegisterComponent } from './auth/register/register.component';
 import { PanierComponent } from './panier/panier.component';
 import { ReservationComponent } from './reservation/reservation.component';
+import { LoginComponent } from './auth/login/login.component';
+import { DashComponent } from './livreur/dash/dash.component';
+import { DashboardComponent } from './admin/dashboard/dashboard.component';
+import { CustomersComponent } from './admin/customers/customers.component';
+
+
 
 const routes: Routes = [
   { path: '', redirectTo: 'accueil', pathMatch: 'full' },
@@ -46,16 +51,37 @@ const routes: Routes = [
     ]
   },
 
+  { 
+    path: 'dash',  
+    component: DashComponent,  
+  },
+  { 
+    path: 'admin/dashboard',  
+    component: DashboardComponent,  
+  },
+
+
+
+  { 
+    path: 'admin/customers',  
+    component: CustomersComponent,  
+  },
+  
+
   
   { 
     path: 'register',  
     component: RegisterComponent,  
   },
 
+  
   { 
     path: 'login',  
     component: LoginComponent,  
   },
+
+
+ 
   
  
 ];

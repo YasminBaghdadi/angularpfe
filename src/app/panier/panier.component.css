@@ -18,7 +18,7 @@
 
 /* Alignement des colonnes */
 .table th, .table td {
-  text-align: center;
+  text-align:justify;
   vertical-align: middle;
 }
 

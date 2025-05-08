@@ -7,10 +7,10 @@
               <thead>
                 <tr>
                   <th class="product-remove"></th>
-                  <th class="product-name">Products</th>
-                  <th class="product-price">Price</th>
-                  <th class="product-quantity">Quantity</th>
-                  <th class="product-subtotal">Subtotal</th>
+                  <th class="product-name">Plats</th>
+                  <th class="product-price">Prix</th>
+                  <th class="product-quantity">Quantité</th>
+                  <th class="product-subtotal">Sous-total</th>
                 </tr>
               </thead>
               <tbody>
@@ -24,7 +24,7 @@
                   </td>
                   <td class="product__wrapper">
                     <a  class="product__thumbnail" href="javascript:void(0)">
-                      <img [src]="plat.imageUrl || 'assets/imgs/blog-details/post-1.png'" [alt]="plat.name">
+                      <img [src]="plat.imageUrl"  [alt]="plat.name">
                     </a>
                     <div class="product__name">
                       <h6 class="title text-uppercase">{{ plat.name }}</h6>
@@ -62,7 +62,7 @@
             </table>
             <div class="cart__btn-wrap">
               <button type="button" class="rr-btn hover-anim" (click)="updatePanier()">
-                Update Cart<span class="hover-bg"></span>
+                Commander<span class="hover-bg"></span>
               </button>
             </div>
           </div>
@@ -76,17 +76,13 @@
       <div class="row">
         <div class="col-xl-6 offset-xl-6">
           <div class="checkout__content">
-            <h3 class="mb-30 text-uppercase">Cart Totals</h3>
+            <h3 class="mb-30 text-uppercase">Totaux des plats</h3>
             <div class="checkout__wrapper mb-40">
               <div class="checkout__top checkout__item">
-                <h6 class="title">Subtotal</h6>
+                <h6 class="title">Sous-total</h6>
                 <span class="price">{{ calculerTotal() - fraisLivraison + remise }} TND</span>
               </div>
               
-              <div *ngIf="remise > 0" class="checkout__discount checkout__item">
-                <h6 class="title">Discount</h6>
-                <span class="price">-{{ remise }} TND</span>
-              </div>
               
               <div class="checkout__total checkout__item">
                 <h6 class="title">Total</h6>
@@ -96,7 +92,7 @@
             
             <div class="checkout-proceed">
               
-              <button  type="button" class="rr-btn hover-anim"  (click)="procederAuPaiement()" [disabled]="platsDansPanier.length === 0"></button>Proceed To Checkout<span class="hover-bg"></span>
+              <button  type="button" class="rr-btn hover-anim"  (click)="procederAuPaiement()" [disabled]="platsDansPanier.length === 0"></button>Passer à la caisse<span class="hover-bg"></span>
            
             </div>
           </div>

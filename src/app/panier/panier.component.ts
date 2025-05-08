@@ -86,6 +86,6 @@ export class PanierComponent implements OnInit {
   // Mettre à jour le panier et afficher un message de confirmation
   updatePanier(): void {
     this.mettreAJourLocalStorage();
-    alert('Panier mis à jour !');
+    alert('Order confirmed!');
   }
 }

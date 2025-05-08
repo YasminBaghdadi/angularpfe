@@ -19,20 +19,24 @@
             "polyfills": [
               "zone.js"
             ],
+
             "tsConfig": "tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
-              
+              "src/assets",
+              "src/asset"
             ],
+
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "src/styles.css"
             ],
+
             "scripts": [
               "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
               "node_modules/jquery/dist/jquery.min.js"
             ]
+
           },
           "configurations": {
             "production": {

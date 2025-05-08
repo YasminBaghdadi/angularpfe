@@ -14,7 +14,7 @@ import { catchError, takeUntil } from 'rxjs/operators';
 })
 export class PlatComponent implements OnInit, OnDestroy {
   plats: Plat[] = [];
-  selectedCategory: string = 'Morning';
+  selectedCategory: string = 'Petit-déjeuner';
   loading = false;
   error: string | null = null;
   private destroy$ = new Subject<void>();
@@ -45,7 +45,7 @@ export class PlatComponent implements OnInit, OnDestroy {
           this.plats = plats.map(plat => ({
             ...plat,
             quantite: 1,
-            imageUrl: 'assets/imgs/food-menu-tab/default-food.jpg' // Valeur par défaut
+            imageUrl: '/assets/imgs/our-collections/shape-1.jpg' 
           }));
           this.loadAllPlatImages();
           this.loading = false;
@@ -64,7 +64,7 @@ export class PlatComponent implements OnInit, OnDestroy {
         this.imageplatService.getPlatImage(plat.idPlat!)
           .pipe(
             takeUntil(this.destroy$),
-            catchError(() => of('assets/imgs/food-menu-tab/default-food.jpg'))
+            catchError(() => of('/assets/imgs/our-collections/shape-1.jpg'))
           )
       );
 

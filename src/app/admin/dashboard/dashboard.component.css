@@ -1,0 +1,20 @@
+.submenu-arrow {
+    transition: transform 0.3s ease;
+    float: right;
+}
+.submenu-toggle.collapsed .submenu-arrow {
+    transform: rotate(-90deg);
+}
+.has-submenu {
+    position: relative;
+}
+.submenu-list {
+    padding-left: 15px;
+}
+
+
+
+.container-fluid{
+    background-color: rgb(246, 247, 249);
+
+}
