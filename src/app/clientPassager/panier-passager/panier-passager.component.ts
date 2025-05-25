@@ -287,7 +287,7 @@ export class PanierPassagerComponent implements OnInit, OnDestroy {
     });
   }
 
-  procederAuPaiement(): void {
+procederAuPaiement(): void {
   this.clearMessages();
 
   if (!this.hasCommandeEnCours()) {
@@ -300,46 +300,34 @@ export class PanierPassagerComponent implements OnInit, OnDestroy {
     return;
   }
 
-  const montantAPayer = this.getTotalAffiche();
+  const montantTnd = this.getTotalAffiche();
+  const montantUsd = this.paymentService.convertTndToUsd(montantTnd);
   
+  console.log(`Paiement de ${montantTnd} TND (${montantUsd} USD)`);
+
   this.isPaymentProcessing = true;
 
-  // Créer le paiement PayPal avec l'ID de commande
-  const paymentRequest = {
-    amount: montantAPayer,
-    currency: 'EUR',
-    description: `Paiement commande #${this.idCommandeEnCours} - Table ${this.tableNumber}`
-  };
-
-  console.log('Envoi de la requête de paiement pour la commande:', this.idCommandeEnCours);
-
-  this.paymentService.createPayment(this.idCommandeEnCours, paymentRequest).subscribe({
+  this.paymentService.createPayment(this.idCommandeEnCours, montantTnd).subscribe({
     next: (response) => {
       this.isPaymentProcessing = false;
-      console.log('Réponse du service de paiement:', response);
       
       if (response.status === 'success' && response.approvalUrl) {
-        // Sauvegarder les informations de paiement
         localStorage.setItem('pendingPayment', JSON.stringify({
           paymentId: response.paymentId,
           idCommande: this.idCommandeEnCours,
           tableNumber: this.tableNumber,
-          amount: montantAPayer
+          amountTnd: montantTnd,
+          amountUsd: montantUsd
         }));
         
-        console.log('Redirection vers PayPal:', response.approvalUrl);
         window.location.href = response.approvalUrl;
       } else {
         this.errorMessage = 'Erreur lors de la création du paiement';
-        console.error(this.errorMessage);
-        this.clearMessagesDelayed();
       }
     },
     error: (error) => {
       this.isPaymentProcessing = false;
-      this.errorMessage = 'Erreur lors de la création du paiement: ' + (error.error?.error || error.message);
-      console.error('Erreur PayPal:', error);
-      this.clearMessagesDelayed();
+      this.errorMessage = 'Erreur lors de la création du paiement';
     }
   });
 }

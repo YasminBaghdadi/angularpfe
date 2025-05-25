@@ -1,0 +1,59 @@
+/* Style de base */
+.card {
+  border-radius: 10px;
+  border: none;
+}
+
+.success-container {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.error-container {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Style pour l'impression */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .card, .card * {
+    visibility: visible;
+  }
+  .card {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    border: none;
+    box-shadow: none;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* Améliorations visuelles */
+.list-group-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.alert {
+  border-left: 4px solid;
+}
+
+.alert-success {
+  border-left-color: #28a745;
+}
+
+.alert-danger {
+  border-left-color: #dc3545;
+}
