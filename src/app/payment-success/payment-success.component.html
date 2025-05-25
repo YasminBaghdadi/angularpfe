@@ -1,0 +1,56 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-body text-center">
+          <!-- État de traitement -->
+          <div *ngIf="isProcessing" class="mb-4">
+            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <h3 class="mt-3">Traitement du paiement en cours...</h3>
+            <p>Veuillez patienter pendant que nous validons votre paiement.</p>
+          </div>
+
+          <!-- Succès -->
+          <div *ngIf="paymentSuccess" class="mb-4">
+            <div class="text-success mb-3">
+              <i class="bi bi-check-circle-fill" style="font-size: 4rem;"></i>
+            </div>
+            <h2 class="text-success">Paiement Réussi!</h2>
+            <div class="alert alert-success">
+              <p class="mb-1">Votre commande #{{ idCommande }} a été payée avec succès.</p>
+              <p class="mb-1" *ngIf="montantPaye">Montant: {{ montantPaye }} €</p>
+              <p class="mb-0">Référence: {{ paymentId }}</p>
+            </div>
+            <p>Vous allez être redirigé automatiquement...</p>
+          </div>
+
+          <!-- Erreur -->
+          <div *ngIf="paymentError" class="mb-4">
+            <div class="text-danger mb-3">
+              <i class="bi bi-exclamation-circle-fill" style="font-size: 4rem;"></i>
+            </div>
+            <h2 class="text-danger">Problème de paiement</h2>
+            <div class="alert alert-danger">
+              <p>{{ errorMessage }}</p>
+              <p *ngIf="idCommande">Votre commande #{{ idCommande }} est toujours active.</p>
+            </div>
+          </div>
+
+          <!-- Boutons d'action -->
+          <div class="mt-4 d-flex justify-content-center gap-3">
+            <button *ngIf="tableNumber" class="btn btn-primary" (click)="retournerAuPanier()">
+              <i class="bi bi-cart me-2"></i>
+              Retour au panier
+            </button>
+            <button class="btn btn-secondary" (click)="retournerAccueil()">
+              <i class="bi bi-house me-2"></i>
+              Retour à l'accueil
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

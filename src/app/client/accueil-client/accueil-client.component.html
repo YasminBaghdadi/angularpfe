@@ -1,0 +1,475 @@
+<!doctype html>
+<html class="no-js" lang="zxx">
+
+
+<!-- Mirrored from html.rrdevs.net/zummi/index-3.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 02 Apr 2025 12:52:04 GMT -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Restaurant</title>
+    <meta name="description" content="Zummi – Restaurant & Cafe Bootstrap HTML5 Template">
+    <meta name="author" content="ahmmedsabbirbd">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Place favicon.ico in the root directory -->
+    <link rel="shortcut icon" type="image/x-icon" href="/assets/imgs/favicon.svg">
+    <!-- CSS here -->
+    <link rel="stylesheet" href="/assets/css/vendor/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/css/vendor/animate.min.css">
+    <link rel="stylesheet" href="/assets/css/plugins/swiper.min.css">
+    <link rel="stylesheet" href="/assets/css/vendor/magnific-popup.css">
+    <link rel="stylesheet" href="/assets/css/vendor/fontawesome-pro.css">
+    <link rel="stylesheet" href="/assets/css/vendor/spacing.css"> 
+    <link rel="stylesheet" href="/assets/css/plugins/odometer-theme-default.css">
+    <link rel="stylesheet" href="/assets/css/main.css">
+</head>
+<header>
+    <div id="header-sticky" class="header__area header-3">
+        <div class="container">
+            <div class="mega__menu-wrapper p-relative">
+                <div class="header__main">
+                    <div class="header__logo">
+                        <a>
+                            <div class="logo">
+                                <img src="/assets/imgs/logo/restau.png" alt="logo not found">
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="mean__menu-wrapper d-none d-lg-block">
+                        <div class="main-menu main-menu-3">
+                            <nav id="mobile-menu">
+                                <ul>
+                                    <li class="has-dropdown has-mega-menu active">
+                                        <a routerLink="client/accueilClient" routerLinkActive="active">Accueil</a>
+                                        
+                                    </li>
+                                
+                                     <li class="has-dropdown">
+                                         <a routerLink="/client/plats" routerLinkActive="active">Plats</a>
+                                           
+                                    </li>
+                                    <li class="has-dropdown">
+                                        <a routerLink="/client/reservations" routerLinkActive="active">Réservation</a>
+                                   </li>
+                                   <li class="has-dropdown">
+                                    <a  routerLinkActive="active">livraison</a>
+                                   </li>
+                                    <li class="has-dropdown">
+
+                                        <a  routerLinkActive="active">                                        
+                                            Mon compte
+                                        </a>
+                                        <ul class="submenu">
+                                            
+<li><a routerLink="/profil">Profil</a></li>
+                                        
+                                            
+<li><a (click)="onLogout()">Déconnexion</a></li>
+                                        </ul>
+
+
+                                    </li>
+                                    <li class="has-dropdown" style="font-size: 20px;"> 
+                                    <p>Bienvenue, {{ username }} !</p>
+                                     </li>
+
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+
+                    <div class="header__right">
+                        <div class="header__action d-flex align-items-center">
+                            <ul class="d-none d-sm-inline-flex">
+                                
+
+                                <li>
+                                    <a class="cart" routerLink="/client/pan" routerLinkActive="active">
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="21" viewBox="0 0 20 21" fill="none">
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M5.78741 20.222H14.1352C17.2016 20.222 19.554 19.1144 18.8858 14.6567L18.1078 8.61555C17.6959 6.3913 16.2771 5.54004 15.0323 5.54004H4.85377C3.59061 5.54004 2.25422 6.45537 1.77825 8.61555L1.00022 14.6567C0.432714 18.611 2.72104 20.222 5.78741 20.222Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M5.65053 5.32041C5.65053 2.93433 7.58483 1.00004 9.9709 1.00004V1.00004C11.1199 0.99517 12.2235 1.4482 13.0377 2.25895C13.8519 3.06971 14.3096 4.17139 14.3096 5.32041V5.32041" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M7.0048 9.82388H7.05057" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M12.8359 9.82388H12.8816" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                      </svg>
+                                      <span>{{ nombreArticles }}</span>  <!-- Affichage du nombre d'articles -->
+                                    </a>
+                                  </li>
+                            </ul>
+
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+<!-- Body main wrapper start -->
+<main>
+    
+    
+     <!-- banner-3 area start -->
+     <section id="banner" class="banner-3 banner-3__space overflow-hidden" style="height: 600px; padding-top: 30px; padding-bottom: 30px;">
+        <div class="banner-3__bg-shape"><img src="/assets/imgs/banner-3/bg-shape.png" alt="image not found"></div>
+        <div class="container">
+            <div class="banner-3__shape-1 upDown"><img src="/assets/imgs/banner-3/shape-1.png" alt="image not found" style="width: 200%"></div>
+            <div class="banner-3__shape-2 upDown"><img src="/assets/imgs/about-us/shape-1.png" alt="image not found" style="width: 150%"></div>
+            <div class="banner-3__shape-3 upDown"><img src="/assets/imgs/banner-3/shape-3.png" alt="image not found" style="width: 150%"></div>
+            <div class="row">
+                <div class="col-xl-7">
+                    <div class="banner-3__content">
+                        <h1 class="banner-3__content-title">Menu. <br> Restau…</h1>
+                        <p class="text-white-80 mb-55 mb-xs-30">Bienvenue dans notre restaurant, où chaque plat est un moment de délice. Que vous choisissiez de commander sur place, de réserver votre table à l’avance ou simplement de vous faire livrer votre repas à votre porte, notre équipe vous accueille dans une ambiance conviviale et nos chefs vous préparent des recettes maison avec des ingrédients soigneusement sélectionnés.
+                            </p>
+                        
+                    </div>
+                </div>
+                <div class="col-xl-5">
+                    <div class="banner-3__media">
+                        <img class="downUp" src="/assets/imgs/banner-3/burger.png" alt="image not found" style="width: 100%; height: auto;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- banner-3 area end -->
+
+    
+
+
+    <!-- client-testimonial area start -->
+ <section class="client-testimonial section-space-120 overflow-hidden">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="client-testimonial__wrapper">
+                        <div class="swiper client-testimonial__active">
+                            <div class="swiper-wrapper">
+                                <div class="swiper-slide">
+                                    <div class="client-testimonial__content text-center">
+                                        <h6 class="client-testimonial__content-title text-uppercase mb-35 mb-xs-15">Chers clients,</h6>
+                                        <div class="client-testimonial__rating mb-30">
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-solid fa-star"></i>
+                                            <i class="fa-solid fa-star"></i>
+                                        </div>
+
+                                        <p class="mb-35">" Bienvenue sur notre site ! Nous proposons des plats délicieux, soigneusement préparés avec des ingrédients frais et de haute qualité.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- client-testimonial area end -->
+
+     
+    
+
+
+    
+
+
+
+    <!-- restaurant-info area start -->
+ <section id="about-us" class="restaurant-info  bg-theme-gray overflow-hidden section-space-120">
+    <div class="container">
+        <div class="restaurant-info__shape-3 upDown"><img src="/assets/imgs/restaurant-info/shape-3.png" alt="image not found"></div>
+        <div class="restaurant-info__shape-4 upDown"><img src="/assets/imgs/restaurant-info/shape-4.png" alt="image not found"></div>
+        <div class="row">
+            <div class="col-xl-6">
+                <div class="restaurant-info__media">
+                    <div class="restaurant-info__shape-1"><img class="autoRotate" src="/assets/imgs/restaurant-info/shape-1.png" alt="image not found"></div>
+                    <div class="restaurant-info__shape-2 upDown"><img src="/assets/imgs/restaurant-info/shape-2.png" alt="image not found"></div>
+                    <img class="image-1 wow clip-a-z" src="/assets/imgs/about-us/about-us-1.jpg" alt="image not found">
+                    <img class="image-2  wow clip-a-z" src="/assets/imgs/team/team-6.png" alt="image not found">
+                </div>
+            </div>
+            <div class="col-xl-6">
+                <div class="restaurant-info__content fade-wrapper">
+                    <div class="section-2__title-wrapper fade-top mb-55 mb-xs-30">
+                        <span class="section-2__subtitle text-uppercase color-theme-primary mb-10">INFORMATIONS SUR LE RESTAURANT...</span>
+                        <h2 class="section-2__title text-uppercase mb-20" data-text-animation="fade-in-right" data-split="char" data-duration="0.7" data-stagger="0.04">DE DÉLICIEUX REPAS LIVRÉS À VOTRE PORTE.</h2>
+                        <p class="mb-0 fade-top">Faites l’expérience d’un repas exceptionnel avec des ingrédients soigneusement sélectionnés conçus pour ravir vos papilles. Notre menu varié, préparé avec passion, garantit des saveurs uniques et des plats toujours frais. Que ce soit pour un dîner de famille ou un repas entre amis, nous nous occupons de tout, de la cuisine à votre porte.</p>
+                    </div>
+
+                    <div class="restaurant-info__wrapper">
+                        <div class="restaurant-info__item fade-top">
+                            <div class="restaurant-info__item-icon">
+                                <img src="/assets/imgs/restaurant-info/icon-1.svg" alt="image not found">
+                            </div>
+                            <div class="restaurant-info__item-text">
+                                <h6 class="text-uppercase"><a >QUALITÉ SUPÉRIEURE</a></h6>
+                            </div>
+                        </div>
+                        <div class="restaurant-info__item fade-top">
+                            <div class="restaurant-info__item-icon">
+                                <img src="/assets/imgs/restaurant-info/icon-3.svg" alt="image not found">
+                            </div>
+                            <div class="restaurant-info__item-text">
+                                <h6 class="text-uppercase"><a>FRAÎCHEUR GARANTIE</a></h6>
+                            </div>
+                        </div>
+                        <div class="restaurant-info__item fade-top">
+                            <div class="restaurant-info__item-icon">
+                                <img src="/assets/imgs/restaurant-info/icon-2.svg" alt="image not found">
+                            </div>
+                            <div class="restaurant-info__item-text">
+                                <h6 class="text-uppercase"><a >UNE LARGE GAMME DE PLATS</a></h6>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- restaurant-info area end -->
+
+
+    <!-- team area start -->
+    <section class="gallery section-space-120 fade-wrapper">
+        <div class="container">
+            <div class="row mb-minus-30">
+                <div class="col-lg-6 col-md-12">
+                    <div class="gallery__item fade-top">
+                        <div class="gallery__item-media">
+                            <img src="/assets/imgs/gallery/gallery-1.jpg" alt="image not found">
+                        </div>
+                        <div class="gallery__item__content">
+                            <h6 class="text-uppercase">Boissons</h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="gallery__item fade-top">
+                        <div class="gallery__item-media">
+                            <img src="/assets/imgs/gallery/gallery-2.jpg" alt="image not found">
+                        </div>
+                        <div class="gallery__item__content">
+                            <h6 class="text-uppercase">Gâteaux</h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="gallery__item fade-top">
+                        <div class="gallery__item-media">
+                            <img src="/assets/imgs/gallery/gallery-3.jpg" alt="image not found">
+                        </div>
+                        <div class="gallery__item__content">
+                            <h6 class="text-uppercase">Boissons</h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="gallery__item fade-top">
+                        <div class="gallery__item-media">
+                            <img src="/assets/imgs/gallery/gallery-4.jpg" alt="image not found">
+                        </div>
+                        <div class="gallery__item__content">
+                            <h6 class="text-uppercase">Pâtes</h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="gallery__item fade-top">
+                        <div class="gallery__item-media">
+                            <img src="/assets/imgs/gallery/gallery-5.jpg" alt="image not found">
+                        </div>
+                        <div class="gallery__item__content">
+                            <h6 class="text-uppercase">Boissons</h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-12">
+                    <div class="gallery__item fade-top">
+                        <div class="gallery__item-media">
+                            <img src="/assets/imgs/gallery/gallery-6.jpg" alt="image not found">
+                        </div>
+                        <div class="gallery__item__content">
+                            <h6 class="text-uppercase">Sandwichs</h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-12">
+                    <div class="gallery__item fade-top">
+                        <div class="gallery__item-media">
+                            <img src="/assets/imgs/gallery/gallery-7.jpg" alt="image not found">
+                        </div>
+                        <div class="gallery__item__content">
+                            <h6 class="text-uppercase">Gâteaux</h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="gallery__item fade-top">
+                        <div class="gallery__item-media">
+                            <img src="/assets/imgs/gallery/gallery-8.jpg" alt="image not found">
+                        </div>
+                        <div class="gallery__item__content">
+                            <h6 class="text-uppercase">Sandwichs</h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="gallery__item fade-top">
+                        <div class="gallery__item-media">
+                            <img src="/assets/imgs/gallery/gallery-9.jpg" alt="image not found">
+                        </div>
+                        <div class="gallery__item__content">
+                            <h6 class="text-uppercase">Boissons</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- team area start -->
+
+
+
+
+ 
+
+    
+</main>
+<!-- Body main wrapper end -->
+<footer>
+    <section class="footer-2__area-common overflow-hidden">
+        <div class="footer-2__main-wrapper position-relative ">
+            <div class="container">
+            <div class="row g-24 mb-minus-50">
+                <div class="col-xl-3 col-sm-8 ">
+                    <div class="footer-2__widget footer-2__widget-item-1">
+                        <div class="footer-2__logo mb-15">
+                            <a >
+                                <img class="img-fluid" src="/assets/imgs/logo/restau.png" alt="logo not found">
+                            </a>
+                        </div>
+ 
+                    </div>
+                </div>
+
+                <div class="col-xl-2 col-sm-4 ">
+                    <div class="footer-2__widget footer-2__widget-item-2">
+                        <div class="footer-2__widget-title">
+                            <h4>Catégorie</h4>
+                        </div>
+                        <div class="footer-2__link">
+                            <ul>
+                                <li><a>Petit-déjeuner</a></li>
+                                <li><a>Déjeuner</a></li>
+                                <li><a>Dîner</a></li>
+                                <li><a>Restauration rapide</a></li>
+                                <li><a>Boissons</a></li>
+                                
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-2 col-md-3 col-sm-6">
+                    <div class="footer-2__widget footer-2__widget-item-3">
+                        <div class="footer-2__widget-title">
+                            <h4>Information</h4>
+                        </div>
+
+                        <div class="footer-2__link">
+                            <ul>
+                                <li ><a >Livraison</a></li>
+                                <li><a >Réservation</a></li>
+                                <li><a ></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-2 col-md-4 col-sm-6">
+                    <div class="footer-2__widget footer-2__widget-item-4">
+                        <div class="footer-2__widget-title">
+                            <h4>Contacter-nous</h4>
+                        </div>
+
+                        <div class="footer-2__contact">
+                            <ul>
+                                <li><a ><i class=" icon-location"></i>Address,Address</a></li>
+                                <li><a > <i class="icon-phone"></i>(+216) 00111222</a></li>
+                                <li><a ><i class="icon-mail-alt"></i>examplegmail.com</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-5 ">
+                    <div class="footer-2__widget footer-2__widget-item-5">
+                        <div class="footer-2__widget-title">
+                            <h4>Médias sociaux</h4>
+                        </div>
+                        <div class="footer-2__content mb-30 mb-xs-35">
+                            <p class="mb-0">Envie d’en voir plus ?...<br>Suivez-nous sur les réseaux sociaux!</p>
+                        </div>
+                        <div class="footer-2__social mt-30 mt-xs-30">
+                            <a href="https://twitter.com/"><i class="icon-twiter"></i> </a>
+                            <a href="https://www.facebook.com/"><i class="fab fa-facebook-f"></i></a>
+                            <a href="https://www.instagram.com/"><i class="icon-instagram"></i></a>
+                        </div>
+                
+            </div>
+        </div> 
+
+            </div>
+        </div>
+        </div>
+
+     
+    </section>
+</footer>
+
+
+<body>
+
+
+
+
+<!-- JS here -->
+<script src="/assets/js/vendor/jquery-3.7.1.min.js"></script>
+<script src="/assets/js/plugins/waypoints.min.js"></script>
+<script src="/assets/js/vendor/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/plugins/meanmenu.min.js"></script>
+<script src="/assets/js/plugins/odometer.min.js"></script>
+<script src="/assets/js/plugins/swiper.min.js"></script>
+<script src="/assets/js/plugins/wow.js"></script>
+<script src="/assets/js/vendor/magnific-popup.min.js"></script>
+<script src="/assets/js/vendor/type.js"></script>
+<script src="/assets/js/plugins/nice-select.min.js"></script>
+<script src="/assets/js/vendor/jquery-ui.min.js"></script>
+<script src="/assets/js/vendor/jquery.appear.js"></script>
+<script src="/assets/js/plugins/parallax.min.js"></script>
+<script src="/assets/js/plugins/parallax-scroll.js"></script>
+<script src="/assets/js/plugins/isotope.pkgd.min.js"></script>
+<script src="/assets/js/plugins/imagesloaded.pkgd.min.js"></script>
+<script src="/assets/js/plugins/gsap.min.js"></script>
+<script src="/assets/js/plugins/ScrollTrigger.min.js"></script>
+<script src="/assets/js/plugins/SplitText.js"></script>
+<script src="/assets/js/plugins/split-type.min.js"></script>
+<script src="/assets/js/plugins/tween-max.min.js"></script>
+<script src="/assets/js/plugins/draggable.min.js"></script>
+<script src="/assets/js/plugins/smoothscroll.js"></script>
+<script src="/assets/js/vendor/ajax-form.js"></script>
+<script src="/assets/js/main.js"></script>
+
+</body>
+
+
+<!-- Mirrored from html.rrdevs.net/zummi/index-3.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 02 Apr 2025 12:52:20 GMT -->
+</html>
+

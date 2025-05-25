@@ -19,22 +19,34 @@
             "polyfills": [
               "zone.js"
             ],
+            "allowedCommonJsDependencies": [
+  "keycloak-js",
+  "base64-js",
+  "js-sha256"
+],
 
             "tsConfig": "tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
               "src/assets",
-              "src/asset"
+              "src/asset",
+              {
+                "glob": "silent-check-sso.html",
+                "input": "src/assets",
+                "output": "/assets"
+              }
             ],
 
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "src/styles.css"
+
             ],
 
             "scripts": [
               "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
               "node_modules/jquery/dist/jquery.min.js"
+
             ]
 
           },

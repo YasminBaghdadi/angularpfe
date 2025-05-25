@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { PlatService } from '../services/plat.service';
 import { ImageplatService } from '../services/imageplat.service';
-import { PanierService } from '../services/panier.service';
+import { AccueilpanierService } from '../services/accueilpanier.service';
 import { Plat } from '../models/plat';
 import { HttpErrorResponse } from '@angular/common/http';
 import { forkJoin, of, Subject } from 'rxjs';
@@ -22,7 +22,7 @@ export class PlatComponent implements OnInit, OnDestroy {
   constructor(
     private platService: PlatService,
     private imageplatService: ImageplatService,
-    private panierService: PanierService
+    private panierService: AccueilpanierService
   ) {}
 
   ngOnInit(): void {

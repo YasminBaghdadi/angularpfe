@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
@@ -7,32 +7,29 @@ import { catchError } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class RegisterService {
-  private baseUrl = 'http://localhost:8081/projet';
+  private baseUrl = 'http://localhost:8081/auth';
 
   constructor(private http: HttpClient) {}
 
-  addUserWithConfirmPassword(user: any): Observable<string> {
-    // Formattez les données EXACTEMENT comme le backend les attend
-    const formattedUser = {
-      username: user.username,
-      firstname: user.firstname, // Notez l'orthographe exacte
-      lastname: user.lastname,
-      email: user.email,
-      password: user.password,
-      confirmPassword: user.confirmPassword // Doit correspondre exactement au champ de l'entité Java
-    };
-  
-    return this.http.post(
-      `${this.baseUrl}/addwithconfpassword`,
-      formattedUser,
-      { responseType: 'text' }
-    ).pipe(
-      catchError((error: HttpErrorResponse) => {
-        // Log complet pour débogage
-        console.error('Erreur complète:', error);
-        const errorMsg = error.error?.message || error.message || 'Erreur inconnue';
-        return throwError(() => new Error(errorMsg));
+  register(userData: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/register`, userData, {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json'
       })
+    }).pipe(
+      catchError(this.handleError)
     );
+  }
+
+  private handleError(error: any) {
+    let errorMessage = 'Unknown error occurred';
+    if (error.error instanceof ErrorEvent) {
+      // Client-side error
+      errorMessage = `Error: ${error.error.message}`;
+    } else {
+      // Server-side error
+      errorMessage = error.error?.message || error.statusText;
+    }
+    return throwError(() => new Error(errorMessage));
   }
 }

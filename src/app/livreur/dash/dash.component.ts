@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-dash',
@@ -6,5 +7,15 @@ import { Component } from '@angular/core';
   styleUrls: ['./dash.component.css']
 })
 export class DashComponent {
+  constructor( private authService: AuthService) { }
+username: string | null = '';
+  ngOnInit(): void {
 
+    this.username = localStorage.getItem('username');
+
+
+  }
+  onLogout(): void {
+    this.authService.logout();
+  }
 }

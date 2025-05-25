@@ -1,0 +1,39 @@
+  <div class="container mt-5">
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-body text-center">
+              <i class="fas fa-times-circle text-warning" style="font-size: 4rem;"></i>
+              <h2 class="text-warning mt-3">Paiement Annulé</h2>
+              <p class="lead">Vous avez annulé le processus de paiement.</p>
+              
+              <div *ngIf="idCommande" class="alert alert-info">
+                <p><strong>Votre commande #{{ idCommande }} reste active.</strong></p>
+                <p>Vous pouvez reprendre le paiement à tout moment depuis votre panier.</p>
+              </div>
+
+              <div class="mt-4">
+                <button class="btn btn-primary me-2" (click)="retournerAuPanier()" *ngIf="tableNumber">
+                  <i class="fas fa-shopping-cart me-2"></i>
+                  Retour au Panier
+                </button>
+                <button class="btn btn-secondary me-2" (click)="retournerInterface()" *ngIf="tableNumber">
+                  <i class="fas fa-utensils me-2"></i>
+                  Continuer les Commandes
+                </button>
+                <button class="btn btn-outline-secondary" (click)="retournerAccueil()">
+                  <i class="fas fa-home me-2"></i>
+                  Accueil
+                </button>
+              </div>
+
+              <div class="mt-3">
+                <small class="text-muted">
+                  Votre session reste active. Vous pouvez continuer vos achats.
+                </small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>

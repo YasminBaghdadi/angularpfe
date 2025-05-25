@@ -1,92 +1,66 @@
-
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { JwtHelperService } from '@auth0/angular-jwt';
-import { BehaviorSubject } from 'rxjs';
-import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-
-interface DecodedToken {
-  role: string;
-  name: string;
-  // autres claims
-}
-
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { Router } from '@angular/router';
+import { roleGuard } from '../role/role.guard';
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private userPayload : any;
+  private baseUrl = 'http://localhost:8081/auth';
+  private loggedIn = new BehaviorSubject<boolean>(false);
 
-  constructor(private http: HttpClient) { 
-    this.userPayload=this.decodedToken()
+  constructor(private http: HttpClient, private router: Router) {
+    this.checkToken();
   }
-  private jwtHelper: JwtHelperService = new JwtHelperService();
-  private baseUrl: string ='http://localhost:8081/projet'
-  login(credentials: { username: string, password: string }): Observable<any> {
-    return this.http.post(`${this.baseUrl}/login`, credentials, {
-      headers: new HttpHeaders({'Content-Type': 'application/json'})
-    }).pipe(
-      catchError((error: any) => {
-        let errorMsg = 'Login failed';
-        if (error.error?.error) {
-          errorMsg = error.error.error;
-        } else if (error.status === 401) {
-          errorMsg = 'Invalid credentials';
-        }
-        return throwError(() => new Error(errorMsg));
-      })
-    );
+
+  login(credentials: {username: string, password: string}): Observable<any> {
+  return this.http.post(`${this.baseUrl}/login`, credentials).pipe(
+    tap((response: any) => {
+      if (response.token) {
+        localStorage.setItem('access_token', response.token);
+        localStorage.setItem('user_role', response.role);
+        localStorage.setItem('username', response.username);
+        localStorage.setItem('user_id', response.idUser); // Uniformisez cette clé
+        this.loggedIn.next(true);
+      }
+    })
+  );
+}
+
+  logout(): void {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('user_role');
+    localStorage.removeItem('username');
+    this.loggedIn.next(false);
+    this.router.navigate(['/accueil']);
   }
-  getToken(){
-    return localStorage.getItem('token')
+
+  isLoggedIn(): Observable<boolean> {
+    return this.loggedIn.asObservable();
   }
-  isLoggedIn(){
-    return !!localStorage.getItem('token')
-  }
-  decodedToken(): DecodedToken {
-    const token = this.getToken();
-    if (!token) return {} as DecodedToken;
+ 
+
+  getToken(): string | null {
+    return localStorage.getItem('access_token');
     
-    const payload = token.split('.')[1];
-    return JSON.parse(atob(payload));
-  }
-  createAuthorization(){
-    let authHeader = new HttpHeaders();
-    const token  = this.getToken();
-    if(token){
-      authHeader=authHeader.set('Authorization','Bearer'+token);
-    }
-    return authHeader;
-  }
-  private fullName$ = new BehaviorSubject<string>("");
-  private email$ = new BehaviorSubject<string>("");
-  private role$ = new BehaviorSubject<string>("");
-  private user$ = new BehaviorSubject<any | null>("null");
-
-  public getUser()
-  {
-    return this.user$.asObservable()
   }
 
-  public setUser(user:any){
-    this.user$.next(user);
+  getUserRole(): string | null {
+    return localStorage.getItem('user_role');
   }
 
-
-  public getRoleFromStore()
-  {
-    return this.role$.asObservable()
+  getUsername(): string | null {
+    return localStorage.getItem('username');
   }
 
-  public setRoleForStore(role:string){
-    this.role$.next(role);
-  }
+  getUserId(): number | null {
+  const id = localStorage.getItem('user_id');
+  return id ? parseInt(id) : null;
+}
 
-  getLogedUser(){
-    if(this.userPayload){
-      return this.userPayload
-    }
+  private checkToken(): void {
+    const token = this.getToken();
+    this.loggedIn.next(!!token);
   }
-
 }

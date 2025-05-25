@@ -1,62 +1,61 @@
-  <!--reservation-->
-  <div class="reservation reservation__space">
-    <div class="container">
-        <div class="reservation__wrapper">
-            <h2 class="text-uppercase text-center rr-fw-bold mb-50 mb-xs-30">create an reservation</h2>
-            <div class="row">
-                <div class="col-md-4 col-sm-6 d-flex justify-content-end flex-column">
-                    <div class="reservation__select">
-                        <label >NUMBER OF GUEST *</label>
-                        <select id="how-many-person">
-                            <option>Person</option>
-                            <option>2 Person</option>
-                            <option>3 Person</option>
-                            <option>4 Person</option>
-                            <option>5 Person</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-4 col-sm-6 d-flex justify-content-end flex-column">
-                    <div class="reservation__input">
-                        <label>SELECT DATE *</label>
-                        <input id="datepicker" name="date" type="text" class="datepicker" placeholder="YY-MM-DD">
-                    </div>
-                </div>
-                <div class="col-md-4 col-sm-6 d-flex justify-content-end flex-column">
-                    <div class="reservation__input time">
-                        <label>SELECT TIME*</label>
-                        <input type="time" value="09:00:00">
-                    </div>
-                </div>
-                <div class="col-md-4 col-sm-6 d-flex justify-content-end flex-column">
-                    <div class="reservation__input">
-                        <label>Your Name*</label>
-                        <input type="text" placeholder="Your Name">
-                    </div>
-                </div>
-                <div class="col-md-4 col-sm-6 d-flex justify-content-end flex-column">
-                    <div class="reservation__input">
-                        <label>Email Address *</label>
-                        <input type="email" placeholder="Email Address">
-                    </div>
-                </div>
-                <div class="col-md-4 col-sm-6 d-flex justify-content-end flex-column">
-                    <div class="reservation__input">
-                        <label>Phone Number *</label>
-                        <input type="tel" placeholder="Phone Number">
-                    </div>
-                </div>
-                <div class="col-md-12 d-flex justify-content-end flex-column">
-                    <div class="reservation__input">
-                        <label>Type Your Special Message*</label>
-                        <textarea name="text" id="text" placeholder="Tell us more about your special message"></textarea>
-                    </div>
-                </div>
-            </div>
-            <div class="reservation__btn text-center">
-                <a href="food-menu.html" class="rr-btn hover-anim">Book a reservation<span class="hover-bg"></span></a>
-            </div>
+<!--reservation-->
+<div class="reservation reservation__space">
+  <div class="container">
+    <div class="reservation__wrapper">
+      <h2 class="text-uppercase text-center rr-fw-bold mb-50 mb-xs-30">Créer une réservation</h2>
+      <div class="row">
+        <!-- Nombre de personnes - toute la ligne -->
+        <div class="col-md-6 col-sm-6 d-flex justify-content-end flex-column">
+          <div class="reservation__select">
+            <label>NOMBRE DE PERSONNES *</label>
+            <input id="nombre" name="nombre" type="number" placeholder="1">
+          </div>
         </div>
+ <div class="col-md-6 col-sm-6 d-flex justify-content-end flex-column">
+        
+        </div>
+        <!-- Date et Heure -->
+        <div class="col-md-6 col-sm-6 d-flex justify-content-end flex-column">
+          <div class="reservation__input">
+            <label>SÉLECTIONNER UNE DATE *</label>
+            <input id="datepicker" name="date" type="text" class="datepicker" placeholder="AA-MM-JJ">
+          </div>
+        </div>
+        <div class="col-md-6 col-sm-6 d-flex justify-content-end flex-column">
+          <div class="reservation__input time">
+            <label>SÉLECTIONNER L’HEURE *</label>
+            <input type="time" value="09:00:00">
+          </div>
+        </div>
+
+        <!-- Nom et téléphone -->
+        <div class="col-md-6 col-sm-6 d-flex justify-content-end flex-column">
+          <div class="reservation__input">
+            <label>Votre nom *</label>
+            <input type="text" placeholder="Votre nom">
+          </div>
+        </div>
+        <div class="col-md-6 col-sm-6 d-flex justify-content-end flex-column">
+          <div class="reservation__input">
+            <label>Numéro de téléphone *</label>
+            <input type="tel" placeholder="Numéro de téléphone">
+          </div>
+        </div>
+
+        <!-- Message -->
+        <div class="col-md-12 d-flex justify-content-end flex-column">
+          <div class="reservation__input">
+            <label>Votre message spécial *</label>
+            <textarea name="text" id="text" placeholder="Parlez-nous de votre demande spéciale"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bouton -->
+      <div class="reservation__btn text-center">
+        <a href="food-menu.html" class="rr-btn hover-anim">Réserver une table<span class="hover-bg"></span></a>
+      </div>
     </div>
+  </div>
 </div>
 <!--reservation-->

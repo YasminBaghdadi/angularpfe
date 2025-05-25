@@ -217,28 +217,28 @@
                             </div>
                         </div>
 
+                    
+
+
+                                    
                         <!-- User profile dropdown -->
                         <div class="dropdown ms-sm-3 header-item topbar-user">
                             <button type="button" class="btn" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="d-flex align-items-center">
-                                    <img class="rounded-circle header-profile-user" src="/asset/images/users/avatar-8.jpg" alt="Header Avatar">
                                     <span class="text-start ms-xl-2">
-                                        <span class="d-none d-xl-inline-block ms-1 fw-medium user-name-text">Restaurant Admin</span>
-                                        <span class="d-none d-xl-block ms-1 fs-12 user-name-sub-text">Manager</span>
+                                        <span class="d-none d-xl-inline-block ms-1 fw-medium user-name-text">Administrateur</span>
+                                        <span class="d-none d-xl-block ms-1 fs-12 user-name-sub-text"> Bienvenue {{ username }} ! </span>
+                                        
+                                            
                                     </span>
                                 </span>
                             </button>
                             <div class="dropdown-menu dropdown-menu-end">
                                 <!-- item-->
-                                <h6 class="dropdown-header">Bienvenue Restaurant Admin !</h6>
+                                <h6 class="dropdown-header">Mon compte</h6>
                                 <a class="dropdown-item" href="#"><i class="mdi mdi-account-circle text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Profil</span></a>
-                                <a class="dropdown-item" href="#"><i class="mdi mdi-message-text-outline text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Messages</span></a>
-                                <a class="dropdown-item" href="#"><i class="mdi mdi-calendar-check-outline text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Tasks</span></a>
-                                <a class="dropdown-item" href="#"><i class="mdi mdi-lifebuoy text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Help</span></a>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="#"><i class="mdi mdi-cog-outline text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Settings</span></a>
-                                <a class="dropdown-item" href="#"><i class="mdi mdi-lock text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Lock screen</span></a>
-                                <a class="dropdown-item" href="#"><i class="mdi mdi-logout text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Logout</span></a>
+                                <a class="dropdown-item" (click)="onLogout()"><i class="mdi mdi-logout text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Déconnexion</span></a>
                             </div>
                         </div>
                     </div>
@@ -273,7 +273,7 @@
         <div class="app-menu navbar-menu">
             <!-- LOGO -->
             <div class="navbar-brand-box">
-                <a href="#" class="logo logo-dark">
+                <a routerLink="/dashboard" class="logo logo-dark">
                     <span class="logo-sm">
                         <img src="/assets/imgs/logo/restau.png" alt="Restaurant Logo" height="28">
                     </span>
@@ -281,7 +281,7 @@
                         <img src="/assets/imgs/logo/restau.png" alt="Restaurant Logo" height="40">
                     </span>
                 </a>
-                <a href="#" class="logo logo-light">
+                <a routerLink="/dashboard" class="logo logo-light">
                     <span class="logo-sm">
                         <img src="/assets/imgs/logo/restau.png" alt="Restaurant Logo" height="28">
                     </span>
@@ -311,10 +311,10 @@
                                         </a>
                                         <div class="collapse" id="customerSubmenu">
                                             <ul class="nav nav-sm flex-column">
-                                                <li class="nav-item"><a routerLink="/admin/customers" class="nav-link">Ajouter un client</a></li>
-                                                <li class="nav-item"><a routerLink="/admin/customers" class="nav-link">Supprimer un client</a></li>
-                                                <li class="nav-item"><a routerLink="/admin/customers" class="nav-link">Modifier un client</a></li>
-                                                <li class="nav-item"><a routerLink="/admin/customers" class="nav-link">Voir la liste des clients</a></li>
+                                                <li class="nav-item"><a routerLink="/customers" class="nav-link">Ajouter un client</a></li>
+                                                <li class="nav-item"><a routerLink="/customers" class="nav-link">Supprimer un client</a></li>
+                                                <li class="nav-item"><a routerLink="/customers" class="nav-link">Modifier un client</a></li>
+                                                <li class="nav-item"><a routerLink="/customers" class="nav-link">Voir la liste des clients</a></li>
                                             </ul>
                                         </div>
                                     </li>
@@ -322,14 +322,15 @@
                                     <!-- Delivery Persons -->
                                     <li class="nav-item">
                                         <a class="nav-link" href="#deliveryPersonSubmenu" data-bs-toggle="collapse" role="button" aria-expanded="false">
-                                            <span>Livreur</span>
+                                            <span>Livreurs</span>
                                         </a>
+
                                         <div class="collapse" id="deliveryPersonSubmenu">
                                             <ul class="nav nav-sm flex-column">
-                                                <li class="nav-item"><a href="#" class="nav-link">Ajouter un livreur</a></li>
-                                                <li class="nav-item"><a href="#" class="nav-link">Supprimer un livreur</a></li>
-                                                <li class="nav-item"><a href="#" class="nav-link">Modifier un livreur</a></li>
-                                                <li class="nav-item"><a href="#" class="nav-link">Voir les livreurs</a></li>
+                                                <li class="nav-item"><a routerLink="/livreurs" class="nav-link">Ajouter un livreur</a></li>
+                                                <li class="nav-item"><a routerLink="/livreurs" class="nav-link">Supprimer un livreur</a></li>
+                                                <li class="nav-item"><a routerLink="/livreurs" class="nav-link">Modifier un livreur</a></li>
+                                                <li class="nav-item"><a routerLink="/livreurs" class="nav-link">Voir les livreurs</a></li>
                                             </ul>
                                         </div>
                                     </li>
@@ -344,10 +345,10 @@
                             </a>
                             <div class="collapse menu-dropdown" id="dishesMenu">
                                 <ul class="nav nav-sm flex-column">
-                                    <li class="nav-item"><a href="#" class="nav-link">Ajouter un plat</a></li>
-                                    <li class="nav-item"><a href="#" class="nav-link">Supprimer un plat</a></li>
-                                    <li class="nav-item"><a href="#" class="nav-link">Modifier un plat</a></li>
-                                    <li class="nav-item"><a href="#" class="nav-link">Voir les plats</a></li>
+                                    <li class="nav-item"><a routerLink="/menu" class="nav-link">Ajouter un plat</a></li>
+                                    <li class="nav-item"><a routerLink="/menu" class="nav-link">Supprimer un plat</a></li>
+                                    <li class="nav-item"><a routerLink="/menu" class="nav-link">Modifier un plat</a></li>
+                                    <li class="nav-item"><a routerLink="/menu" class="nav-link">Voir les plats</a></li>
                                 </ul>
                             </div>
                         </li>
@@ -359,10 +360,10 @@
                             </a>
                             <div class="collapse menu-dropdown" id="tableMenu">
                                 <ul class="nav nav-sm flex-column">
-                                    <li class="nav-item"><a href="#" class="nav-link">Ajouter un table</a></li>
-                                    <li class="nav-item"><a href="#" class="nav-link">Supprimer un table</a></li>
-                                    <li class="nav-item"><a href="#" class="nav-link">Modifier un table</a></li>
-                                    <li class="nav-item"><a href="#" class="nav-link">Voir la liste des tables</a></li>
+                                    <li class="nav-item"><a routerLink="/table" class="nav-link">Ajouter un table</a></li>
+                                    <li class="nav-item"><a routerLink="/table" class="nav-link">Supprimer un table</a></li>
+                                    <li class="nav-item"><a routerLink="/table" class="nav-link">Modifier un table</a></li>
+                                    <li class="nav-item"><a routerLink="/table" class="nav-link">Voir la liste des tables</a></li>
                                 </ul>
                             </div>
                         </li>
@@ -421,186 +422,214 @@
         <!-- Left Sidebar End -->
         <div class="vertical-overlay"></div>
 
+
         <div class="main-content">
             <div class="page-content">
                 <div class="container-fluid">
         
-                    <!-- ========== Section 1 : Ajouter un client ========== -->
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="card">
-                                <div class="card-header align-items-center d-flex">
-                                    <h4 class="card-title mb-0 flex-grow-1">Ajouter un client</h4>
-                                </div>
-                                <div class="card-body">
-                                    <div class="live-preview">
-                                        <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
-                                            <div class="row gy-3">
-                                                <!-- Nom -->
-                                                <div class="col-md-6">
-                                                    <div class="mb-3">
-                                                        <label for="username" class="form-label">Nom</label>
-                                                        <input type="text" class="form-control" id="username" formControlName="username" placeholder="Entrez le nom">
-                                                        <div *ngIf="f['username'].touched && f['username'].errors" class="text-danger">
-                                                            <small *ngIf="f['username'].errors['required']">Le nom est requis</small>
-                                                            <small *ngIf="f['username'].errors['minlength']">Le nom doit comporter au moins 3 caractères</small>
-                                                        </div>
-                                                    </div>
-                                                </div>
-        
-                                                <!-- Prénom -->
-                                                <div class="col-md-6">
-                                                    <div class="mb-3">
-                                                        <label for="firstname" class="form-label">Prénom</label>
-                                                        <input type="text" class="form-control" id="firstname" formControlName="firstname" placeholder="Entrez le prénom">
-                                                    </div>
-                                                </div>
-        
-                                                <!-- Email -->
-                                                <div class="col-md-6">
-                                                    <div class="mb-3">
-                                                        <label for="email" class="form-label">Email</label>
-                                                        <input type="email" class="form-control" id="email" formControlName="email" placeholder="exemple@email.com">
-                                                        <div *ngIf="f['email'].touched && f['email'].errors" class="text-danger">
-                                                            <small *ngIf="f['email'].errors['required']">L'email est requis</small>
-                                                            <small *ngIf="f['email'].errors['email']">Format invalide</small>
-                                                            <small *ngIf="f['email'].errors['emailExists']">Email déjà existant</small>
-                                                        </div>
-                                                    </div>
-                                                </div>
-        
-                                                <!-- Mot de passe -->
-                                                <div class="col-md-6">
-                                                    <div class="mb-3">
-                                                        <label for="password" class="form-label">Mot de passe</label>
-                                                        <input type="password" class="form-control" id="password" formControlName="password" placeholder="Entrez le mot de passe">
-                                                        <div *ngIf="f['password'].touched && f['password'].errors" class="text-danger">
-                                                            <small *ngIf="f['password'].errors['required']">Mot de passe requis</small>
-                                                            <small *ngIf="f['password'].errors['minlength']">Minimum 6 caractères</small>
-                                                        </div>
-                                                    </div>
-                                                </div>
-        
-                                                <!-- Confirmation mot de passe -->
-                                                <div class="col-md-6">
-                                                    <div class="mb-3">
-                                                        <label for="confirmPassword" class="form-label">Confirmer le mot de passe</label>
-                                                        <input type="password" class="form-control" id="confirmPassword" formControlName="confirmPassword" placeholder="Confirmez le mot de passe">
-                                                        <div *ngIf="f['confirmPassword'].touched && (f['confirmPassword'].errors || userForm.errors)" class="text-danger">
-                                                            <small *ngIf="f['confirmPassword'].errors?.['required']">Confirmation requise</small>
-                                                            <small *ngIf="userForm.errors?.['mismatch']">Les mots de passe ne correspondent pas</small>
-                                                        </div>
-                                                    </div>
-                                                </div>
-        
-                                                <input type="hidden" formControlName="role" [value]="1">
-        
-                                                <!-- Bouton Submit -->
-                                                <div class="col-12">
-                                                    <button type="submit" class="btn btn-primary" [disabled]="userForm.invalid && formSubmitted">
-                                                        Ajouter
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </form>
+<!-- ========== Section 1 : Ajouter un client ========== -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header align-items-center d-flex">
+                <h4 class="card-title mb-0 flex-grow-1">Ajouter un client</h4>
+            </div>
+            <div class="card-body">
+                <div class="live-preview">
+                    <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+                        <div class="row gy-3">
+                            <!-- Nom -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="username" class="form-label">Nom</label>
+                                    <input type="text" class="form-control" id="username" formControlName="username" placeholder="Entrez le nom">
+                                    <div *ngIf="f['username'].touched && f['username'].errors" class="text-danger">
+                                        <small *ngIf="f['username'].errors['required']">Le nom est requis</small>
+                                        <small *ngIf="f['username'].errors['minlength']">Le nom doit comporter au moins 3 caractères</small>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-        
-                    <!-- ========== Section 2 : Liste des clients ========== -->
-                    <div class="row mt-4">
-                        <div class="col-12">
-                          <div class="card">
-                            <div class="card-header">
-                              <h4 class="card-title mb-0">Liste des clients</h4>
-                            </div>
-                      
-                            <div class="card-body">
-                              <div class="table-responsive">
-                                <table class="table align-middle table-nowrap table-striped mb-0">
-                                  <thead class="table-light">
-                                    <tr>
-                                      <th scope="col">Nom</th>
-                                      <th scope="col">Prénom</th>
-                                      <th scope="col">Email</th>
-                                      <th scope="col">Date création</th>
-                                      <th scope="col" style="width: 150px;">Actions</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    <tr *ngFor="let user of users">
-                                      <td>{{ user.firstname }}</td>
-                                      <td>{{ user.lastname }}</td>
-                                      <td>{{ user.email }}</td>
-                                      <td>{{ user.dateCreation | date: 'dd MMM yyyy' }}</td>
-                                      <td>
-                                        <button type="button" class="btn btn-sm btn-primary me-1">Modifier</button>
-                                        <button type="button" class="btn btn-sm btn-danger" (click)="deleteUser(user.id)">Supprimer</button>
-                                    </td>
-                                    </tr>
-                                  </tbody>
-                                </table>
-                              </div>
-                      
-                              <!-- Pagination buttons -->
-                              <div class="pagination d-flex justify-content-between mt-3">
-                                <!-- Précédent -->
-                                <button *ngIf="page > 0" (click)="previousPage()" class="btn btn-sm btn-primary">Précédent</button>
-                                
-                                <!-- Affichage de la page actuelle et du total -->
-                                <span>Page {{ page + 1 }} sur {{ totalPages }}</span>
-                      
-                                <!-- Suivant -->
-                                <button *ngIf="page < totalPages - 1" (click)="nextPage()" class="btn btn-sm btn-primary">Suivant</button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      
 
-                      
-        
-                    <!-- ========== Section 3 : Modifier un client ========== -->
-                    <div class="row mt-4">
-                        <div class="col-12">
-                            <div class="card">
-                                <div class="card-header align-items-center d-flex">
-                                    <h4 class="card-title mb-0 flex-grow-1">Modifier un client</h4>
+                            <!-- Prénom -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="firstname" class="form-label">Prénom</label>
+                                    <input type="text" class="form-control" id="firstname" formControlName="firstname" placeholder="Entrez le prénom">
                                 </div>
-                                <div class="card-body">
-                                    <div class="live-preview">
-                                        <div class="row gy-4">
-                                            <div class="col-xxl-6 col-md-6">
-                                                <label for="basiInput" class="form-label">nom</label>
-                                                <input type="text" class="form-control" id="basiInput">
-                                            </div>
-                                            <div class="col-xxl-6 col-md-6">
-                                                <label for="labelInput" class="form-label">Prénom</label>
-                                                <input type="text" class="form-control" id="labelInput">
-                                            </div>
-                                            <div class="col-xxl-6 col-md-6">
-                                                <label for="valueInput" class="form-label">Email</label>
-                                                <input type="email" class="form-control">
-                                            </div>
-                                            <div class="col-xxl-6 col-md-6">
-                                                <label for="placeholderInput" class="form-label">Mot de passe</label>
-                                                <input type="password" class="form-control">
-                                            </div>
-                                            <div class="col-6">
-                                                <button type="submit" class="btn btn-primary">modifier</button>
-                                            </div>
-                                        </div> <!-- end row -->
+                            </div>
+
+                            <!-- Email -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" formControlName="email" placeholder="exemple@email.com">
+                                    <div *ngIf="f['email'].touched && f['email'].errors" class="text-danger">
+                                        <small *ngIf="f['email'].errors['required']">L'email est requis</small>
+                                        <small *ngIf="f['email'].errors['email']">Format invalide</small>
+                                        <small *ngIf="f['email'].errors['emailExists']">Email déjà existant</small>
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Mot de passe -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">Mot de passe</label>
+                                    <input type="password" class="form-control" id="password" formControlName="password" placeholder="Entrez le mot de passe">
+                                    <div *ngIf="f['password'].touched && f['password'].errors" class="text-danger">
+                                        <small *ngIf="f['password'].errors['required']">Mot de passe requis</small>
+                                        <small *ngIf="f['password'].errors['minlength']">Minimum 6 caractères</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Confirmation mot de passe -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="confirmPassword" class="form-label">Confirmer le mot de passe</label>
+                                    <input type="password" class="form-control" id="confirmPassword" formControlName="confirmPassword" placeholder="Confirmez le mot de passe">
+                                    <div *ngIf="f['confirmPassword'].touched && (f['confirmPassword'].errors || userForm.errors)" class="text-danger">
+                                        <small *ngIf="f['confirmPassword'].errors?.['required']">Confirmation requise</small>
+                                        <small *ngIf="userForm.errors?.['mismatch']"><br>Les mots de passe ne correspondent pas</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Bouton Submit -->
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary" [disabled]="userForm.invalid">
+                                    Ajouter
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- Messages de succès/erreur -->
+        <div class="col-12">
+            <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+            <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+        </div>
+    </div>
+</div>
+<!-- ========== Section 2 : Liste des clients ========== -->
+<div class="row mt-4">
+    <div class="col-12">
+        <!-- Liste des clients -->
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">Liste des clients</h4>
+            </div>
+      
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table align-middle table-nowrap table-striped mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">Nom</th>
+                                <th scope="col">Prénom</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Date création</th>
+                                <th scope="col" style="width: 150px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let user of users">
+                                <td>{{ user.username }}</td>
+                                <td>{{ user.firstname || user.lastname }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>{{ user.dateCreation | date: 'dd MMM yyyy' }}</td>
+                                <td>
+                                    <button (click)="onEdit(user)" class="btn btn-sm btn-primary me-1">
+                                        <i class="fas fa-edit me-1"></i> Modifier
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-danger" (click)="openDeleteModal(user.idUser)">
+                                        <i class="fas fa-trash me-1"></i> Supprimer
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de modification -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true" [ngClass]="{'show': showEditForm}" [ngStyle]="{'display': showEditForm ? 'block' : 'none'}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header ">
+                <h5 class="modal-title" id="editUserModalLabel">Modifier le client</h5>
+                <button type="button" class="btn-close btn-close-white" aria-label="Close" (click)="onCancelEdit()"></button>
+            </div>
+            <div class="modal-body">
+                <form [formGroup]="editForm">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Nom</label>
+                            <input type="text" class="form-control" formControlName="username" 
+                                   [ngClass]="{ 'is-invalid': ef['username'].touched && ef['username'].errors }">
+                            <div *ngIf="ef['username'].errors?.['required'] && ef['username'].touched" class="invalid-feedback">
+                                Le nom d'utilisateur est requis
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Prénom</label>
+                            <input type="text" class="form-control" formControlName="firstname">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" formControlName="email" 
+                                   [ngClass]="{ 'is-invalid': ef['email'].touched && ef['email'].errors }">
+                            <div *ngIf="ef['email'].errors?.['required'] && ef['email'].touched" class="invalid-feedback">
+                                L'email est requis
+                            </div>
+                            <div *ngIf="ef['email'].errors?.['email'] && ef['email'].touched" class="invalid-feedback">
+                                Email invalide
+                            </div>
                         </div>
                     </div>
-        
-                </div><!-- container-fluid -->
-            </div><!-- page-content -->
-        </div><!-- main-content -->
-        
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" (click)="onCancelEdit()">
+                    <i class="fas fa-times me-1"></i> Annuler
+                </button>
+                <button type="button" class="btn btn-primary" [disabled]="editForm.invalid" (click)="onSaveEdit()">
+                    <i class="fas fa-save me-1"></i> Enregistrer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmation de suppression -->
+<div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true"  [ngClass]="{'show': showDeleteModal}" [ngStyle]="{'display': showDeleteModal ? 'block' : 'none'}">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" aria-label="Close" (click)="closeDeleteModal()"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center py-3" >
+                    <p class="mb-0" >Êtes-vous sûr de vouloir supprimer ce client  ?</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" (click)="closeDeleteModal()">
+                    <i class="fas fa-times me-1"></i> Annuler
+                </button>
+                <button type="button" class="btn btn-danger" (click)="confirmDelete()">
+                    <i class="fas fa-trash me-1"></i> Supprimer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Overlay pour le fond sombre derrière la modal -->
+<div class="modal-backdrop fade show" *ngIf="showEditForm || showDeleteModal"></div>

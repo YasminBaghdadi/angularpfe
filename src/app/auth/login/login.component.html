@@ -1,84 +1,91 @@
-
-
 <section class="vh-100" style="background-color: #eee;">
-    <div class="container h-100">
-        <div class="row d-flex justify-content-center align-items-center h-100">
-            <div class="col-lg-12 col-xl-11">
-                <div class="card text-black" style="border-radius: 25px; max-width: 7000px; margin: 70px;">
-                    <div class="card-body p-md-4">
-                        <div class="row justify-content-center">
-                            <div class="col-md-10 col-lg-6 col-xl-5 order-2 order-lg-1">
-                                <p class="text-center h1 fw-bold mb-4 mx-1 mx-md-4 mt-4">Login</p>
-                                
-                                <!-- Message d'erreur -->
-                                <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
-                                <div *ngIf="message" class="alert alert-info">{{ message }}</div>
-                                
-                                <form [formGroup]="authForm" (ngSubmit)="authentificate()" class="mx-1 mx-md-4">
-                                    <!-- Email/Username -->
-                                    <div class="d-flex flex-row align-items-center mb-3">
-                                        <i class="fas fa-user fa-lg me-3 fa-fw"></i>
-                                        <div class="form-outline flex-fill mb-0">
-                                            <input 
-                                                type="text" 
-                                                id="username" 
-                                                formControlName="username" 
-                                                class="form-control" 
-                                                [ngClass]="{'is-invalid': authForm.get('username')?.invalid && authForm.get('username')?.touched}"
-                                            />
-                                            <label class="form-label" for="username">Username</label>
-                                            <div *ngIf="authForm.get('username')?.invalid && authForm.get('username')?.touched" class="invalid-feedback">
-                                                Username is required
-                                            </div>
-                                        </div>
-                                    </div>
+  <div class="container h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100" style="width: 1500px; height: 2000000000px;">
+      <div class="col-lg-12 col-xl-11">
+        <div class="card text-black" style="border-radius: 25px; margin: 70px; justify-content: center; align-items: center; margin-left: 0px; margin-right: 200px;" >
+          <div class="card-body p-md-5">
+            <div class="row justify-content-center">
+              <!-- Image à gauche -->
+              <div class="col-md-10 col-lg-6 col-xl-7 d-flex align-items-center order-1 order-lg-1">
+                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-registration/draw1.webp" 
+                     class="img-fluid" 
+                     alt="Image de connexion">
+              </div>
 
-                                    <!-- Password -->
-                                    <div class="d-flex flex-row align-items-center mb-3">
-                                        <i class="fas fa-lock fa-lg me-3 fa-fw"></i>
-                                        <div class="form-outline flex-fill mb-0">
-                                            <input 
-                                                type="password" 
-                                                id="password" 
-                                                formControlName="password" 
-                                                class="form-control"
-                                                [ngClass]="{'is-invalid': authForm.get('password')?.invalid && authForm.get('password')?.touched}"
-                                            />
-                                            <label class="form-label" for="password">Password</label>
-                                            <div *ngIf="authForm.get('password')?.invalid && authForm.get('password')?.touched" class="invalid-feedback">
-                                                Password is required
-                                            </div>
-                                        </div>
-                                    </div>
+              <!-- Formulaire à droite -->
+              <div class="col-md-10 col-lg-6 col-xl-5 order-2 order-lg-2">
+                <h1 class="text-center fw-bold mb-5">Connexion</h1>
+                
+                <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="mx-1 mx-md-4">
+                  <!-- Message d'erreur -->
+                  <div *ngIf="errorMessage" class="alert alert-danger mb-4">
+                    {{ errorMessage }}
+                  </div>
 
-                                    <!-- Register Link -->
-                                    <div class="form-check d-flex justify-content-center mb-4">
-                                        <label class="form-check-label">
-                                            Don't have an account? <a routerLink="/register">Register here</a>
-                                        </label>
-                                    </div>
-
-                                    <!-- Submit Button -->
-                                    <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
-                                        <button 
-                                            type="submit" 
-                                            class="btn btn-primary btn-lg"
-                                            [disabled]="authForm.invalid"
-                                        >
-                                            Login
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-
-                            <!-- Image -->
-                            <div class="col-md-10 col-lg-6 col-xl-7 d-flex align-items-center order-1 order-lg-2">
-                                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-registration/draw1.webp" class="img-fluid" alt="Sample image">
-                            </div>
-                        </div>
+                  <!-- Nom d'utilisateur -->
+                  <div class="d-flex flex-row align-items-center mb-4">
+                    <i class="fas fa-user fa-lg me-3 fa-fw"></i>
+                    <div class="form-outline flex-fill mb-0">
+                      <input 
+                        type="text" 
+                        id="username" 
+                        class="form-control" 
+                        formControlName="username"
+                        [ngClass]="{'is-invalid': loginForm.get('username')?.invalid && loginForm.get('username')?.touched}"
+                      />
+                      <label class="form-label" for="username">Nom</label>
+                      <div *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched" 
+                          class="invalid-feedback">
+                        Le nom est requis
+                      </div>
                     </div>
+                  </div>
+
+                  <!-- Mot de passe -->
+                  <div class="d-flex flex-row align-items-center mb-4">
+                    <i class="fas fa-lock fa-lg me-3 fa-fw"></i>
+                    <div class="form-outline flex-fill mb-0">
+                      <input 
+                        type="password" 
+                        id="password" 
+                        class="form-control" 
+                        formControlName="password"
+                        [ngClass]="{'is-invalid': loginForm.get('password')?.invalid && loginForm.get('password')?.touched}"
+                      />
+                      <label class="form-label" for="password">Mot de passe</label>
+                      <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" 
+                          class="invalid-feedback">
+                        Le mot de passe est requis
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Bouton de soumission -->
+                  <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
+                    <button 
+                      type="submit" 
+                      class="btn btn-primary btn-lg"
+                      [disabled]="loginForm.invalid || isLoading"
+                    >
+                      <span *ngIf="!isLoading">Connexion</span>
+                      <span *ngIf="isLoading">
+                        <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                        Chargement...
+                      </span>
+                    </button>
+                  </div>
+                </form>
+
+                <div class="form-check d-flex justify-content-center mb-4">
+                  <label class="form-check-label">
+                    Nouveau ici ? <a routerLink="/register" class="text-primary">Inscrivez-vous !</a>
+                  </label>
                 </div>
+              </div>
             </div>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </section>

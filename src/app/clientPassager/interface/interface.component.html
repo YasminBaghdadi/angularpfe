@@ -1,0 +1,329 @@
+
+
+
+<!doctype html>
+<html class="no-js" lang="zxx">
+
+
+<!-- Mirrored from html.rrdevs.net/zummi/index-3.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 02 Apr 2025 12:52:04 GMT -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Restaurant</title>
+    <meta name="description" content="Zummi – Restaurant & Cafe Bootstrap HTML5 Template">
+    <meta name="author" content="ahmmedsabbirbd">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Place favicon.ico in the root directory -->
+    <link rel="shortcut icon" type="image/x-icon" href="/assets/imgs/favicon.svg">
+    <!-- CSS here -->
+    <link rel="stylesheet" href="/assets/css/vendor/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/css/vendor/animate.min.css">
+    <link rel="stylesheet" href="/assets/css/plugins/swiper.min.css">
+    <link rel="stylesheet" href="/assets/css/vendor/magnific-popup.css">
+    <link rel="stylesheet" href="/assets/css/vendor/fontawesome-pro.css">
+    <link rel="stylesheet" href="/assets/css/vendor/spacing.css"> 
+    <link rel="stylesheet" href="/assets/css/plugins/odometer-theme-default.css">
+    <link rel="stylesheet" href="/assets/css/main.css">
+</head>
+<header>
+    <div id="header-sticky" class="header__area header-3">
+        <div class="container">
+            <div class="mega__menu-wrapper p-relative">
+                <div class="header__main">
+                    <div class="header__logo">
+                        <a>
+                            <div class="logo">
+                                <img src="/assets/imgs/logo/restau.png" alt="logo not found">
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="mean__menu-wrapper d-none d-lg-block">
+                        <div class="main-menu main-menu-3">
+                            <nav id="mobile-menu">
+                                <ul>
+                                    
+                            
+                                     <li class="has-dropdown">
+<a [routerLink]="['/interface-table', tableNumber]" routerLinkActive="active">Plats</a>                                           
+                                    </li>
+                                   
+                                   
+
+
+                                 
+                                    <li class="has-dropdown" style="font-size: 20px;"> 
+                                    <p>Bienvenue, client passager ! </p>
+
+                                     </li>
+                                    <li class="has-dropdown" style="font-size: 20px;"> 
+
+                                                                         <p class="session-info"> Table {{ tableNumber }} : Session active jusqu'à {{ expiresAt | date:'HH:mm' }}</p>
+ </li>
+
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+
+                    <div class="header__right">
+                        <div class="header__action d-flex align-items-center">
+                            <ul class="d-none d-sm-inline-flex">
+                                
+
+                                <li>
+<a class="cart" [routerLink]="['/panierPassager-table', tableNumber]" routerLinkActive="active">                                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="21" viewBox="0 0 20 21" fill="none">
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M5.78741 20.222H14.1352C17.2016 20.222 19.554 19.1144 18.8858 14.6567L18.1078 8.61555C17.6959 6.3913 16.2771 5.54004 15.0323 5.54004H4.85377C3.59061 5.54004 2.25422 6.45537 1.77825 8.61555L1.00022 14.6567C0.432714 18.611 2.72104 20.222 5.78741 20.222Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M5.65053 5.32041C5.65053 2.93433 7.58483 1.00004 9.9709 1.00004V1.00004C11.1199 0.99517 12.2235 1.4482 13.0377 2.25895C13.8519 3.06971 14.3096 4.17139 14.3096 5.32041V5.32041" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M7.0048 9.82388H7.05057" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M12.8359 9.82388H12.8816" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                      </svg>
+                                      <span>{{ nombreArticles }}</span>  <!-- Affichage du nombre d'articles -->
+                                    </a>
+                                  </li>
+                            </ul>
+
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<div *ngIf="!isLoading && error" class="error-message">
+    <p>{{ error }}</p>
+  </div>
+
+
+<section class="food-menu-tab food-menu-tab-2 overflow-hidden section-space-120 overflow-hidden">
+  <div class="container">
+      <div class="row">
+          <div class="col-12">
+              <div class="food-menu-tab__nav-tabs">
+                <nav class="nav" id="nav-tab" role="tablist">
+                  <button class="nav-link active" id="morning-tab" data-bs-toggle="tab" data-bs-target="#morning-food" type="button" role="tab" aria-controls="morning-food" aria-selected="true" (click)="onCategorieChange('Petit-déjeuner')">Petit-déjeuner</button>
+                  <button class="nav-link" id="nav-lunch-tab" data-bs-toggle="tab" data-bs-target="#nav-lunch" type="button" role="tab" aria-controls="nav-lunch" aria-selected="false" (click)="onCategorieChange('Déjeuner')">Déjeuner</button>
+                  <button class="nav-link" id="nav-dinner-tab" data-bs-toggle="tab" data-bs-target="#nav-dinner" type="button" role="tab" aria-controls="nav-dinner" aria-selected="false" (click)="onCategorieChange('Dîner')">Dîner</button>
+                  <button class="nav-link" id="nav-fast-food-tab" data-bs-toggle="tab" data-bs-target="#nav-fast-food" type="button" role="tab" aria-controls="nav-fast-food" aria-selected="false" (click)="onCategorieChange('Restauration rapide')">Restauration rapide</button>
+                  <button class="nav-link" id="nav-beverage-tab" data-bs-toggle="tab" data-bs-target="#nav-beverage" type="button" role="tab" aria-controls="nav-beverage" aria-selected="false" (click)="onCategorieChange('Boissons')">Boissons</button>
+                </nav>
+              </div>
+          </div>
+      </div>
+
+
+      
+<div class="row mb-minus-30 fade-wrapper">
+    <!-- Colonne de gauche (première moitié des plats) -->
+    <div class="col-xl-6">
+      <div class="food-menu-tab__left">
+        <ng-container *ngFor="let plat of plats | slice:(plats.length / 2-1):plats.length; let i = index">
+          <div *ngIf="plat.categorie === selectedCategory" class="food-menu-tab__item fade-top">
+            <div class="food-menu-tab__item-media">
+              <img [src]="plat.imageUrl || '/assets/imgs/our-collections/shape-1.jpg'" alt="plat" class="img-fluid" />
+            </div>
+            <div class="food-menu-tab__item-wrapper">
+              <div class="food-menu-tab__item-text">
+                <h6 style="margin-bottom: 5px;"><a>{{ plat.name }}</a></h6>
+                
+                <div style="display: flex; align-items: center; margin-top: 8px;">
+                  <span style="font-size: 14px; font-weight: bold; margin-right: 15px;">{{ plat.prix }} TND</span>
+                  <input type="number" [(ngModel)]="plat.quantite" min="1" value="1" 
+                         style="width: 40px; padding: 2px; border: 1px solid #ddd; margin-right: 5px;">
+                 
+                       <button (click)="commander(plat)" style="background: none; border: none; cursor: pointer;">
+                        <img src="/assets/imgs/Panier/panier.png" alt="Panier" 
+                        style="width: 18px; height: 18px; cursor: pointer;" />
+                      </button>
+                </div>
+              </div>
+              <p style="font-size: 12px; color: #666; margin-bottom: 10px;">{{ plat.description || 'Pas de description' }}</p>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  
+    <!-- Colonne de droite (deuxième moitié des plats) - CORRIGÉE -->
+    <div class="col-xl-6">
+      <div class="food-menu-tab__right">
+        <ng-container *ngFor="let plat of plats | slice:0:(plats.length / 2)-1; let i = index" >
+          <div *ngIf="plat.categorie === selectedCategory" class="food-menu-tab__item fade-top">
+            <div class="food-menu-tab__item-media">
+              <img [src]="plat.imageUrl || '/assets/imgs/our-collections/shape-1.jpg'" alt="plat" class="img-fluid" />
+          </div>
+            <div class="food-menu-tab__item-wrapper">
+              <div class="food-menu-tab__item-text">
+                <h6 style="margin-bottom: 5px;"><a>{{ plat.name }}</a></h6>
+                
+                <div style="display: flex; align-items: center; margin-top: 8px;">
+                  <span style="font-size: 14px; font-weight: bold; margin-right: 15px;">{{ plat.prix }} TND</span>
+                  <input type="number" [(ngModel)]="plat.quantite" min="1" value="1" 
+                         style="width: 40px; padding: 2px; border: 1px solid #ddd; margin-right: 5px;">
+                         <button (click)="commander(plat)" style="background: none; border: none; cursor: pointer;">
+                            <img src="/assets/imgs/Panier/panier.png" alt="Panier" 
+                            style="width: 18px; height: 18px; cursor: pointer;" />
+                          </button>
+                </div>
+              </div>
+              <p style="font-size: 12px; color: #666; margin-bottom: 10px;">{{ plat.description || 'Pas de description' }}</p>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+      
+      
+    
+      <!-- Message si aucun plat trouvé -->
+      <div *ngIf="!loading && !error && plats.length === 0" class="text-center mt-5">
+        <div class="alert alert-info">
+          Aucun plat disponible pour cette catégorie.
+        </div>
+      </div>
+  </div>
+</section>
+
+
+
+<footer>
+    <section class="footer-2__area-common overflow-hidden">
+        <div class="footer-2__main-wrapper position-relative ">
+            <div class="container">
+            <div class="row g-24 mb-minus-50">
+                <div class="col-xl-3 col-sm-8 ">
+                    <div class="footer-2__widget footer-2__widget-item-1">
+                        <div class="footer-2__logo mb-15">
+                            <a >
+                                <img class="img-fluid" src="/assets/imgs/logo/restau.png" alt="logo not found">
+                            </a>
+                        </div>
+ 
+                    </div>
+                </div>
+
+                <div class="col-xl-2 col-sm-4 ">
+                    <div class="footer-2__widget footer-2__widget-item-2">
+                        <div class="footer-2__widget-title">
+                            <h4>Catégorie</h4>
+                        </div>
+                        <div class="footer-2__link">
+                            <ul>
+                                <li><a>Petit-déjeuner</a></li>
+                                <li><a>Déjeuner</a></li>
+                                <li><a>Dîner</a></li>
+                                <li><a>Restauration rapide</a></li>
+                                <li><a>Boissons</a></li>
+                                
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-2 col-md-3 col-sm-6">
+                    <div class="footer-2__widget footer-2__widget-item-3">
+                        <div class="footer-2__widget-title">
+                            <h4>Information</h4>
+                        </div>
+
+                        <div class="footer-2__link">
+                            <ul>
+                                <li ><a >Livraison</a></li>
+                                <li><a >Réservation</a></li>
+                                <li><a ></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-2 col-md-4 col-sm-6">
+                    <div class="footer-2__widget footer-2__widget-item-4">
+                        <div class="footer-2__widget-title">
+                            <h4>Contacter-nous</h4>
+                        </div>
+
+                        <div class="footer-2__contact">
+                            <ul>
+                                <li><a ><i class=" icon-location"></i>Address,Address</a></li>
+                                <li><a > <i class="icon-phone"></i>(+216) 00111222</a></li>
+                                <li><a ><i class="icon-mail-alt"></i>examplegmail.com</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-5 ">
+                    <div class="footer-2__widget footer-2__widget-item-5">
+                        <div class="footer-2__widget-title">
+                            <h4>Médias sociaux</h4>
+                        </div>
+                        <div class="footer-2__content mb-30 mb-xs-35">
+                            <p class="mb-0">Envie d’en voir plus ?...<br>Suivez-nous sur les réseaux sociaux!</p>
+                        </div>
+                        <div class="footer-2__social mt-30 mt-xs-30">
+                            <a href="https://twitter.com/"><i class="icon-twiter"></i> </a>
+                            <a href="https://www.facebook.com/"><i class="fab fa-facebook-f"></i></a>
+                            <a href="https://www.instagram.com/"><i class="icon-instagram"></i></a>
+                        </div>
+                
+            </div>
+        </div> 
+
+            </div>
+        </div>
+        </div>
+
+     
+    </section>
+</footer>
+
+
+<body>
+
+
+
+
+<!-- JS here -->
+<script src="/assets/js/vendor/jquery-3.7.1.min.js"></script>
+<script src="/assets/js/plugins/waypoints.min.js"></script>
+<script src="/assets/js/vendor/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/plugins/meanmenu.min.js"></script>
+<script src="/assets/js/plugins/odometer.min.js"></script>
+<script src="/assets/js/plugins/swiper.min.js"></script>
+<script src="/assets/js/plugins/wow.js"></script>
+<script src="/assets/js/vendor/magnific-popup.min.js"></script>
+<script src="/assets/js/vendor/type.js"></script>
+<script src="/assets/js/plugins/nice-select.min.js"></script>
+<script src="/assets/js/vendor/jquery-ui.min.js"></script>
+<script src="/assets/js/vendor/jquery.appear.js"></script>
+<script src="/assets/js/plugins/parallax.min.js"></script>
+<script src="/assets/js/plugins/parallax-scroll.js"></script>
+<script src="/assets/js/plugins/isotope.pkgd.min.js"></script>
+<script src="/assets/js/plugins/imagesloaded.pkgd.min.js"></script>
+<script src="/assets/js/plugins/gsap.min.js"></script>
+<script src="/assets/js/plugins/ScrollTrigger.min.js"></script>
+<script src="/assets/js/plugins/SplitText.js"></script>
+<script src="/assets/js/plugins/split-type.min.js"></script>
+<script src="/assets/js/plugins/tween-max.min.js"></script>
+<script src="/assets/js/plugins/draggable.min.js"></script>
+<script src="/assets/js/plugins/smoothscroll.js"></script>
+<script src="/assets/js/vendor/ajax-form.js"></script>
+<script src="/assets/js/main.js"></script>
+
+</body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

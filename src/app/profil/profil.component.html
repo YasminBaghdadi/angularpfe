@@ -1,0 +1,95 @@
+<div class="page-content">
+  <div class="row">
+    <div class="col-xxl-3">
+      <div class="card mt-n5">
+        <div class="card-body p-4">
+          <div class="text-center">
+            <div class="profile-user position-relative d-inline-block mx-auto mb-4">
+              <!-- photo ici si tu veux -->
+              <img *ngIf="user?.imageUrl" [src]="user.imageUrl" class="rounded-circle avatar-xl img-thumbnail" alt="Profile">
+              <div *ngIf="!user?.imageUrl" class="avatar-xl bg-light rounded-circle">
+                <span class="avatar-title fs-2 text-primary">{{ user?.firstname?.charAt(0) || 'U' }}</span>
+              </div>
+            </div>
+            <h5 class="fs-16 mb-1">{{ user?.firstname }} {{ user?.lastname }}</h5>
+            <p class="text-muted mb-0">{{ user?.role?.name || 'Utilisateur' }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xxl-6">
+      <div class="card mt-xxl-n5">
+        <div class="card-header">
+          <ul class="nav nav-tabs-custom rounded card-header-tabs border-bottom-0" role="tablist">
+            <li class="nav-item">
+              <a class="nav-link active" data-bs-toggle="tab" href="#personalDetails" role="tab">
+                <i class="fas fa-home"></i> Détails personnels
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="card-body p-4">
+          <div class="tab-content">
+            <div class="tab-pane active" id="personalDetails" role="tabpanel">
+              <form #profileForm="ngForm" (ngSubmit)="updateProfile(profileForm)" *ngIf="!isLoading; else loading">
+                <div class="row">
+                  <div class="col-lg-6">
+                    <div class="mb-3">
+                      <label class="form-label">Nom</label>
+                      <input type="text" class="form-control" [(ngModel)]="user.lastname" name="lastname" [readonly]="!isEditing" required />
+                    </div>
+                  </div>
+
+                  <div class="col-lg-6">
+                    <div class="mb-3">
+                      <label class="form-label">Prénom</label>
+                      <input type="text" class="form-control" [(ngModel)]="user.firstname" name="firstname" [readonly]="!isEditing" required />
+                    </div>
+                  </div>
+
+                  <div class="col-lg-6">
+                    <div class="mb-3">
+                      <label class="form-label">Nom d'utilisateur</label>
+                      <input type="text" class="form-control" [(ngModel)]="user.username" name="username" readonly />
+                    </div>
+                  </div>
+
+                  <div class="col-lg-6">
+                    <div class="mb-3">
+                      <label class="form-label">Email</label>
+                      <input type="email" class="form-control" [(ngModel)]="user.email" name="email" [readonly]="!isEditing" required />
+                    </div>
+                  </div>
+
+                  <div class="col-lg-12">
+                    <div class="hstack gap-2 justify-content-end">
+                      <button type="button" class="btn btn-soft-secondary" (click)="toggleEdit()" *ngIf="!isEditing">
+                        Modifier
+                      </button>
+                      <button type="submit" class="btn btn-primary" *ngIf="isEditing">
+                        Enregistrer
+                      </button>
+                      <button type="button" class="btn btn-soft-danger" (click)="toggleEdit()" *ngIf="isEditing">
+                        Annuler
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+
+              <ng-template #loading>
+                <div class="text-center py-4">
+                  <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Chargement...</span>
+                  </div>
+                </div>
+              </ng-template>
+            </div> <!-- fin tab-pane -->
+          </div> <!-- fin tab-content -->
+        </div> <!-- fin card-body -->
+      </div> <!-- fin card -->
+    </div> <!-- fin col -->
+  </div> <!-- fin row -->
+</div>

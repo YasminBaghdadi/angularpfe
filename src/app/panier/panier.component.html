@@ -61,7 +61,7 @@
               </tbody>
             </table>
             <div class="cart__btn-wrap">
-              <button type="button" class="rr-btn hover-anim" (click)="updatePanier()">
+              <button type="button" class="rr-btn hover-anim" (click)="commander()">
                 Commander<span class="hover-bg"></span>
               </button>
             </div>
@@ -80,7 +80,7 @@
             <div class="checkout__wrapper mb-40">
               <div class="checkout__top checkout__item">
                 <h6 class="title">Sous-total</h6>
-                <span class="price">{{ calculerTotal() - fraisLivraison + remise }} TND</span>
+                <span class="price">{{ calculerTotal() }} TND</span>
               </div>
               
               
@@ -92,7 +92,7 @@
             
             <div class="checkout-proceed">
               
-              <button  type="button" class="rr-btn hover-anim"  (click)="procederAuPaiement()" [disabled]="platsDansPanier.length === 0"></button>Passer à la caisse<span class="hover-bg"></span>
+              <button  type="button" class="rr-btn hover-anim"   [disabled]="platsDansPanier.length === 0"></button>Passer à la caisse<span class="hover-bg"></span>
            
             </div>
           </div>

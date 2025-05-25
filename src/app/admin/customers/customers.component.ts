@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { RegisterService } from 'src/app/services/register.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CustomerService } from 'src/app/services/customer.service';
+import { Router } from '@angular/router';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-customers',
@@ -9,138 +11,222 @@ import { CustomerService } from 'src/app/services/customer.service';
   styleUrls: ['./customers.component.css']
 })
 export class CustomersComponent implements OnInit {
+  // Formulaires
   userForm!: FormGroup;
-  formSubmitted = false;
-  users: any[] = []; 
-  page: number = 0; 
-  size: number = 10; 
-  totalPages: number = 0; 
-  totalUsers: number = 0;
+  editForm!: FormGroup;
+  
+  // Messages
+  errorMessage: string = '';
+  successMessage: string = '';
+
+  // Données
+  users: any[] = [];
+  selectedUser: any = null;
+  showEditForm: boolean = false;
+  showDeleteModal: boolean = false;
+  userToDelete: number | null = null;
+  loading: boolean = false;
+
+  // Pagination
+  page: number = 0;
+  size: number = 10;
+  totalPages: number = 0;
+  totalElements: number = 0;
+
+  // Auth
+  username: string | null = '';
 
   constructor(
     private fb: FormBuilder,
     private registerService: RegisterService,
-    private customerService: CustomerService // ✅ Virgule corrigée ici
-  ) {}
+    private customerService: CustomerService,
+    private router: Router,
+    private authService: AuthService
+  ) {
+    this.initForms();
+  }
 
   ngOnInit(): void {
-    this.initForm();
+    this.username = localStorage.getItem('username');
     this.loadUsers();
   }
 
-  private initForm(): void {
+  private initForms(): void {
+    // Formulaire d'ajout
     this.userForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3)]],
-      firstname: [''],
-      lastname: [''],
+      firstname: [''],  // Prénom
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', Validators.required],
-      role: this.fb.group({
-        idRole: [1]
-      })
+      confirmPassword: ['', Validators.required]
     }, { validators: this.passwordMatchValidator });
+
+    // Formulaire de modification
+    this.editForm = this.fb.group({
+      username: ['', [Validators.required, Validators.minLength(3)]],
+      firstname: [''],  // Prénom
+      email: ['', [Validators.required, Validators.email]]
+    });
   }
 
-  private passwordMatchValidator(fg: FormGroup): { [key: string]: boolean } | null {
-    const password = fg.get('password')?.value;
-    const confirmPassword = fg.get('confirmPassword')?.value;
-
-    return password && confirmPassword && password === confirmPassword
-      ? null
+  private passwordMatchValidator(fg: FormGroup): {[key: string]: boolean} | null {
+    return fg.get('password')?.value === fg.get('confirmPassword')?.value 
+      ? null 
       : { mismatch: true };
   }
 
-  onSubmit(): void {
-    this.formSubmitted = true;
+  loadUsers(): void {
+    this.loading = true;
+    this.customerService.getAllUsers(this.page, this.size).subscribe({
+      next: (response: any) => {
+        this.users = response.content || response;
+        // Log des données pour débugger
+        console.log('Users chargés:', this.users);
+        this.totalPages = response.totalPages || 1;
+        this.totalElements = response.totalElements || response.length;
+        this.loading = false;
+      },
+      error: (err) => {
+        this.loading = false;
+        console.error(err);
+        this.errorMessage = 'Erreur lors du chargement des clients';
+      }
+    });
+  }
 
+  onSubmit(): void {
     if (this.userForm.invalid) {
-      this.markFormGroupTouched(this.userForm);
+      this.userForm.markAllAsTouched();
       return;
     }
 
+    this.errorMessage = '';
+    this.successMessage = '';
+
     const formData = {
       ...this.userForm.value,
-      role: { idRole: this.userForm.value.role.idRole }
+      role: { idRole: 3 }
     };
 
-    this.registerService.addUserWithConfirmPassword(formData).subscribe({
-      next: (res) => {
-        if (res.includes('successfully')) {
-          this.handleSuccess(res);
+    // Log des données envoyées au serveur
+    console.log('Données envoyées pour création:', formData);
+
+    this.registerService.register(formData).subscribe({
+      next: (response) => {
+        this.successMessage = response.message || 'Client ajouté avec succès';
+        this.userForm.reset();
+        this.loadUsers();
+      },
+      error: (err) => {
+        if (err.status === 409) {
+          this.errorMessage = 'Cet email est déjà utilisé';
+          this.userForm.get('email')?.setErrors({ emailExists: true });
         } else {
-          this.handleError({ message: res });
+          this.errorMessage = err.error?.message || 'Erreur lors de l\'enregistrement';
         }
-      },
-      error: (err) => {
-        this.handleError(err);
       }
     });
   }
 
-  private handleSuccess(response: any): void {
-    console.log('Enregistrement réussi:', response);
-    alert('Enregistrement réussi !');
-    this.formSubmitted = false;
-    this.userForm.reset();
-    this.loadUsers(); // Recharge les utilisateurs après ajout
+  onEdit(user: any): void {
+    this.selectedUser = user;
+    this.showEditForm = true;
+
+    // Log de l'utilisateur à modifier pour debug
+    console.log('Utilisateur à modifier:', user);
+
+    this.editForm.patchValue({
+      username: user.username,
+      firstname: user.firstname || user.lastname, // Prénom - essaie d'abord firstname, puis lastname si firstname n'existe pas
+      email: user.email
+    });
+
+    // Ajout de la classe au body pour empêcher le défilement
+    document.body.classList.add('modal-open');
+
+    this.errorMessage = '';
+    this.successMessage = '';
   }
 
-  private handleError(error: any): void {
-    console.error('Erreur lors de l\'enregistrement:', error);
-
-    let errorMessage = 'Erreur lors de l\'enregistrement';
-
-    if (error.error?.includes('L’email existe déjà')) {
-      errorMessage = 'Cet email est déjà utilisé';
-      this.userForm.get('email')?.setErrors({ emailExists: true });
-    } else if (error.error?.includes('Les mots de passe ne correspondent pas')) {
-      errorMessage = 'Les mots de passe ne correspondent pas';
-      this.userForm.setErrors({ mismatch: true });
-    } else if (error.message) {
-      errorMessage = error.message;
+  onSaveEdit(): void {
+    if (this.editForm.invalid) {
+      this.editForm.markAllAsTouched();
+      return;
     }
 
-    alert(errorMessage);
+    const updatedData = {
+      ...this.editForm.value,
+      idUser: this.selectedUser.idUser,
+      role: this.selectedUser.role
+    };
+
+    // Log des données à mettre à jour
+    console.log('Données à mettre à jour:', updatedData);
+
+    this.customerService.updateUser(this.selectedUser.idUser, updatedData)
+      .subscribe({
+        next: () => {
+          this.successMessage = 'Client modifié avec succès';
+          this.showEditForm = false;
+          this.selectedUser = null;
+          this.editForm.reset();
+          // Retirer la classe du body
+          document.body.classList.remove('modal-open');
+          this.loadUsers();
+        },
+        error: (err) => {
+          console.error("Erreur modification:", err);
+          this.errorMessage = err.error?.message || 'Erreur lors de la modification';
+        }
+      });
   }
 
-  private markFormGroupTouched(formGroup: FormGroup): void {
-    Object.values(formGroup.controls).forEach(control => {
-      control.markAsTouched();
-
-      if (control instanceof FormGroup) {
-        this.markFormGroupTouched(control);
-      }
-    });
+  onCancelEdit(): void {
+    this.showEditForm = false;
+    this.selectedUser = null;
+    this.editForm.reset();
+    // Retirer la classe du body
+    document.body.classList.remove('modal-open');
   }
 
-  get f() {
-    return this.userForm.controls;
+  // Nouvelle méthode pour ouvrir le modal de suppression
+  openDeleteModal(userId: number): void {
+    this.userToDelete = userId;
+    this.showDeleteModal = true;
+    document.body.classList.add('modal-open');
   }
 
-   // Charger les utilisateurs selon la page et la taille
-   loadUsers(): void {
-    this.customerService.getAllUsers(this.page, this.size).subscribe({
-      next: (res) => {
-        this.users = res; // Liste d'utilisateurs sans pagination
-        this.totalPages = 1; // Il n'y a qu'une seule page dans ce cas
-        this.totalUsers = res.length; // Nombre total d'utilisateurs
-      },
-      error: (err) => {
-        console.error('Erreur de chargement des utilisateurs', err);
-      }
-    });
+  // Nouvelle méthode pour fermer le modal de suppression
+  closeDeleteModal(): void {
+    this.showDeleteModal = false;
+    this.userToDelete = null;
+    document.body.classList.remove('modal-open');
   }
-  
 
-  // Passer à la page suivante
-  previousPage(): void {
-    if (this.page > 0) {
-      this.page--;
-      this.loadUsers();
+  // Nouvelle méthode pour confirmer la suppression
+  confirmDelete(): void {
+    if (this.userToDelete) {
+      this.customerService.deleteUser(this.userToDelete).subscribe({
+        next: (response: any) => {
+          this.successMessage = response.message || 'Client supprimé avec succès';
+          this.closeDeleteModal();
+          this.loadUsers();
+        },
+        error: (err) => {
+          console.error("Erreur de suppression:", err);
+          this.errorMessage = err.error?.error || err.message || 'Erreur lors de la suppression';
+
+          if (err.status === 401) {
+            this.authService.logout();
+            this.router.navigate(['/login']);
+          }
+          this.closeDeleteModal();
+        }
+      });
     }
   }
 
+  // Pagination
   nextPage(): void {
     if (this.page < this.totalPages - 1) {
       this.page++;
@@ -148,19 +234,18 @@ export class CustomersComponent implements OnInit {
     }
   }
 
-
-
-  deleteUser(userId: number): void {
-    if (confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) {
-      this.customerService.deleteUser(userId).subscribe({
-        next: () => {
-          // Recharge la liste des utilisateurs après suppression
-          this.loadUsers();
-        },
-        error: (err) => {
-          console.error('Erreur lors de la suppression de l\'utilisateur', err);
-        }
-      });
+  previousPage(): void {
+    if (this.page > 0) {
+      this.page--;
+      this.loadUsers();
     }
   }
+
+  onLogout(): void {
+    this.authService.logout();
+  }
+
+  // Accès simplifié aux contrôles
+  get f() { return this.userForm.controls; }
+  get ef() { return this.editForm.controls; }
 }

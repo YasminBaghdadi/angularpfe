@@ -1,1 +1,138 @@
-<p>dash works!</p>
+
+<!doctype html>
+<html class="no-js" lang="zxx">
+
+
+<!-- Mirrored from html.rrdevs.net/zummi/index-3.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 02 Apr 2025 12:52:04 GMT -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Restaurant</title>
+    <meta name="description" content="Zummi – Restaurant & Cafe Bootstrap HTML5 Template">
+    <meta name="author" content="ahmmedsabbirbd">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Place favicon.ico in the root directory -->
+    <link rel="shortcut icon" type="image/x-icon" href="/assets/imgs/favicon.svg">
+    <!-- CSS here -->
+    <link rel="stylesheet" href="/assets/css/vendor/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/css/vendor/animate.min.css">
+    <link rel="stylesheet" href="/assets/css/plugins/swiper.min.css">
+    <link rel="stylesheet" href="/assets/css/vendor/magnific-popup.css">
+    <link rel="stylesheet" href="/assets/css/vendor/fontawesome-pro.css">
+    <link rel="stylesheet" href="/assets/css/vendor/spacing.css"> 
+    <link rel="stylesheet" href="/assets/css/plugins/odometer-theme-default.css">
+    <link rel="stylesheet" href="/assets/css/main.css">
+</head>
+<header>
+    <div id="header-sticky" class="header__area header-3">
+        <div class="container">
+            <div class="mega__menu-wrapper p-relative">
+                <div class="header__main">
+                    <div class="header__logo">
+                        <a>
+                            <div class="logo">
+                                <img src="/assets/imgs/logo/restau.png" alt="logo not found">
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="mean__menu-wrapper d-none d-lg-block">
+                        <div class="main-menu main-menu-3">
+                            <nav id="mobile-menu">
+                               <ul>
+
+                                <li class="has-dropdown" style="font-size: 20px;"> 
+                                    <p>Bienvenue, {{ username }} !</p>
+                                     </li> 
+
+                                     
+                                <li class="has-dropdown">
+
+                                        <a  routerLinkActive="active">                                        
+                                            Mon compte
+                                        </a>
+                                        <ul class="submenu">
+                                            
+<li><a routerLink="/profil">Profil</a></li>
+                                        
+                                            
+<li><a (click)="onLogout()">Déconnexion</a></li>
+                                        </ul>
+
+
+                                    </li>
+                                
+
+
+                                  
+                                    
+
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+
+                 
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- ========== Liste des livraisons ========== -->
+<div class="main-content">
+  <div class="page-content">
+    <div class="container-fluid">
+      <div class="row mt-4">
+        <div class="col-12">
+          <!-- Carte avec la liste des livraisons -->
+          <div class="card">
+            <div class="card-header">
+              <h4 class="card-title mb-0">Liste des livraisons</h4>
+            </div>
+            
+            <div class="card-body">
+              <!-- Message d'information quand aucune livraison n'est disponible -->
+              <div class="alert alert-info">
+                Aucune livraison disponible pour le moment.
+              </div>
+              
+              <!-- Tableau des livraisons -->
+              <div class="table-responsive" >
+                <table class="table align-middle table-nowrap table-striped mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th scope="col">Nom de livreur</th>
+                      <th scope="col">Numéro de livraison</th>
+                      <th scope="col">Nom de client</th>
+                      <th scope="col">Adresse</th>
+                      <th scope="col">Total</th>
+                      <th scope="col" style="width: 150px;">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr >
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td>
+                        <button class="btn btn-sm btn-primary me-1" >
+                          <i class="fas fa-check me-1"></i> Confirmer
+                        </button>
+                       
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              
+             
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

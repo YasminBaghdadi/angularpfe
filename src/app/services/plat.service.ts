@@ -7,7 +7,7 @@ import { Plat } from '../models/plat';
   providedIn: 'root'
 })
 export class PlatService {
-
+ 
   private apiUrl = 'http://localhost:8081/Plat'; 
 
   constructor(private http: HttpClient) {}

@@ -1,0 +1,391 @@
+
+<!doctype html>
+<html class="no-js" lang="zxx">
+
+
+<!-- Mirrored from html.rrdevs.net/zummi/index-3.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 02 Apr 2025 12:52:04 GMT -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Restaurant</title>
+    <meta name="description" content="Zummi – Restaurant & Cafe Bootstrap HTML5 Template">
+    <meta name="author" content="ahmmedsabbirbd">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Place favicon.ico in the root directory -->
+    <link rel="shortcut icon" type="image/x-icon" href="/assets/imgs/favicon.svg">
+    <!-- CSS here -->
+    <link rel="stylesheet" href="/assets/css/vendor/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/css/vendor/animate.min.css">
+    <link rel="stylesheet" href="/assets/css/plugins/swiper.min.css">
+    <link rel="stylesheet" href="/assets/css/vendor/magnific-popup.css">
+    <link rel="stylesheet" href="/assets/css/vendor/fontawesome-pro.css">
+    <link rel="stylesheet" href="/assets/css/vendor/spacing.css"> 
+    <link rel="stylesheet" href="/assets/css/plugins/odometer-theme-default.css">
+    <link rel="stylesheet" href="/assets/css/main.css">
+</head>
+
+
+<header>
+    <div id="header-sticky" class="header__area header-3">
+        <div class="container">
+            <div class="mega__menu-wrapper p-relative">
+                <div class="header__main">
+                    <div class="header__logo">
+                        <a>
+                            <div class="logo">
+                                <img src="/assets/imgs/logo/restau.png" alt="logo not found">
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="mean__menu-wrapper d-none d-lg-block">
+                        <div class="main-menu main-menu-3">
+                                <ul>
+                                    <li class="has-dropdown has-mega-menu active">
+<a [routerLink]="['/interface-table', tableNumber]" routerLinkActive="active">Plats</a>                                    </li>
+                                </ul>
+                        </div>
+                    </div>
+
+                    <div class="header__right">
+                        <div class="header__action d-flex align-items-center">
+                            <ul class="d-none d-sm-inline-flex">
+                                
+                                    
+                                <li>
+<a class="cart" [routerLink]="['/panierPassager-table', tableNumber]" routerLinkActive="active">                                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="21" viewBox="0 0 20 21" fill="none">
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M5.78741 20.222H14.1352C17.2016 20.222 19.554 19.1144 18.8858 14.6567L18.1078 8.61555C17.6959 6.3913 16.2771 5.54004 15.0323 5.54004H4.85377C3.59061 5.54004 2.25422 6.45537 1.77825 8.61555L1.00022 14.6567C0.432714 18.611 2.72104 20.222 5.78741 20.222Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M5.65053 5.32041C5.65053 2.93433 7.58483 1.00004 9.9709 1.00004V1.00004C11.1199 0.99517 12.2235 1.4482 13.0377 2.25895C13.8519 3.06971 14.3096 4.17139 14.3096 5.32041V5.32041" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M7.0048 9.82388H7.05057" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M12.8359 9.82388H12.8816" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                      </svg>
+                                      <span>{{ nombreArticles }}</span>  <!-- Affichage du nombre d'articles -->
+                                    </a>
+                                </li>
+                               
+                                
+                            </ul>   
+                        </div>
+                    </div>
+                   
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<section class="cart section-space-120 overflow-hidden">
+    <div class="container">
+      <div class="row g-24">
+        <div class="col-12">
+          <div class="table-content cart-table">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th class="product-remove"></th>
+                  <th class="product-name">Plats</th>
+                  <th class="product-price">Prix</th>
+                  <th class="product-quantity">Quantité</th>
+                  <th class="product-subtotal">Sous-total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let plat of platsDansPanier; let i = index">
+                  <td class="product-remove">
+                    <button (click)="supprimerDuPanier(i)">
+                      <svg width="11" height="10" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M8.63551 0L5.57196 4.07L2.57009 0H0.514019L4.68785 5.23286L0 11H2.05607L5.5514 6.39571L8.94393 11H11L6.43551 5.23286L10.6916 0H8.63551Z" fill="#74787C"/>
+                      </svg>
+                    </button>
+                  </td>
+                  <td class="product__wrapper">
+                    <a class="product__thumbnail" href="javascript:void(0)">
+                      <img [src]="plat.imageUrl" [alt]="plat.name">
+                    </a>
+                    <div class="product__name">
+                      <h6 class="title text-uppercase">{{ plat.name }}</h6>
+                    </div>
+                  </td>
+                  <td class="product__price">
+                    <span class="amount">{{ plat.prix }} TND</span>
+                  </td>
+                  <td class="product__quantity">
+                    <div class="product__quantity__group">
+                      <div class="product__quantity__control">
+                        <span class="minus" (click)="mettreAJourQuantite(i, plat.quantite - 1)">
+                          <i class="fa-solid fa-minus"></i>
+                        </span>
+                      </div>
+                      <input type="number" class="input-text qty text" 
+                            [(ngModel)]="plat.quantite" 
+                            (change)="mettreAJourQuantite(i, plat.quantite)"
+                            min="1" max="100">
+                      <div class="product__quantity__control">
+                        <span class="plus" (click)="mettreAJourQuantite(i, plat.quantite + 1)">
+                          <i class="fa-solid fa-plus"></i>
+                        </span>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="product__subtotal">
+                    <span>{{ calculerSousTotal(plat) }} TND</span>
+                  </td>
+                </tr>
+                <tr *ngIf="platsDansPanier.length === 0 && !hasCommandeEnCours()">
+                  <td colspan="5" class="text-center py-4">Votre panier est vide</td>
+                </tr>
+                <tr *ngIf="platsDansPanier.length === 0 && hasCommandeEnCours()">
+                  <td colspan="5" class="text-center py-4">
+                    <div class="alert alert-info">
+                      Commande en cours de traitement ({{ getTotalAffiche() }} TND)
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            
+            <!-- Messages d'état -->
+            <div *ngIf="successMessage" class="alert alert-success">
+              {{ successMessage }}
+            </div>
+            
+            <div *ngIf="errorMessage" class="alert alert-danger">
+              {{ errorMessage }}
+            </div>
+            
+            <!-- Bouton Commander -->
+            <div class="cart__btn-wrap" *ngIf="platsDansPanier.length > 0">
+              <button type="button" 
+                      (click)="ouvrirFactureModal()" 
+                      class="rr-btn hover-anim"
+                      [disabled]="isProcessing">
+                <span *ngIf="isProcessing" class="spinner-border spinner-border-sm me-2"></span>
+                {{ isProcessing ? 'Traitement...' : 'Commander' }}
+                <span class="hover-bg"></span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</section>
+  
+<section class="checkout section-space__bottom overflow-hidden">
+    <div class="container">
+      <div class="row">
+        <div class="col-xl-6 offset-xl-6">
+          <div class="checkout__content">
+            <h3 class="mb-30 text-uppercase">Totaux des plats</h3>
+            <div class="checkout__wrapper mb-40">
+              <div class="checkout__top checkout__item">
+                <h6 class="title">Sous-total</h6>
+                <span class="price">{{ getTotalAffiche() - fraisLivraison + remise }} TND</span>
+              </div>
+              
+              <div class="checkout__total checkout__item">
+                <h6 class="title">Total</h6>
+                <span>{{ getTotalAffiche() }} TND</span>
+              </div>
+            </div>
+            
+            <div class="checkout-proceed">
+              <button type="button" 
+                      class="rr-btn hover-anim" 
+                      (click)="procederAuPaiement()" 
+                      [disabled]="(!platsDansPanier.length && !hasCommandeEnCours()) || isProcessing">
+                <span *ngIf="isProcessing" class="spinner-border spinner-border-sm me-2"></span>
+                {{ isProcessing ? 'Traitement...' : 'Passer à la caisse' }}
+                <span class="hover-bg"></span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</section>
+
+<!-- MODAL FACTURE -->
+<div class="modal fade" 
+     id="factureModal" 
+     tabindex="-1"
+     [ngClass]="{ show: showFactureModal }"
+     [ngStyle]="{ display: showFactureModal ? 'block' : 'none' }"
+     aria-labelledby="factureModalLabel"
+     aria-hidden="!showFactureModal">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="factureModalLabel">Facture de votre commande</h5>
+        <button type="button" class="btn-close" (click)="fermerFactureModal()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Plat</th>
+              <th>Quantité</th>
+              <th>Prix</th>
+              <th>Sous-total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let plat of platsDansPanier">
+              <td>{{ plat.name }}</td>
+              <td>{{ plat.quantite }}</td>
+              <td>{{ plat.prix }} TND</td>
+              <td>{{ calculerSousTotal(plat) }} TND</td>
+            </tr>
+          </tbody>
+        </table>
+        <hr />
+        <div class="text-end">
+          <h5><strong>Total :</strong> {{ calculerTotal() }} TND</h5>
+        </div>
+        <p style="text-align: center; margin-top: 15px; color: #666;">
+          Vous pourrez modifier la commande après la confirmation !
+        </p>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="fermerFactureModal()">Annuler</button>
+        <button class="btn btn-success" 
+                (click)="confirmerCommande()"
+                [disabled]="isProcessing">
+          <span *ngIf="isProcessing" class="spinner-border spinner-border-sm me-2"></span>
+          {{ isProcessing ? 'Confirmation...' : 'Confirmer la commande' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+ 
+
+ 
+  <footer>
+    <section class="footer-2__area-common overflow-hidden">
+        <div class="footer-2__main-wrapper position-relative ">
+            <div class="container">
+            <div class="row g-24 mb-minus-50">
+                <div class="col-xl-3 col-sm-8 ">
+                    <div class="footer-2__widget footer-2__widget-item-1">
+                        <div class="footer-2__logo mb-15">
+                            <a >
+                                <img class="img-fluid" src="/assets/imgs/logo/restau.png" alt="logo not found">
+                            </a>
+                        </div>
+ 
+                    </div>
+                </div>
+
+                <div class="col-xl-2 col-sm-4 ">
+                    <div class="footer-2__widget footer-2__widget-item-2">
+                        <div class="footer-2__widget-title">
+                            <h4>Catégorie</h4>
+                        </div>
+                        <div class="footer-2__link">
+                            <ul>
+                                <li><a>Petit-déjeuner</a></li>
+                                <li><a>Déjeuner</a></li>
+                                <li><a>Dîner</a></li>
+                                <li><a>Restauration rapide</a></li>
+                                <li><a>Boissons</a></li>
+                                
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-2 col-md-3 col-sm-6">
+                    <div class="footer-2__widget footer-2__widget-item-3">
+                        <div class="footer-2__widget-title">
+                            <h4>Information</h4>
+                        </div>
+
+                        <div class="footer-2__link">
+                            <ul>
+                                <li ><a >Livraison</a></li>
+                                <li><a >Réservation</a></li>
+                                <li><a ></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-2 col-md-4 col-sm-6">
+                    <div class="footer-2__widget footer-2__widget-item-4">
+                        <div class="footer-2__widget-title">
+                            <h4>Contacter-nous</h4>
+                        </div>
+
+                        <div class="footer-2__contact">
+                            <ul>
+                                <li><a ><i class=" icon-location"></i>Address,Address</a></li>
+                                <li><a > <i class="icon-phone"></i>(+216) 00111222</a></li>
+                                <li><a ><i class="icon-mail-alt"></i>examplegmail.com</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-5 ">
+                    <div class="footer-2__widget footer-2__widget-item-5">
+                        <div class="footer-2__widget-title">
+                            <h4>Médias sociaux</h4>
+                        </div>
+                        <div class="footer-2__content mb-30 mb-xs-35">
+                            <p class="mb-0">Envie d’en voir plus ?...<br>Suivez-nous sur les réseaux sociaux!</p>
+                        </div>
+                        <div class="footer-2__social mt-30 mt-xs-30">
+                            <a href="https://twitter.com/"><i class="icon-twiter"></i> </a>
+                            <a href="https://www.facebook.com/"><i class="fab fa-facebook-f"></i></a>
+                            <a href="https://www.instagram.com/"><i class="icon-instagram"></i></a>
+                        </div>
+                
+            </div>
+        </div> 
+
+            </div>
+        </div>
+        </div>
+
+     
+    </section>
+</footer>
+
+
+<body>
+
+
+
+
+<!-- JS here -->
+<script src="/assets/js/vendor/jquery-3.7.1.min.js"></script>
+<script src="/assets/js/plugins/waypoints.min.js"></script>
+<script src="/assets/js/vendor/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/plugins/meanmenu.min.js"></script>
+<script src="/assets/js/plugins/odometer.min.js"></script>
+<script src="/assets/js/plugins/swiper.min.js"></script>
+<script src="/assets/js/plugins/wow.js"></script>
+<script src="/assets/js/vendor/magnific-popup.min.js"></script>
+<script src="/assets/js/vendor/type.js"></script>
+<script src="/assets/js/plugins/nice-select.min.js"></script>
+<script src="/assets/js/vendor/jquery-ui.min.js"></script>
+<script src="/assets/js/vendor/jquery.appear.js"></script>
+<script src="/assets/js/plugins/parallax.min.js"></script>
+<script src="/assets/js/plugins/parallax-scroll.js"></script>
+<script src="/assets/js/plugins/isotope.pkgd.min.js"></script>
+<script src="/assets/js/plugins/imagesloaded.pkgd.min.js"></script>
+<script src="/assets/js/plugins/gsap.min.js"></script>
+<script src="/assets/js/plugins/ScrollTrigger.min.js"></script>
+<script src="/assets/js/plugins/SplitText.js"></script>
+<script src="/assets/js/plugins/split-type.min.js"></script>
+<script src="/assets/js/plugins/tween-max.min.js"></script>
+<script src="/assets/js/plugins/draggable.min.js"></script>
+<script src="/assets/js/plugins/smoothscroll.js"></script>
+<script src="/assets/js/vendor/ajax-form.js"></script>
+<script src="/assets/js/main.js"></script>
+
+</body>
+
+
+<!-- Mirrored from html.rrdevs.net/zummi/index-3.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 02 Apr 2025 12:52:20 GMT -->
+</html>
+

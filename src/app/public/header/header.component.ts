@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { PanierService } from '../../services/panier.service';
+import { AccueilpanierService } from 'src/app/services/accueilpanier.service';
 
 
 @Component({
@@ -10,12 +10,12 @@ import { PanierService } from '../../services/panier.service';
 export class HeaderComponent implements OnInit {
   nombreArticles: number = 0;
 
-  constructor(private panierService: PanierService) { }
-
+  constructor(private accueilPanierService: AccueilpanierService) { }
   ngOnInit(): void {
     // S'abonner au service pour récupérer le nombre d'articles dans le panier
-    this.panierService.nombreArticles$.subscribe(nombre => {
+    this.accueilPanierService.nombreArticles$.subscribe(nombre => {
       this.nombreArticles = nombre;
     });
   }
 }
+
