@@ -188,76 +188,88 @@
               </div>
             </div>
             
+            
             <div class="checkout-proceed">
               <button type="button" 
                       class="rr-btn hover-anim" 
                       (click)="procederAuPaiement()" 
                       [disabled]="(!platsDansPanier.length && !hasCommandeEnCours()) || isProcessing">
                 <span *ngIf="isProcessing" class="spinner-border spinner-border-sm me-2"></span>
-                {{ isProcessing ? 'Traitement...' : 'Passer à la caisse' }}
+                {{ isProcessing ? 'Traitement...' : 'Payer avec PayPal' }}
                 <span class="hover-bg"></span>
               </button>
             </div>
+            <h6 class="modal-title"> <br>
+  💬 <h5 class="modal-title" class="d-inline">Vous ne souhaitez pas payer en ligne ? </h5>..  Aucun souci !  Vous pouvez payer en espèces en passant directement à la caisse !
+</h6>
           </div>
         </div>
       </div>
     </div>
 </section>
 
-<!-- MODAL FACTURE -->
+<!-- MODAL FACTURE - Version alternative -->
 <div class="modal fade" 
      id="factureModal" 
      tabindex="-1"
      [ngClass]="{ show: showFactureModal }"
-     [ngStyle]="{ display: showFactureModal ? 'block' : 'none' }"
+     [ngStyle]="{ display: showFactureModal ? 'flex' : 'none', 'align-items': 'center', 'justify-content': 'center' }"
      aria-labelledby="factureModalLabel"
-     aria-hidden="!showFactureModal">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="factureModalLabel">Facture de votre commande</h5>
-        <button type="button" class="btn-close" (click)="fermerFactureModal()" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Plat</th>
-              <th>Quantité</th>
-              <th>Prix</th>
-              <th>Sous-total</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let plat of platsDansPanier">
-              <td>{{ plat.name }}</td>
-              <td>{{ plat.quantite }}</td>
-              <td>{{ plat.prix }} TND</td>
-              <td>{{ calculerSousTotal(plat) }} TND</td>
-            </tr>
-          </tbody>
-        </table>
-        <hr />
-        <div class="text-end">
-          <h5><strong>Total :</strong> {{ calculerTotal() }} TND</h5>
-        </div>
-        <p style="text-align: center; margin-top: 15px; color: #666;">
-          Vous pourrez modifier la commande après la confirmation !
-        </p>
-      </div>
+     aria-hidden="!showFactureModal"
+     style="background: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-dialog-centered modal-lg p-6" style="max-width: 800px;">
+    <div class="modal-content rounded-4 shadow border-0 p-4" style="background: #f5f5f5;">
 
-      <div class="modal-footer">
-        <button class="btn btn-secondary" (click)="fermerFactureModal()">Annuler</button>
-        <button class="btn btn-success" 
+      <header class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+        <h5 id="factureModalLabel" class="text-uppercase fw-bold mb-0" style="letter-spacing: 1.5px;">
+          Facture de votre commande
+        </h5>
+        <button type="button" class="btn-close" (click)="fermerFactureModal()" aria-label="Close"></button>
+      </header>
+
+      <section class="facture-items mb-4" style="display: flex; flex-direction: column; gap: 15px;">
+        <div class="facture-item d-flex justify-content-between align-items-center fw-semibold text-uppercase px-3 py-2 rounded-3" style="background: #f8f9fa; font-size: 0.9rem;">
+          <span style="flex: 3;">Plat</span>
+          <span style="flex: 1; text-align: center;">Quantité</span>
+          <span style="flex: 1; text-align: right;">Prix</span>
+          <span style="flex: 1; text-align: right;">Sous-total</span>
+        </div>
+
+        <ng-container *ngFor="let plat of platsDansPanier">
+          <div class="facture-item d-flex justify-content-between align-items-center px-3 py-2 border rounded-3" style="font-size: 0.95rem;">
+            <span style="flex: 3; font-weight: 500;">{{ plat.name }}</span>
+            <span style="flex: 1; text-align: center;">{{ plat.quantite }}</span>
+            <span style="flex: 1; text-align: right;">{{ plat.prix }} TND</span>
+            <span style="flex: 1; text-align: right;">{{ calculerSousTotal(plat) }} TND</span>
+          </div>
+        </ng-container>
+      </section>
+
+      <section class="facture-total d-flex justify-content-between align-items-center border-top pt-3 mt-3" style="font-size: 1.3rem; font-weight: 700;">
+        <span>Total :</span>
+        <span>{{ calculerTotal() }} TND</span>
+      </section>
+      
+      <p class="text-center text-muted fst-italic mt-3" style="font-size: 1.5rem;">
+        Une fois la commande confirmée, aucune modification n’est possible !
+      </p>
+
+      <footer class="modal-footer border-0 d-flex justify-content-end gap-3 pt-4 px-0">
+        <button class="btn btn-outline-secondary px-4 py-2 rounded-3" (click)="fermerFactureModal()">Annuler</button>
+
+        <button class="btn btn-primary px-4 py-2 rounded-3 d-flex align-items-center" 
                 (click)="confirmerCommande()"
                 [disabled]="isProcessing">
           <span *ngIf="isProcessing" class="spinner-border spinner-border-sm me-2"></span>
           {{ isProcessing ? 'Confirmation...' : 'Confirmer la commande' }}
         </button>
-      </div>
+      </footer>
+
     </div>
   </div>
 </div>
+
+
  
 
  

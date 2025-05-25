@@ -20,6 +20,8 @@ export class PanierPassagerComponent implements OnInit, OnDestroy {
   nombreArticles: number = 0;
   tableNumber: number | null = null;
   isProcessing: boolean = false;
+showPaymentOptions = false;
+selectedPaymentMethod: 'especes' | 'paypal' | null = null;
 
   orderSuccess: boolean = false;
   orderError: string | null = null;
@@ -294,6 +296,7 @@ procederAuPaiement(): void {
     this.errorMessage = 'Aucune commande à payer. Veuillez d\'abord passer une commande.';
     return;
   }
+  this.showPaymentOptions = true;
 
   if (!this.idCommandeEnCours) {
     this.errorMessage = 'ID de commande non trouvé.';

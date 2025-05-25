@@ -27,33 +27,27 @@ export class PaymentCancelComponent implements OnInit {
       console.log('Numéro de table:', this.tableNumber);
     });
 
-    // Redirection automatique après 10 secondes vers le panier
+    // Redirection automatique après 60 secondes vers le panier
     setTimeout(() => {
       if (this.tableNumber) {
         this.router.navigate(['/panierPassager-table', this.tableNumber]);
-      } else {
-        this.router.navigate(['/accueil']);
-      }
-    }, 10000);
+      } 
+    }, 60000);
   }
 
   retournerAuPanier(): void {
     if (this.tableNumber) {
       this.router.navigate(['/panierPassager-table', this.tableNumber]);
-    } else {
-      this.router.navigate(['/panier']);
-    }
+    } 
   }
 
   retournerInterface(): void {
     if (this.tableNumber) {
       this.router.navigate(['/interface-table', this.tableNumber]);
-    } else {
-      this.router.navigate(['/accueil']);  
-    }
+    } 
   }
 
   retournerAccueil(): void {
-    this.router.navigate(['/accueil']);
+    this.router.navigate(['/interface-table', this.tableNumber]);
   }
 }

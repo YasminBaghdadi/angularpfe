@@ -215,5 +215,20 @@ export class CommandeService {
   this.setTotalCommandeEnCours(commande.montantTotal);
   this.saveToStorage();
 }
+confirmerPaiementEspeces(idCommande: number): Observable<any> {
+  const headers = new HttpHeaders({
+    'X-Session-Token': localStorage.getItem('token') || ''
+  });
 
+  return this.http.post(
+    `${this.baseUrl}/confirmerPaiementEspeces/${idCommande}`,
+    null,
+    { headers }
+  ).pipe(
+    catchError(error => {
+      console.error('Erreur paiement espèces:', error);
+      return throwError(() => error.error?.error || 'Erreur lors du paiement');
+    })
+  );
+}
 }

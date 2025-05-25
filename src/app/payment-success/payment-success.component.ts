@@ -89,7 +89,7 @@ export class PaymentSuccessComponent implements OnInit {
       }
     });
   }
-  
+
 private handlePaymentSuccess(response: any): void {
     this.paymentSuccess = true;
     
@@ -162,21 +162,17 @@ private cleanupAfterSuccess(): void {
           commandeId: this.idCommande 
         }
       });
-    } else {
-      this.router.navigate(['/accueil']);
-    }
+    } 
   }
 
   retournerAuPanier(): void {
     if (this.tableNumber) {
       this.router.navigate(['/panierPassager-table', this.tableNumber]);
-    } else {
-      this.router.navigate(['/panier']);
-    }
+    } 
   }
 
   retournerAccueil(): void {
-    this.router.navigate(['/accueil']);
+    this.router.navigate(['/interface-table', this.tableNumber]);
   }
 
   imprimerFacture(): void {
