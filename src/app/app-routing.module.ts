@@ -25,6 +25,8 @@ import { MenuComponent } from './admin/menu/menu.component';
 import { PaymentComponent } from './payment/payment.component';
 import { PaymentCancelComponent } from './payment-cancel/payment-cancel.component';
 import { PaymentSuccessComponent } from './payment-success/payment-success.component';
+import { SimplePaymentCancelComponent} from './simple-payment-cancel/simple-payment-cancel.component';
+import { SimplePaymentSuccessComponent } from './simple-payment-success/simple-payment-success.component';
 const routes: Routes = [
   { path: '', redirectTo: 'accueil', pathMatch: 'full' },
   { 
@@ -34,6 +36,14 @@ const routes: Routes = [
       { path: '', component: HomeComponent },
     ]
   },
+
+
+   // Routes de paiement en premier
+  { path: 'simple-payment-success', component: SimplePaymentSuccessComponent },
+  { path: 'simple-payment-cancel', component: SimplePaymentCancelComponent },
+  { path: 'paiement', component: PaymentComponent },
+  { path: 'payment/success', component: PaymentSuccessComponent },
+  { path: 'payment/cancel', component: PaymentCancelComponent },
   { 
     path: 'plat', 
     component: HeaderfooterComponent,  
@@ -102,19 +112,10 @@ const routes: Routes = [
     component: PanierPassagerComponent,  
     
   },
-  { 
-    path: 'paiement', 
-    component: PaymentComponent 
-  },
- { 
-    path: 'payment/success', 
-    component: PaymentSuccessComponent 
-  },
-  { 
-    path: 'payment/cancel', 
-    component: PaymentCancelComponent 
-  },
 
+
+
+ 
  { 
     path: 'customers',  
     component: CustomersComponent,

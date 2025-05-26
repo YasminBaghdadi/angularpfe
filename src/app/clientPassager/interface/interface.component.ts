@@ -23,6 +23,7 @@ export class InterfaceComponent implements OnInit, OnDestroy {
   selectedCategory: string = 'Petit-déjeuner';
   loading = false;
   nombreArticles: number = 0;
+messageConfirmation: string = '';
 
   private destroy$ = new Subject<void>();
 
@@ -167,6 +168,10 @@ export class InterfaceComponent implements OnInit, OnDestroy {
     const quantite = plat.quantite ?? 1;
     const total = plat.prix * quantite;
     this.panierService.ajouterAuPanier({ ...plat, quantite });
-    alert(`Commande : ${quantite} x ${plat.name} = ${total.toFixed(2)} TND`);
-  }
+  this.messageConfirmation = `✔️ ${quantite} x ${plat.name} ajouté au panier (${total.toFixed(2)} TND)`;
+
+  // Efface le message après 3 secondes
+  setTimeout(() => {
+    this.messageConfirmation = '';
+  }, 3000);  }
 }

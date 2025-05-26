@@ -21,7 +21,7 @@ export class AuthService {
         localStorage.setItem('access_token', response.token);
         localStorage.setItem('user_role', response.role);
         localStorage.setItem('username', response.username);
-        localStorage.setItem('user_id', response.idUser); // Uniformisez cette clé
+        localStorage.setItem('user_id', response.idUser); 
         this.loggedIn.next(true);
       }
     })

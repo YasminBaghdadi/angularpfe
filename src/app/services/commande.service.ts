@@ -16,7 +16,7 @@ export interface CommandeLivraisonRequest {
 }
 
 interface CommandeEnAttente {
-  id?: number; // Ajouter cette ligne
+  id?: number;
   montantTotal: number;
   plats: Array<{
     idPlat: number;
@@ -36,7 +36,8 @@ interface CommandeEnAttente {
 export class CommandeService {
   private baseUrl = 'http://localhost:8081/commande';
   private commandeEnAttente: CommandeEnAttente | null = null;
-  private readonly STORAGE_KEY = 'commandeEnAttente';
+  private readonly STORAGE_BASE_KEY = 'commandeEnAttente_user_';
+  private readonly TOTAL_BASE_KEY = 'totalCommandeEnCours_user_';
   
   // Variables pour stocker le total et les détails de commande
   private totalCommandeSubject = new BehaviorSubject<number>(0);
@@ -50,16 +51,54 @@ export class CommandeService {
   ) {
     this.loadCommandeFromStorage();
     this.loadTotalFromStorage();
+    
+    // Écouter les changements de connexion
+    this.authService.isLoggedIn().subscribe(isLoggedIn => {
+      if (isLoggedIn) {
+        this.loadCommandeFromStorage();
+        this.loadTotalFromStorage();
+      } else {
+        // Si déconnecté, vider les données
+        this.commandeEnAttente = null;
+        this.totalCommandeEnCours = 0;
+        this.totalCommandeSubject.next(0);
+      }
+    });
+  }
+
+  // Générer les clés uniques pour chaque utilisateur
+  private getStorageKey(): string {
+    const userId = this.authService.getUserId();
+    return userId ? `${this.STORAGE_BASE_KEY}${userId}` : 'commandeEnAttente_anonymous';
+  }
+
+  private getTotalStorageKey(): string {
+    const userId = this.authService.getUserId();
+    return userId ? `${this.TOTAL_BASE_KEY}${userId}` : 'totalCommandeEnCours_anonymous';
+  }
+
+  private getAuthHeaders(): HttpHeaders {
+    const token = this.authService.getToken();
+    if (!token) {
+      throw new Error('No authentication token available');
+    }
+    return new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
   }
 
   private loadCommandeFromStorage(): void {
     try {
-      const storedCommande = localStorage.getItem(this.STORAGE_KEY);
+      const storageKey = this.getStorageKey();
+      const storedCommande = localStorage.getItem(storageKey);
       if (storedCommande) {
         this.commandeEnAttente = JSON.parse(storedCommande);
         if (this.commandeEnAttente) {
           this.commandeEnAttente.date = new Date(this.commandeEnAttente.date);
         }
+      } else {
+        this.commandeEnAttente = null;
       }
     } catch (error) {
       console.error('Erreur lors du chargement de la commande depuis le storage:', error);
@@ -69,20 +108,27 @@ export class CommandeService {
 
   private loadTotalFromStorage(): void {
     try {
-      const storedTotal = localStorage.getItem('totalCommandeEnCours');
+      const totalStorageKey = this.getTotalStorageKey();
+      const storedTotal = localStorage.getItem(totalStorageKey);
       if (storedTotal) {
         this.totalCommandeEnCours = parseFloat(storedTotal);
         this.totalCommandeSubject.next(this.totalCommandeEnCours);
+      } else {
+        this.totalCommandeEnCours = 0;
+        this.totalCommandeSubject.next(0);
       }
     } catch (error) {
       console.error('Erreur lors du chargement du total:', error);
+      this.totalCommandeEnCours = 0;
+      this.totalCommandeSubject.next(0);
     }
   }
 
   private saveToStorage(): void {
     try {
       if (this.commandeEnAttente) {
-        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.commandeEnAttente));
+        const storageKey = this.getStorageKey();
+        localStorage.setItem(storageKey, JSON.stringify(this.commandeEnAttente));
       }
     } catch (error) {
       console.error('Erreur lors de la sauvegarde de la commande:', error);
@@ -91,13 +137,12 @@ export class CommandeService {
 
   private saveTotalToStorage(): void {
     try {
-      localStorage.setItem('totalCommandeEnCours', this.totalCommandeEnCours.toString());
+      const totalStorageKey = this.getTotalStorageKey();
+      localStorage.setItem(totalStorageKey, this.totalCommandeEnCours.toString());
     } catch (error) {
       console.error('Erreur lors de la sauvegarde du total:', error);
     }
   }
-
-  
 
   getCommandeEnAttente(): CommandeEnAttente | null {
     return this.commandeEnAttente;
@@ -137,24 +182,41 @@ export class CommandeService {
 
   clearCommandeEnAttente(): void {
     this.commandeEnAttente = null;
-    localStorage.removeItem(this.STORAGE_KEY);
+    const storageKey = this.getStorageKey();
+    localStorage.removeItem(storageKey);
   }
 
-  // Nettoyer tout (commande + total)
+  // Nettoyer tout (commande + total) pour l'utilisateur actuel
   clearToutCommande(): void {
     this.commandeEnAttente = null;
     this.totalCommandeEnCours = 0;
     this.totalCommandeSubject.next(0);
     
-    localStorage.removeItem(this.STORAGE_KEY);
-    localStorage.removeItem('totalCommandeEnCours');
+    const storageKey = this.getStorageKey();
+    const totalStorageKey = this.getTotalStorageKey();
+    localStorage.removeItem(storageKey);
+    localStorage.removeItem(totalStorageKey);
   }
 
   // Nettoyer seulement le total (garder la commande)
   clearTotalCommande(): void {
     this.totalCommandeEnCours = 0;
     this.totalCommandeSubject.next(0);
-    localStorage.removeItem('totalCommandeEnCours');
+    const totalStorageKey = this.getTotalStorageKey();
+    localStorage.removeItem(totalStorageKey);
+  }
+
+  // Nettoyer toutes les données de tous les utilisateurs (utile pour maintenance)
+  clearAllUsersData(): void {
+    const keys = Object.keys(localStorage);
+    keys.forEach(key => {
+      if (key.startsWith(this.STORAGE_BASE_KEY) || key.startsWith(this.TOTAL_BASE_KEY)) {
+        localStorage.removeItem(key);
+      }
+    });
+    this.commandeEnAttente = null;
+    this.totalCommandeEnCours = 0;
+    this.totalCommandeSubject.next(0);
   }
 
   getCommandeTotal(): number {
@@ -170,20 +232,10 @@ export class CommandeService {
     idUser: number,
     request: CommandeLivraisonRequest
   ): Observable<any> {
-    const token = this.authService.getToken();
-    if (!token) {
-      return throwError(() => new Error('Session expirée, veuillez vous reconnecter'));
-    }
-
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    });
-
     return this.http.post<any>(
-      `${this.baseUrl}/passerlivraison/${idUser}`,
+      `${this.baseUrl}/passerlivraison/${idUser.toString()}`,
       request,
-      { headers }
+      { headers: this.getAuthHeaders() }
     ).pipe(
       catchError(error => {
         console.error('Erreur lors de la commande en livraison:', error);
@@ -202,33 +254,30 @@ export class CommandeService {
     );
   }
 
-
-
-
-  
   setCommandeEnAttente(commande: CommandeEnAttente): void {
-  // Générer un ID temporaire si non fourni
-  if (!commande.id) {
-    commande.id = Math.floor(Math.random() * 1000000);
+    // Générer un ID temporaire si non fourni
+    if (!commande.id) {
+      commande.id = Math.floor(Math.random() * 1000000);
+    }
+    this.commandeEnAttente = { ...commande, isConfirmed: false };
+    this.setTotalCommandeEnCours(commande.montantTotal);
+    this.saveToStorage();
   }
-  this.commandeEnAttente = { ...commande, isConfirmed: false };
-  this.setTotalCommandeEnCours(commande.montantTotal);
-  this.saveToStorage();
-}
-confirmerPaiementEspeces(idCommande: number): Observable<any> {
-  const headers = new HttpHeaders({
-    'X-Session-Token': localStorage.getItem('token') || ''
-  });
 
-  return this.http.post(
-    `${this.baseUrl}/confirmerPaiementEspeces/${idCommande}`,
-    null,
-    { headers }
-  ).pipe(
-    catchError(error => {
-      console.error('Erreur paiement espèces:', error);
-      return throwError(() => error.error?.error || 'Erreur lors du paiement');
-    })
-  );
-}
+  confirmerPaiementEspeces(idCommande: number): Observable<any> {
+    const headers = new HttpHeaders({
+      'X-Session-Token': localStorage.getItem('token') || ''
+    });
+
+    return this.http.post(
+      `${this.baseUrl}/confirmerPaiementEspeces/${idCommande}`,
+      null,
+      { headers }
+    ).pipe(
+      catchError(error => {
+        console.error('Erreur paiement espèces:', error);
+        return throwError(() => error.error?.error || 'Erreur lors du paiement');
+      })
+    );
+  }
 }

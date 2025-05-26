@@ -50,7 +50,6 @@ export class LoginComponent {
     this.router.navigate(['/not-authorized']); 
   }
 },
-
       error: (err) => {
         this.isLoading = false;
         this.errorMessage = err.error?.message || 'Login failed. Please check your credentials.';

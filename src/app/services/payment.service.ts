@@ -47,6 +47,8 @@ export class PaymentService {
     });
   }
 
+  
+
   private getQRHeaders(): HttpHeaders {
     const sessionToken = localStorage.getItem('token');
     return new HttpHeaders({
@@ -56,27 +58,30 @@ export class PaymentService {
   }
 
   // Créer un paiement avec l'ID de commande
-   createPayment(idCommande: number, amountTnd: number): Observable<any> {
-    const amountUsd = this.convertTndToUsd(amountTnd);
-    
-    const paymentRequest = {
-      amount: amountUsd,
-      currency: 'USD', // Toujours USD pour PayPal
-      description: `Paiement commande #${idCommande}`
-    };
+createPayment(idCommande: number, amountTnd: number): Observable<any> {
+  const amountUsd = this.convertTndToUsd(amountTnd);
+  
+  const paymentRequest = {
+    amount: amountUsd,
+    currency: 'USD',
+    description: `Paiement commande #${idCommande}`
+  };
 
-    return this.http.post<any>(
-      `${this.baseUrl}/create/${idCommande}`,
-      paymentRequest,
-      { headers: this.getQRHeaders() }
-    ).pipe(
-      tap(response => console.log('Réponse création paiement:', response)),
-      catchError(error => {
-        console.error('Erreur création paiement:', error);
-        return throwError(() => error.error?.error || 'Erreur lors de la création du paiement');
-      })
-    );
-  }
+  return this.http.post<any>(
+    `${this.baseUrl}/create/${idCommande}`,
+    paymentRequest,
+    { headers: this.getQRHeaders() }
+  ).pipe(
+    catchError(error => {
+      console.error('Erreur création paiement:', error);
+      // Renvoyer une erreur claire
+      return throwError(() => ({
+        error: error.error?.error || 'Erreur lors de la création du paiement',
+        details: error
+      }));
+    })
+  );
+}
 
   // Exécuter le paiement
 executePayment(executeRequest: PaymentExecuteRequest): Observable<any> {
@@ -94,6 +99,7 @@ executePayment(executeRequest: PaymentExecuteRequest): Observable<any> {
         })
     );
 }
+
 
   // Obtenir le statut du paiement
   getPaymentStatus(paymentId: string): Observable<any> {

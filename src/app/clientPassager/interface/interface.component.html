@@ -96,7 +96,9 @@
 <div *ngIf="!isLoading && error" class="error-message">
     <p>{{ error }}</p>
   </div>
-
+    <div *ngIf="messageConfirmation" class="confirmation-message">
+  {{ messageConfirmation }}
+</div>
 
 <section class="food-menu-tab food-menu-tab-2 overflow-hidden section-space-120 overflow-hidden">
   <div class="container">

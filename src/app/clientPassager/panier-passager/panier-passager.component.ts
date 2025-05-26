@@ -20,8 +20,8 @@ export class PanierPassagerComponent implements OnInit, OnDestroy {
   nombreArticles: number = 0;
   tableNumber: number | null = null;
   isProcessing: boolean = false;
-showPaymentOptions = false;
-selectedPaymentMethod: 'especes' | 'paypal' | null = null;
+  showPaymentOptions = false;
+  selectedPaymentMethod: 'especes' | 'paypal' | null = null;
 
   orderSuccess: boolean = false;
   orderError: string | null = null;
@@ -34,7 +34,7 @@ selectedPaymentMethod: 'especes' | 'paypal' | null = null;
   // Variables pour gérer le montant de commande en cours
   totalCommandeEnCours: number = 0;
   hasActiveOrder: boolean = false;
-  idCommandeEnCours: number | null = null; // IMPORTANT: Stocker l'ID de commande
+  idCommandeEnCours: number | null = null;
   
   // Variables pour le paiement
   isPaymentProcessing: boolean = false;
@@ -59,6 +59,7 @@ selectedPaymentMethod: 'especes' | 'paypal' | null = null;
         if (tableId) {
           this.tableNumber = parseInt(tableId);
           this.panierService.setTableNumber(this.tableNumber);
+          localStorage.setItem('tableNumber', this.tableNumber.toString());
         } else {
           const storedTableNumber = localStorage.getItem('tableNumber');
           if (storedTableNumber) {
@@ -67,8 +68,9 @@ selectedPaymentMethod: 'especes' | 'paypal' | null = null;
           }
         }
         
+        // IMPORTANT: Charger d'abord les données puis le panier
+        this.loadCommandeData();
         this.chargerPanier();
-        this.chargerCommandeEnCours();
       })
     );
 
@@ -79,11 +81,13 @@ selectedPaymentMethod: 'especes' | 'paypal' | null = null;
       })
     );
 
-    // S'abonner au total de commande en cours
+    // S'abonner au total de commande en cours depuis le service
     this.subscriptions.push(
       this.commandeService.getTotalCommandeObservable().subscribe(total => {
-        this.totalCommandeEnCours = total;
-        this.hasActiveOrder = total > 0;
+        if (total > 0) {
+          this.totalCommandeEnCours = total;
+          this.hasActiveOrder = true;
+        }
       })
     );
 
@@ -96,7 +100,6 @@ selectedPaymentMethod: 'especes' | 'paypal' | null = null;
   }
 
   private checkPaymentReturn(): void {
-    // Vérifier les paramètres d'URL pour le retour PayPal
     this.subscriptions.push(
       this.route.queryParams.subscribe(params => {
         if (params['paymentId'] && params['PayerID']) {
@@ -109,14 +112,48 @@ selectedPaymentMethod: 'especes' | 'paypal' | null = null;
     );
   }
 
-  private handlePaymentReturn(paymentId: string, payerId: string): void {
-    if (!this.idCommandeEnCours) {
+  private loadCommandeData(): void {
+    if (this.tableNumber) {
       // Récupérer l'ID de commande depuis le localStorage
+      const storedCommandeId = localStorage.getItem(`idCommande_table_${this.tableNumber}`);
+      if (storedCommandeId) {
+        this.idCommandeEnCours = parseInt(storedCommandeId);
+        console.log('ID Commande chargé:', this.idCommandeEnCours);
+      }
+
+      // Récupérer le montant total
+      const storedTotal = localStorage.getItem(`commandeEnCours_table_${this.tableNumber}`);
+      if (storedTotal) {
+        this.totalCommandeEnCours = parseFloat(storedTotal);
+        this.hasActiveOrder = true;
+        
+        // CORRECTION: Synchroniser avec le service
+        this.commandeService.setTotalCommandeEnCours(this.totalCommandeEnCours);
+        console.log('Total commande chargé:', this.totalCommandeEnCours);
+      }
+
+      // Récupérer les détails de la commande
+      const storedDetails = localStorage.getItem(`detailsCommande_table_${this.tableNumber}`);
+      if (storedDetails) {
+        try {
+          const details = JSON.parse(storedDetails);
+          console.log('Détails commande chargés:', details);
+        } catch (e) {
+          console.error('Erreur parsing commande details', e);
+        }
+      }
+    }
+  }
+
+  private handlePaymentReturn(paymentId: string, payerId: string): void {
+    // CORRECTION: Vérifier d'abord dans localStorage si pas en mémoire
+    if (!this.idCommandeEnCours) {
       const storedCommandeId = localStorage.getItem(`idCommande_table_${this.tableNumber}`);
       if (storedCommandeId) {
         this.idCommandeEnCours = parseInt(storedCommandeId);
       } else {
         this.errorMessage = 'ID de commande non trouvé.';
+        this.resetPaymentState();
         return;
       }
     }
@@ -136,16 +173,14 @@ selectedPaymentMethod: 'especes' | 'paypal' | null = null;
         if (response.status === 'success') {
           this.paymentSuccess = true;
           this.successMessage = 'Paiement effectué avec succès!';
-          
-          // Nettoyer la commande en cours après paiement réussi
           this.clearCommandeEnCours();
           
-          // Rediriger après un délai
           setTimeout(() => {
             this.router.navigate(['/table', this.tableNumber]);
           }, 3000);
         } else {
           this.errorMessage = 'Le paiement n\'a pas pu être finalisé.';
+          this.resetPaymentState();
         }
         
         this.clearMessagesDelayed();
@@ -153,6 +188,7 @@ selectedPaymentMethod: 'especes' | 'paypal' | null = null;
       error: (error) => {
         this.isPaymentProcessing = false;
         this.errorMessage = 'Erreur lors de la finalisation du paiement: ' + error;
+        this.resetPaymentState();
         this.clearMessagesDelayed();
       }
     });
@@ -167,17 +203,10 @@ selectedPaymentMethod: 'especes' | 'paypal' | null = null;
     }
   }
 
-  chargerCommandeEnCours(): void {
-    // Vérifier s'il y a une commande en cours stockée
-    const storedTotal = localStorage.getItem(`commandeEnCours_table_${this.tableNumber}`);
-    const storedCommandeId = localStorage.getItem(`idCommande_table_${this.tableNumber}`);
-    
-    if (storedTotal && storedCommandeId) {
-      this.totalCommandeEnCours = parseFloat(storedTotal);
-      this.idCommandeEnCours = parseInt(storedCommandeId);
-      this.hasActiveOrder = true;
-      this.commandeService.setTotalCommandeEnCours(this.totalCommandeEnCours);
-    }
+  // CORRECTION: Méthode publique pour recharger manuellement
+  rechargeDonnees(): void {
+    this.loadCommandeData();
+    console.log('Données rechargées - hasActiveOrder:', this.hasActiveOrder, 'total:', this.totalCommandeEnCours);
   }
 
   // Obtenir le total à afficher (panier actuel ou commande en cours)
@@ -193,147 +222,158 @@ selectedPaymentMethod: 'especes' | 'paypal' | null = null;
     return this.hasActiveOrder && this.totalCommandeEnCours > 0 && this.idCommandeEnCours !== null;
   }
 
-  passerCommande(): void {
-    this.clearMessages();
-
-    if (!this.tableNumber) {
-      this.errorMessage = 'Numéro de table non trouvé. Veuillez scanner à nouveau le QR code.';
-      return;
-    }
-
-    if (this.platsDansPanier.length === 0) {
-      this.errorMessage = 'Votre panier est vide. Veuillez ajouter des plats avant de commander.';
-      return;
-    }
-
-    const sessionToken = localStorage.getItem('token');
-    if (!sessionToken) {
-      this.errorMessage = 'Session expirée. Veuillez scanner à nouveau le QR code.';
-      return;
-    }
-
-    const platQuantites = this.platsDansPanier.map(plat => ({
-      idPlat: plat.idPlat,
-      quantite: plat.quantite
-    }));
-
-    if (platQuantites.some(p => !p.idPlat || p.quantite < 1)) {
-      this.errorMessage = 'Certains plats sont invalides. Veuillez vérifier votre panier.';
-      return;
-    }
-
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'X-Session-Token': sessionToken
-    });
-
-    this.isProcessing = true;
-
-    // Sauvegarder le total AVANT de l'envoyer
-    const totalCommande = this.calculerTotal();
-
-    this.http.post<any>(
-      `http://localhost:8081/commande/passerCommande/${this.tableNumber}`,
-      platQuantites,
-      { headers }
-    ).subscribe({
-      next: (response) => {
-        this.isProcessing = false;
-        this.orderSuccess = true;
-
-        // IMPORTANT: Récupérer l'ID de commande depuis la réponse
-        if (response && response.idCommande) {
-          this.idCommandeEnCours = response.idCommande;
-          
-          // Stocker l'ID de commande et le total
-          this.totalCommandeEnCours = totalCommande;
-          this.hasActiveOrder = true;
-          this.commandeService.setTotalCommandeEnCours(totalCommande);
-          
-          localStorage.setItem(`commandeEnCours_table_${this.tableNumber}`, totalCommande.toString());
-          
-          // Sauvegarder les détails pour référence
-          const commandeDetails = {
-            idCommande: this.idCommandeEnCours,
-            montantTotal: totalCommande,
-            plats: this.platsDansPanier.map(plat => ({
-              idPlat: plat.idPlat,
-              nom: plat.name,
-              quantite: plat.quantite,
-              prix: plat.prix
-            })),
-            tableNumber: this.tableNumber,
-            date: new Date()
-          };
-          localStorage.setItem(`detailsCommande_table_${this.tableNumber}`, JSON.stringify(commandeDetails));
-
-          // Vider le panier uniquement (garder le total de commande)
-          this.panierService.clearPanier();
-          this.platsDansPanier = [];
-
-          this.successMessage = `Votre commande #${this.idCommandeEnCours} a été passée avec succès! Le montant reste disponible pour le paiement.`;
-        } else {
-          this.errorMessage = 'Erreur: ID de commande non reçu du serveur.';
-        }
-        
-        this.clearMessagesDelayed();
-      },
-      error: (error) => {
-        this.isProcessing = false;
-        this.errorMessage = error.error?.error || 'Une erreur est survenue lors de la commande. Veuillez réessayer.';
-        
-        // En cas d'erreur, supprimer la commande stockée
-        this.clearCommandeEnCours();
-        this.clearMessagesDelayed();
-      }
-    });
-  }
-
-procederAuPaiement(): void {
+ passerCommande(): void {
   this.clearMessages();
 
-  if (!this.hasCommandeEnCours()) {
-    this.errorMessage = 'Aucune commande à payer. Veuillez d\'abord passer une commande.';
-    return;
-  }
-  this.showPaymentOptions = true;
-
-  if (!this.idCommandeEnCours) {
-    this.errorMessage = 'ID de commande non trouvé.';
+  if (!this.tableNumber) {
+    this.errorMessage = 'Numéro de table non trouvé. Veuillez scanner à nouveau le QR code.';
     return;
   }
 
-  const montantTnd = this.getTotalAffiche();
-  const montantUsd = this.paymentService.convertTndToUsd(montantTnd);
-  
-  console.log(`Paiement de ${montantTnd} TND (${montantUsd} USD)`);
+  if (this.platsDansPanier.length === 0) {
+    this.errorMessage = 'Votre panier est vide. Veuillez ajouter des plats avant de commander.';
+    return;
+  }
 
-  this.isPaymentProcessing = true;
+  const sessionToken = localStorage.getItem('token');
+  if (!sessionToken) {
+    this.errorMessage = 'Session expirée. Veuillez scanner à nouveau le QR code.';
+    return;
+  }
 
-  this.paymentService.createPayment(this.idCommandeEnCours, montantTnd).subscribe({
+  const platQuantites = this.platsDansPanier.map(plat => ({
+    idPlat: plat.idPlat,
+    quantite: plat.quantite
+  }));
+
+  if (platQuantites.some(p => !p.idPlat || p.quantite < 1)) {
+    this.errorMessage = 'Certains plats sont invalides. Veuillez vérifier votre panier.';
+    return;
+  }
+
+  const headers = new HttpHeaders({
+    'Content-Type': 'application/json',
+    'X-Session-Token': sessionToken
+  });
+
+  this.isProcessing = true;
+  const totalCommande = this.calculerTotal();
+
+  this.http.post<any>(
+    `http://localhost:8081/commande/passerCommande/${this.tableNumber}`,
+    platQuantites,
+    { headers }
+  ).subscribe({
     next: (response) => {
-      this.isPaymentProcessing = false;
-      
-      if (response.status === 'success' && response.approvalUrl) {
-        localStorage.setItem('pendingPayment', JSON.stringify({
-          paymentId: response.paymentId,
-          idCommande: this.idCommandeEnCours,
-          tableNumber: this.tableNumber,
-          amountTnd: montantTnd,
-          amountUsd: montantUsd
-        }));
+      this.isProcessing = false;
+      this.orderSuccess = true;
+
+      if (response && response.idCommande) {
+        this.idCommandeEnCours = response.idCommande;
+        this.totalCommandeEnCours = totalCommande;
+        this.hasActiveOrder = true;
         
-        window.location.href = response.approvalUrl;
+        // CORRECTION: Synchroniser avec le service
+        this.commandeService.setTotalCommandeEnCours(totalCommande);
+        
+        // Sauvegarder avec la clé correcte - FIXED NULL CHECK
+        localStorage.setItem(`commandeEnCours_table_${this.tableNumber}`, totalCommande.toString());
+        
+        // Fixed line - add null check
+        if (this.idCommandeEnCours !== null) {
+          localStorage.setItem(`idCommande_table_${this.tableNumber}`, this.idCommandeEnCours.toString());
+        }
+        
+        const commandeDetails = {
+          idCommande: this.idCommandeEnCours,
+          montantTotal: totalCommande,
+          plats: this.platsDansPanier.map(plat => ({
+            idPlat: plat.idPlat,
+            nom: plat.name,
+            quantite: plat.quantite,
+            prix: plat.prix
+          })),
+          tableNumber: this.tableNumber,
+          date: new Date()
+        };
+        localStorage.setItem(`detailsCommande_table_${this.tableNumber}`, JSON.stringify(commandeDetails));
+
+        // Vider le panier uniquement
+        this.panierService.clearPanier();
+        this.platsDansPanier = [];
+
+        this.successMessage = `Votre commande #${this.idCommandeEnCours} a été passée avec succès! Le montant reste disponible pour le paiement.`;
       } else {
-        this.errorMessage = 'Erreur lors de la création du paiement';
+        this.errorMessage = 'Erreur: ID de commande non reçu du serveur.';
       }
+      
+      this.clearMessagesDelayed();
     },
     error: (error) => {
-      this.isPaymentProcessing = false;
-      this.errorMessage = 'Erreur lors de la création du paiement';
+      this.isProcessing = false;
+      this.errorMessage = error.error?.error || 'Une erreur est survenue lors de la commande. Veuillez réessayer.';
+      this.clearCommandeEnCours();
+      this.clearMessagesDelayed();
     }
   });
 }
+
+  procederAuPaiement(): void {
+    this.clearMessages();
+    this.resetPaymentState();
+
+    // CORRECTION: Vérifications améliorées
+    console.log('Procédure paiement - hasActiveOrder:', this.hasActiveOrder, 'total:', this.totalCommandeEnCours, 'id:', this.idCommandeEnCours);
+
+    if (!this.hasCommandeEnCours()) {
+      // Essayer de recharger les données avant d'échouer
+      this.loadCommandeData();
+      
+      if (!this.hasCommandeEnCours()) {
+        this.errorMessage = 'Aucune commande à payer. Veuillez d\'abord passer une commande.';
+        return;
+      }
+    }
+
+    this.showPaymentOptions = true;
+
+    if (!this.idCommandeEnCours) {
+      this.errorMessage = 'ID de commande non trouvé.';
+      return;
+    }
+
+    const montantTnd = this.getTotalAffiche();
+    const montantUsd = this.paymentService.convertTndToUsd(montantTnd);
+    
+    console.log(`Paiement de ${montantTnd} TND (${montantUsd} USD) pour commande ${this.idCommandeEnCours}`);
+
+    this.isPaymentProcessing = true;
+
+    this.paymentService.createPayment(this.idCommandeEnCours, montantTnd).subscribe({
+      next: (response) => {
+        this.isPaymentProcessing = false;
+        
+        if (response.status === 'success' && response.approvalUrl) {
+          localStorage.setItem('pendingPayment', JSON.stringify({
+            paymentId: response.paymentId,
+            idCommande: this.idCommandeEnCours,
+            tableNumber: this.tableNumber,
+            amountTnd: montantTnd,
+            amountUsd: montantUsd
+          }));
+          
+          window.location.href = response.approvalUrl;
+        } else {
+          this.errorMessage = 'Erreur lors de la création du paiement';
+        }
+      },
+      error: (error) => {
+        this.isPaymentProcessing = false;
+        this.errorMessage = 'Erreur lors de la création du paiement: ' + (error.error || error.message);
+        console.error('Erreur paiement:', error);
+      }
+    });
+  }
 
   calculerSousTotal(plat: any): number {
     return plat.prix * plat.quantite;
@@ -377,19 +417,20 @@ procederAuPaiement(): void {
     this.passerCommande();
   }
 
-  // Méthode pour nettoyer la commande en cours (après paiement par exemple)
   clearCommandeEnCours(): void {
     this.totalCommandeEnCours = 0;
     this.hasActiveOrder = false;
     this.idCommandeEnCours = null;
     this.commandeService.clearTotalCommande();
-    localStorage.removeItem(`commandeEnCours_table_${this.tableNumber}`);
-    localStorage.removeItem(`idCommande_table_${this.tableNumber}`);
-    localStorage.removeItem(`detailsCommande_table_${this.tableNumber}`);
+    
+    if (this.tableNumber) {
+      localStorage.removeItem(`commandeEnCours_table_${this.tableNumber}`);
+      localStorage.removeItem(`idCommande_table_${this.tableNumber}`);
+      localStorage.removeItem(`detailsCommande_table_${this.tableNumber}`);
+    }
     localStorage.removeItem('pendingPayment');
   }
 
-  // Méthode publique pour nettoyer après paiement réussi
   onPaiementReussi(): void {
     this.clearCommandeEnCours();
     this.paymentSuccess = true;
@@ -400,6 +441,13 @@ procederAuPaiement(): void {
   clearMessages(): void {
     this.errorMessage = null;
     this.successMessage = null;
+  }
+
+  resetPaymentState(): void {
+    this.isPaymentProcessing = false;
+    this.paymentSuccess = false;
+    this.selectedPaymentMethod = null;
+    localStorage.removeItem('pendingPayment');
   }
 
   clearMessagesDelayed(): void {

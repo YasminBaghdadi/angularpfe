@@ -136,7 +136,7 @@
                 </tr>
                 <tr *ngIf="platsDansPanier.length === 0 && hasCommandeEnCours()">
                   <td colspan="5" class="text-center py-4">
-                    <div class="alert alert-info">
+                    <div class="alert alert-info col-md-3 mx-auto text-center mt-3">
                       Commande en cours de traitement ({{ getTotalAffiche() }} TND)
                     </div>
                   </td>
@@ -144,14 +144,6 @@
               </tbody>
             </table>
             
-            <!-- Messages d'état -->
-            <div *ngIf="successMessage" class="alert alert-success">
-              {{ successMessage }}
-            </div>
-            
-            <div *ngIf="errorMessage" class="alert alert-danger">
-              {{ errorMessage }}
-            </div>
             
             <!-- Bouton Commander -->
             <div class="cart__btn-wrap" *ngIf="platsDansPanier.length > 0">
@@ -169,7 +161,15 @@
       </div>
     </div>
 </section>
-  
+  <!-- Messages d'état -->
+            <div *ngIf="successMessage" class="alert alert-success col-md-3 mx-auto text-center mt-3">
+  {{ successMessage }}
+</div>
+
+<div *ngIf="errorMessage" class="alert alert-danger col-md-3 mx-auto text-center mt-3">
+  {{ errorMessage }}
+</div>
+
 <section class="checkout section-space__bottom overflow-hidden">
     <div class="container">
       <div class="row">
@@ -187,11 +187,18 @@
                 <span>{{ getTotalAffiche() }} TND</span>
               </div>
             </div>
-            
+        
             
             <div class="checkout-proceed">
+                  <div class="checkout__content">
+  <img src="assets/visa.png" alt="Visa" style="height: 10px">
+  <img src="assets/mastercard.png" alt="MasterCard" style="height: 30px">
+  <img src="assets/amex.png" alt="American Express" style="height: 20px">
+  ...
+</div><div class="payment-options mb-4">
+  <div class="d-flex flex-column gap-3">
               <button type="button" 
-                      class="rr-btn hover-anim" 
+                      class="rr-btn hover-anim mt-2" 
                       (click)="procederAuPaiement()" 
                       [disabled]="(!platsDansPanier.length && !hasCommandeEnCours()) || isProcessing">
                 <span *ngIf="isProcessing" class="spinner-border spinner-border-sm me-2"></span>
@@ -199,8 +206,10 @@
                 <span class="hover-bg"></span>
               </button>
             </div>
-            <h6 class="modal-title"> <br>
-  💬 <h5 class="modal-title" class="d-inline">Vous ne souhaitez pas payer en ligne ? </h5>..  Aucun souci !  Vous pouvez payer en espèces en passant directement à la caisse !
+            </div>
+        </div>
+          <h6 class="modal-title"> <br>
+  💬 <h5 class="modal-title" class="d-inline">Vous ne souhaitez pas payer en ligne ? </h5>.. <br> Aucun souci !  Vous pouvez payer en espèces en passant directement à la caisse !
 </h6>
           </div>
         </div>

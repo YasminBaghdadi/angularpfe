@@ -1,0 +1,160 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow">
+        <div class="card-body text-center p-4">
+          
+          <!-- Icône et titre principal -->
+          <div class="mb-4">
+            <i class="bi bi-x-circle text-warning" style="font-size: 4rem;"></i>
+            <h2 class="text-warning mt-3 mb-2">Paiement Annulé</h2>
+            <p class="text-muted">Vous avez annulé le processus de paiement PayPal.</p>
+          </div>
+
+          <!-- Informations sur la commande -->
+          <div *ngIf="idCommande" class="alert alert-info">
+            <h5 class="alert-heading">
+              <i class="bi bi-info-circle me-2"></i>
+              Votre commande est conservée
+            </h5>
+            <hr>
+            <p class="mb-2"><strong>Commande #{{ idCommande }}</strong></p>
+            <p class="mb-0">
+              Votre commande reste active et en attente de paiement.<br>
+              Vous pouvez reprendre le paiement à tout moment.
+            </p>
+          </div>
+
+          <!-- Détails du paiement si disponibles -->
+          <div *ngIf="paymentDetails" class="alert alert-light">
+            <h6><i class="bi bi-receipt me-2"></i>Détails de la commande</h6>
+            <div class="row text-start">
+              <div class="col-6">
+                <small class="text-muted">Commande:</small><br>
+                <strong>#{{ paymentDetails.idCommande }}</strong>
+              </div>
+              <div class="col-6">
+                <small class="text-muted">Montant:</small><br>
+                <strong>{{ paymentDetails.montantTotal }} TND</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Options disponibles -->
+          <div class="mt-4">
+            <h5 class="mb-3">Que souhaitez-vous faire ?</h5>
+            
+            <div class="d-grid gap-2">
+              <!-- Option principale: Réessayer le paiement -->
+              <button *ngIf="showRetryOptions" 
+                      class="btn btn-primary btn-lg" 
+                      (click)="retenterPaiement()">
+                <i class="bi bi-credit-card me-2"></i>
+                Réessayer le paiement
+              </button>
+              
+              <!-- Retour au panier -->
+              <button class="btn btn-outline-primary" 
+                      (click)="retournerAuPanier()">
+                <i class="bi bi-cart me-2"></i>
+                Retour au panier
+              </button>
+              
+              <!-- Continuer les achats -->
+              <button class="btn btn-outline-success" 
+                      (click)="continuerAchats()">
+                <i class="bi bi-bag-plus me-2"></i>
+                Continuer mes achats
+              </button>
+              
+              <!-- Retour à l'accueil -->
+              <button class="btn btn-outline-secondary" 
+                      (click)="retournerAccueil()">
+                <i class="bi bi-house me-2"></i>
+                Retour à l'accueil
+              </button>
+            </div>
+
+            <!-- Option d'annulation définitive -->
+            <div *ngIf="showRetryOptions" class="mt-4 pt-3 border-top">
+              <button class="btn btn-outline-danger btn-sm" 
+                      (click)="annulerDefinitivement()">
+                <i class="bi bi-trash me-2"></i>
+                Annuler définitivement la commande
+              </button>
+            </div>
+          </div>
+
+          <!-- Message d'aide -->
+          <div class="mt-4 pt-3 border-top">
+            <div class="alert alert-light">
+              <small>
+                <i class="bi bi-lightbulb me-2"></i>
+                <strong>Bon à savoir:</strong><br>
+                Votre session reste active et aucune donnée n'a été perdue.<br>
+                Vous pouvez reprendre votre commande quand vous le souhaitez.
+              </small>
+            </div>
+          </div>
+
+          <!-- Timer de redirection automatique -->
+          <div *ngIf="!showRetryOptions" class="mt-3">
+            <small class="text-muted">
+              <i class="bi bi-clock me-1"></i>
+              Redirection automatique vers l'accueil dans quelques secondes...
+            </small>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Styles personnalisés -->
+<style>
+  .card {
+    border-radius: 15px;
+    border: none;
+  }
+  
+  .btn {
+    border-radius: 8px;
+    font-weight: 500;
+  }
+  
+  .btn-lg {
+    padding: 12px 24px;
+    font-size: 1.1rem;
+  }
+  
+  .alert {
+    border-radius: 10px;
+  }
+  
+  .border-top {
+    border-top: 1px solid #dee2e6 !important;
+  }
+  
+  .text-warning {
+    color: #f39c12 !important;
+  }
+  
+  .bi {
+    vertical-align: middle;
+  }
+  
+  .alert-light {
+    background-color: #f8f9fa;
+    border-color: #e9ecef;
+  }
+  
+  .card-body {
+    animation: fadeIn 0.5s ease-in;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>

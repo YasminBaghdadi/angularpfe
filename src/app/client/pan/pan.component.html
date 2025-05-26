@@ -105,9 +105,10 @@
     </div>
 </header>
 
-
 <section class="cart section-space-120 overflow-hidden">
   <div class="container">
+    
+
     <div class="row g-24">
       <div class="col-12">
         <div class="table-content cart-table">
@@ -122,9 +123,9 @@
               </tr>
             </thead>
             <tbody>
-              <tr >
+              <tr *ngFor="let plat of platsAffichage; let i = index">
                 <td class="product-remove">
-                  <button >
+                  <button (click)="supprimerPlat(i)" [disabled]="isProcessing || !peutModifierPanier">
                     <svg width="11" height="10" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M8.63551 0L5.57196 4.07L2.57009 0H0.514019L4.68785 5.23286L0 11H2.05607L5.5514 6.39571L8.94393 11H11L6.43551 5.23286L10.6916 0H8.63551Z" fill="#74787C"/>
                     </svg>
@@ -132,38 +133,47 @@
                 </td>
                 <td class="product__wrapper">
                   <a class="product__thumbnail" href="javascript:void(0)">
-                    <img >
+                    <img [src]="plat.image" [alt]="plat.nom">
                   </a>
                   <div class="product__name">
-                    <h6 class="title text-uppercase"></h6>
+                    <h6 class="title text-uppercase">{{ plat.nom }}</h6>
                   </div>
                 </td>
                 <td class="product__price">
-                  <span class="amount"> TND</span>
+                  <span class="amount">{{ plat.prix }} TND</span>
                 </td>
                 <td class="product__quantity">
                   <div class="product__quantity__group">
                     <div class="product__quantity__control">
-                      <span class="minus" >
+                      <span class="minus" 
+                            (click)="modifierQuantite(i, plat.quantite - 1)" 
+                            [class.disabled]="isProcessing || !peutModifierPanier">
                         <i class="fa-solid fa-minus"></i>
                       </span>
                     </div>
                     <input type="number" class="input-text qty text"
-                         
-                           min="1" max="100">
+                           [(ngModel)]="plat.quantite" 
+                           (change)="modifierQuantite(i, plat.quantite)"
+                           min="1" max="100"
+                           [disabled]="isProcessing || !peutModifierPanier">
                     <div class="product__quantity__control">
-                      <span class="plus" >
+                      <span class="plus" 
+                            (click)="modifierQuantite(i, plat.quantite + 1)" 
+                            [class.disabled]="isProcessing || !peutModifierPanier">
                         <i class="fa-solid fa-plus"></i>
                       </span>
                     </div>
                   </div>
                 </td>
                 <td class="product__subtotal">
-                  <span> TND</span>
+                  <span>{{ plat.prix * plat.quantite }} TND</span>
                 </td>
               </tr>
-              <tr >
-                <td colspan="5" class="text-center py-4">Votre panier est vide</td>
+              
+              <tr *ngIf="platsAffichage.length === 0">
+                <td colspan="5" class="text-center py-4">
+                  {{ commandePassee ? 'Aucune commande en attente' : 'Votre panier est vide' }}
+                </td>
               </tr>
             </tbody>
           </table>
@@ -172,6 +182,21 @@
     </div>
   </div>
 </section>
+<!-- Messages d'alerte -->
+    <div class="row justify-content-center">
+  <div class="col-md-3">
+    <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show text-center" role="alert">
+      {{ errorMessage }}
+      <button type="button" class="btn-close" (click)="errorMessage = null"></button>
+    </div>
+
+    <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show text-center" role="alert">
+      {{ successMessage }}
+      <button type="button" class="btn-close" (click)="successMessage = null"></button>
+    </div>
+  </div>
+</div>
+
 
 <section class="checkout section-space__bottom overflow-hidden">
   <div class="container">
@@ -180,62 +205,141 @@
         <div class="checkout__form mb-5">
           <h3 class="mb-30 text-uppercase">Informations de livraison</h3>
 
-          
-
-        
-
           <div class="form-group mb-4">
             <label for="adresse">Adresse de livraison *</label>
             <input type="text" id="adresse" class="form-control"
->          </div>
+                   [(ngModel)]="adresseLivraison" 
+                   required
+                   [disabled]="isProcessing || commandePassee">
+          </div>
 
           <div class="form-group mb-4">
             <label for="telephone">Téléphone *</label>
             <input type="tel" id="telephone" class="form-control"
-                   >
+                   [(ngModel)]="telephone" 
+                   required
+                   [disabled]="isProcessing || commandePassee">
           </div>
 
-          <div class="checkout-proceed">
-            <button type="button" class="rr-btn hover-anim"
->
-              <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-commander              <span class="hover-bg"></span>
-            </button>
-          </div>
+ <div class="checkout-proceed">
+  <button type="button" class="rr-btn hover-anim mb-3"
+          (click)="ouvrirFactureModal()"
+          [disabled]="isProcessing || panier.length === 0">
+    <span *ngIf="isProcessing" class="spinner-border spinner-border-sm me-2"></span>
+    {{ isProcessing ? 'TRAITEMENT...' : 'COMMANDER' }}
+    <span class="hover-bg"></span>
+  </button>
+</div>
         </div>
       </div>
 
       <div class="col-xl-6">
         <div class="checkout__content">
-          <h3 class="mb-30 text-uppercase">Totaux des plats</h3>
+          <h3 class="mb-30 text-uppercase">Totaux</h3>
           <div class="checkout__wrapper mb-40">
             <div class="checkout__top checkout__item">
               <h6 class="title">Sous-total</h6>
-              <span class="price"> TND</span>
+              <span class="price">{{ montantTotalTND }}</span>
             </div>
 
             <div class="checkout__total checkout__item">
               <h6 class="title">Total</h6>
-              <span> TND</span>
+              <span>{{ montantTotalTND }}</span>
             </div>
+            
           </div>
 
-          <div class="checkout-proceed">
-            <button type="button" class="rr-btn hover-anim"
-               
-                  >
-              <span  class="spinner-border spinner-border-sm me-2" role="status"></span>
-passer a la caisse              <span class="hover-bg"></span>
-            </button>
+          <!-- Options de paiement supplémentaires -->
+          <div class="payment-options mb-4">
+             <div class="checkout__content">
+  <img src="assets/visa.png" alt="Visa" style="height: 10px">
+  <img src="assets/mastercard.png" alt="MasterCard" style="height: 30px">
+  <img src="assets/amex.png" alt="American Express" style="height: 20px">
+  ...
+</div>
+  <div class="d-flex flex-column gap-3">
+    <button type="button" class="rr-btn hover-anim"
+            (click)="procederAuPaiementSimple()"
+            [disabled]="isProcessing || !commandePassee">
+      <span *ngIf="isProcessing" class="spinner-border spinner-border-sm me-2"></span>
+      {{ isProcessing ? 'TRAITEMENT...' : 'PASSER À LA CAISSE' }}
+      <span class="hover-bg"></span>
+    </button>
+    
+    
+  </div>
+</div>
+          
+              <h6 class="modal-title"> <br>
+  💬 <h5 class="modal-title" class="d-inline">Vous ne souhaitez pas payer en ligne ? </h5>.. <br> Aucun souci !  Vous pouvez payer en espèces en passant directement à la caisse !
+</h6>
           </div>
         </div>
       </div>
     </div>
-  </div>
 </section>
 
 
+<!-- Modal de confirmation de commande -->
+<div class="modal fade" 
+     id="factureModal" 
+     tabindex="-1"
+     [ngClass]="{ show: showFactureModal }"
+     [ngStyle]="{ display: showFactureModal ? 'flex' : 'none', 'align-items': 'center', 'justify-content': 'center' }"
+     aria-labelledby="factureModalLabel"
+     aria-hidden="!showFactureModal"
+     style="background: rgba(0,0,0,0.5); position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1050;">
+  <div class="modal-dialog modal-dialog-centered modal-lg p-6" style="max-width: 800px;">
+    <div class="modal-content rounded-4 shadow border-0 p-4" style="background: #f5f5f5;">
 
+      <header class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+        <h5 id="factureModalLabel" class="text-uppercase fw-bold mb-0" style="letter-spacing: 1.5px;">
+          Facture de votre commande
+        </h5>
+        <button type="button" class="btn-close" (click)="fermerFactureModal()" aria-label="Close"></button>
+      </header>
+
+      <section class="facture-items mb-4" style="display: flex; flex-direction: column; gap: 15px;">
+        <div class="facture-item d-flex justify-content-between align-items-center fw-semibold text-uppercase px-3 py-2 rounded-3" style="background: #f8f9fa; font-size: 0.9rem;">
+          <span style="flex: 3;">Plat</span>
+          <span style="flex: 1; text-align: center;">Quantité</span>
+          <span style="flex: 1; text-align: right;">Prix</span>
+          <span style="flex: 1; text-align: right;">Sous-total</span>
+        </div>
+
+        <ng-container *ngFor="let plat of platsAffichage">
+          <div class="facture-item d-flex justify-content-between align-items-center px-3 py-2 border rounded-3" style="font-size: 0.95rem;">
+            <span style="flex: 3; font-weight: 500;">{{ plat.nom }}</span>
+            <span style="flex: 1; text-align: center;">{{ plat.quantite }}</span>
+            <span style="flex: 1; text-align: right;">{{ plat.prix }} TND</span>
+            <span style="flex: 1; text-align: right;">{{ plat.prix * plat.quantite }} TND</span>
+          </div>
+        </ng-container>
+      </section>
+
+      <section class="facture-total d-flex justify-content-between align-items-center border-top pt-3 mt-3" style="font-size: 1.3rem; font-weight: 700;">
+        <span>Total :</span>
+        <span>{{ montantTotalTND }}</span>
+      </section>
+      
+      <p class="text-center text-muted fst-italic mt-3" style="font-size: 1.5rem;">
+        Une fois la commande confirmée, aucune modification n'est possible !
+      </p>
+
+      <footer class="modal-footer border-0 d-flex justify-content-end gap-3 pt-4 px-0">
+        <button class="btn btn-outline-secondary px-4 py-2 rounded-3" (click)="fermerFactureModal()">Annuler</button>
+
+        <button class="btn btn-primary px-4 py-2 rounded-3 d-flex align-items-center" 
+                (click)="confirmerCommande()"
+                [disabled]="isProcessing">
+          <span *ngIf="isProcessing" class="spinner-border spinner-border-sm me-2"></span>
+          {{ isProcessing ? 'Confirmation...' : 'Confirmer la commande' }}
+        </button>
+      </footer>
+
+    </div>
+  </div>
+</div>
 
 <!-- Body main wrapper end -->
 <footer>

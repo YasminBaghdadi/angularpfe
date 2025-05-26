@@ -1,0 +1,170 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow">
+        <div class="card-body text-center p-4">
+          
+          <!-- État de traitement -->
+          <div *ngIf="isProcessing" class="text-center py-4">
+            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+              <span class="visually-hidden">Chargement...</span>
+            </div>
+            <h3 class="mt-3">Validation du paiement en cours</h3>
+            <p class="text-muted">Veuillez patienter pendant que nous confirmons votre paiement.</p>
+          </div>
+
+          <!-- Succès du paiement -->
+          <div *ngIf="paymentSuccess" class="success-container">
+            <div class="text-success mb-3">
+              <i class="bi bi-check-circle-fill" style="font-size: 4rem;"></i>
+            </div>
+            <h2 class="text-success mb-3">Paiement Confirmé!</h2>
+            
+            <div class="alert alert-success">
+              <h5 class="alert-heading">Commande #{{ idCommande }}</h5>
+              <hr>
+              <p><strong>Montant:</strong> {{ montantPaye }}</p>
+              <p><strong>Référence PayPal:</strong> {{ paymentId }}</p>
+            </div>
+
+            <!-- Détails de la commande si disponibles -->
+            <div *ngIf="commandeDetails" class="mt-3 text-start">
+              <h5>Détails de la commande:</h5>
+              <div *ngIf="commandeDetails.plats" class="mb-3">
+                <ul class="list-group">
+                  <li *ngFor="let plat of commandeDetails.plats" class="list-group-item d-flex justify-content-between">
+                    <span>{{ plat.quantite }} x {{ plat.nom }}</span>
+                    <span class="fw-bold">{{ plat.prix * plat.quantite }} TND</span>
+                  </li>
+                </ul>
+              </div>
+              <div class="text-end">
+                <h5 class="fw-bold text-primary">Total: {{ montantPaye }}</h5>
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <div class="alert alert-info">
+                <i class="bi bi-info-circle me-2"></i>
+                <strong>Votre commande a été confirmée!</strong><br>
+                Vous allez être redirigé automatiquement vers l'accueil dans quelques secondes...
+              </div>
+            </div>
+          </div>
+
+          <!-- Erreur de paiement -->
+          <div *ngIf="paymentError" class="error-container">
+            <div class="text-danger mb-3">
+              <i class="bi bi-exclamation-triangle-fill" style="font-size: 4rem;"></i>
+            </div>
+            <h2 class="text-danger mb-3">Problème de paiement</h2>
+            
+            <div class="alert alert-danger">
+              <h5 class="alert-heading">Erreur</h5>
+              <hr>
+              <p>{{ errorMessage }}</p>
+              <p *ngIf="idCommande" class="mb-0">
+                <strong>Commande #{{ idCommande }}</strong><br>
+                Votre commande est toujours en attente de paiement.
+              </p>
+            </div>
+
+            <div class="mt-3">
+              <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                Veuillez réessayer le paiement ou contacter notre support client.
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions disponibles -->
+          <div class="mt-4">
+            <!-- Actions pour succès -->
+            <div *ngIf="paymentSuccess" class="d-grid gap-2 d-md-flex justify-content-md-center">
+              <button class="btn btn-primary me-md-2" (click)="retournerAccueil()">
+                <i class="bi bi-house-fill me-2"></i>
+                Retour à l'accueil
+              </button>
+              
+              <button class="btn btn-outline-primary me-md-2" (click)="nouvelleCommande()">
+                <i class="bi bi-plus-circle me-2"></i>
+                Nouvelle commande
+              </button>
+              
+              <button class="btn btn-outline-secondary" (click)="imprimerFacture()">
+                <i class="bi bi-printer me-2"></i>
+                Imprimer
+              </button>
+            </div>
+
+            <!-- Actions pour erreur -->
+            <div *ngIf="paymentError" class="d-grid gap-2 d-md-flex justify-content-md-center">
+              <button class="btn btn-primary me-md-2" (click)="retenterPaiement()">
+                <i class="bi bi-arrow-clockwise me-2"></i>
+                Réessayer le paiement
+              </button>
+              
+              <button class="btn btn-outline-primary me-md-2" (click)="retournerAuPanier()">
+                <i class="bi bi-cart me-2"></i>
+                Retour au panier
+              </button>
+              
+              <button class="btn btn-outline-secondary" (click)="retournerAccueil()">
+                <i class="bi bi-house me-2"></i>
+                Accueil
+              </button>
+            </div>
+          </div>
+
+          <!-- Message d'aide -->
+          <div class="mt-4">
+            <small class="text-muted">
+              <i class="bi bi-info-circle me-1"></i>
+              Pour toute question, n'hésitez pas à contacter notre service client.
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Styles personnalisés -->
+<style>
+  .success-container {
+    animation: fadeIn 0.5s ease-in;
+  }
+  
+  .error-container {
+    animation: fadeIn 0.5s ease-in;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .spinner-border {
+    animation: spin 1s linear infinite;
+  }
+  
+  .alert {
+    border-radius: 10px;
+  }
+  
+  .card {
+    border-radius: 15px;
+    border: none;
+  }
+  
+  .btn {
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 500;
+  }
+  
+  .list-group-item {
+    border-radius: 8px !important;
+    margin-bottom: 2px;
+  }
+</style>

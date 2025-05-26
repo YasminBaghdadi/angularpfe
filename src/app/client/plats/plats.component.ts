@@ -18,6 +18,7 @@ export class PlatsComponent implements OnInit, OnDestroy {
   loading = false;
   error: string | null = null;
   private destroy$ = new Subject<void>();
+messageConfirmation: string = '';
 
   constructor(
     private platService: PlatService,
@@ -107,9 +108,19 @@ export class PlatsComponent implements OnInit, OnDestroy {
   }
 
   commander(plat: Plat): void {
-    const quantite = plat.quantite ?? 1;
-    const total = plat.prix * quantite;
-    this.panierService.ajouterAuPanier({ ...plat, quantite });
-    alert(`Commande : ${quantite} x ${plat.name} = ${total.toFixed(2)} TND`);
-  }
+  const quantite = plat.quantite ?? 1;
+  const total = plat.prix * quantite;
+  this.panierService.ajouterAuPanier({ ...plat, quantite });
+
+  this.messageConfirmation = `✔️ ${quantite} x ${plat.name} ajouté au panier (${total.toFixed(2)} TND)`;
+
+  // Efface le message après 3 secondes
+  setTimeout(() => {
+    this.messageConfirmation = '';
+  }, 3000);
+}
+
+
+
+  
 }

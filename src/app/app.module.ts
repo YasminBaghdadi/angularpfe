@@ -43,6 +43,8 @@ import { MenuComponent } from './admin/menu/menu.component';
 import { PaymentComponent } from './payment/payment.component';
 import { PaymentSuccessComponent } from './payment-success/payment-success.component';
 import { PaymentCancelComponent } from './payment-cancel/payment-cancel.component';
+import { SimplePaymentSuccessComponent } from './simple-payment-success/simple-payment-success.component';
+import { SimplePaymentCancelComponent } from './simple-payment-cancel/simple-payment-cancel.component';
 // Keycloak config
 const keycloakConfig = {
   url: 'http://localhost:9090',
@@ -91,7 +93,9 @@ function initializeKeycloak(keycloak: KeycloakService) {
     MenuComponent,
     PaymentComponent,
     PaymentSuccessComponent,
-    PaymentCancelComponent  
+    PaymentCancelComponent,
+    SimplePaymentSuccessComponent,
+    SimplePaymentCancelComponent  
      ],
   imports: [
     BrowserModule,

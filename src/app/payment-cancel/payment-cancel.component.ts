@@ -27,12 +27,7 @@ export class PaymentCancelComponent implements OnInit {
       console.log('Numéro de table:', this.tableNumber);
     });
 
-    // Redirection automatique après 60 secondes vers le panier
-    setTimeout(() => {
-      if (this.tableNumber) {
-        this.router.navigate(['/panierPassager-table', this.tableNumber]);
-      } 
-    }, 60000);
+    
   }
 
   retournerAuPanier(): void {
