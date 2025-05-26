@@ -27,6 +27,7 @@ import { PaymentCancelComponent } from './payment-cancel/payment-cancel.componen
 import { PaymentSuccessComponent } from './payment-success/payment-success.component';
 import { SimplePaymentCancelComponent} from './simple-payment-cancel/simple-payment-cancel.component';
 import { SimplePaymentSuccessComponent } from './simple-payment-success/simple-payment-success.component';
+import { ModifierprofilComponent } from './modifierprofil/modifierprofil.component';
 const routes: Routes = [
   { path: '', redirectTo: 'accueil', pathMatch: 'full' },
   { 
@@ -52,6 +53,9 @@ const routes: Routes = [
     ]
 
   },
+
+    { path: 'modifier', component: ModifierprofilComponent },
+
 
 
   { 

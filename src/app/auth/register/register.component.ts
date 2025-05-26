@@ -58,11 +58,18 @@ export class RegisterComponent {
         setTimeout(() => this.router.navigate(['/login']), 2000);
       },
       error: (err) => {
-        this.errorMessage = err.message || 'Registration failed';
-        if (err.error?.includes('email already exists')) {
-          this.userForm.get('email')?.setErrors({ emailExists: true });
-        }
-      }
+  const errorMessage = err.error || 'Registration failed';
+  this.errorMessage = errorMessage;
+
+  if (errorMessage.includes('Nom d\'utilisateur déjà utilisé')) {
+    this.userForm.get('username')?.setErrors({ usernameExists: true });
+  }
+
+  if (errorMessage.includes('Email déjà utilisé')) {
+    this.userForm.get('email')?.setErrors({ emailExists: true });
+  }
+}
+
     });
   }
 

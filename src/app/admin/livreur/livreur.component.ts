@@ -99,7 +99,7 @@ export class LivreurComponent implements OnInit {
           this.errorMessage = 'Cet email est déjà utilisé';
           this.userForm.get('email')?.setErrors({ emailExists: true });
         } else {
-          this.errorMessage = err.error?.message || 'Erreur lors de l\'enregistrement';
+          this.errorMessage = err.error?.message || 'Erreur : L\'email ou le nom est déjà utilisé';
         }
       }
     });

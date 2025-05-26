@@ -14,7 +14,9 @@ export class ProfilComponent implements OnInit {
     firstname: '',
     lastname: '',
     email: '',
-    username: ''
+    username: '',
+    password: '',
+    confirmPassword: ''
   };
   isLoading = true;
   isEditing = false;
@@ -41,17 +43,21 @@ export class ProfilComponent implements OnInit {
 
     this.customerService.getUserById(userId).subscribe({
       next: (data) => {
-        this.user = data;
+        this.user = {
+          ...data,
+          password: '',
+          confirmPassword: ''
+        };
         this.originalUserData = {...data};
         this.isLoading = false;
       },
       error: (err) => {
-        console.error('Error loading user data:', err);
+        console.error('Erreur chargement user:', err);
         this.errorMessage = 'Erreur lors du chargement des données utilisateur';
         this.isLoading = false;
-        // Rediriger vers login si l'utilisateur n'est pas authentifié
         if (err.status === 401) {
           this.authService.logout();
+          this.router.navigate(['/login']);
         }
       }
     });
@@ -65,44 +71,71 @@ export class ProfilComponent implements OnInit {
   }
 
   resetForm(): void {
-    this.user = {...this.originalUserData};
+    this.user = {
+      ...this.originalUserData,
+      password: '',
+      confirmPassword: ''
+    };
     this.errorMessage = null;
     this.successMessage = null;
   }
 
+  // Getter utilisé pour le template pour indiquer si les mots de passe ne correspondent pas
+  get passwordsDoNotMatch(): boolean {
+    return this.user.password !== this.user.confirmPassword;
+  }
+
   updateProfile(form: NgForm): void {
     if (form.invalid) {
-      this.errorMessage = 'Veuillez remplir tous les champs requis correctement';
+      this.errorMessage = 'Veuillez remplir tous les champs requis correctement.';
+      return;
+    }
+
+    if (this.user.password !== this.user.confirmPassword) {
+      this.errorMessage = 'Les mots de passe ne correspondent pas.';
       return;
     }
 
     const userId = this.authService.getUserId();
     if (!userId) {
-      this.router.navigate(['/dash']);
+      this.router.navigate(['/login']);
       return;
     }
 
-    const updatedData = {
+    // Préparation des données à envoyer : ne pas envoyer password si vide
+    const updatedData: any = {
       firstname: this.user.firstname,
       lastname: this.user.lastname,
-      email: this.user.email
-      // On ne met pas à jour le username car il est généralement immuable
+      email: this.user.email,
+      username: this.user.username
     };
+
+    if (this.user.password && this.user.password.trim().length > 0) {
+      updatedData.password = this.user.password;
+    }
 
     this.isLoading = true;
     this.errorMessage = null;
     this.successMessage = null;
 
     this.customerService.updateUser(userId, updatedData).subscribe({
-      next: (response) => {
+      next: () => {
         this.isEditing = false;
-        this.originalUserData = {...this.user};
-        this.successMessage = 'Profil mis à jour avec succès';
+        // Mettre à jour originalUserData avec les données mises à jour sans les mots de passe
+        this.originalUserData = {
+          firstname: this.user.firstname,
+          lastname: this.user.lastname,
+          email: this.user.email,
+          username: this.user.username
+        };
+        this.user.password = '';
+        this.user.confirmPassword = '';
+        this.successMessage = 'Profil mis à jour avec succès.';
         this.isLoading = false;
       },
       error: (err) => {
-        console.error('Error updating profile:', err);
-        this.errorMessage = err.error?.message || 'Erreur lors de la mise à jour du profil';
+        console.error('Erreur mise à jour:', err);
+        this.errorMessage = err.error?.message || 'Erreur lors de la mise à jour du profil.';
         this.isLoading = false;
       }
     });
