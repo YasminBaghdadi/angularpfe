@@ -33,13 +33,16 @@ export class PanComponent implements OnInit {
     private simplePaymentService: SimplePaymentService,
     private router: Router,
     private route: ActivatedRoute
-  ) {}
+  ) {}// Dans PanComponent, ajoutez ceci dans ngOnInit() :
+
 
   ngOnInit(): void {
     this.verifierParametresRetour();
     this.verifierCommandeEnAttente();
     this.verifierPaiementEnCours();
-
+  console.log('Panier:', this.panier);
+  console.log('Commande en attente:', this.commandeEnAttente?.plats);
+  
     this.panierService.nombreArticles$.subscribe(nombre => {
       this.nombreArticles = nombre;
     });

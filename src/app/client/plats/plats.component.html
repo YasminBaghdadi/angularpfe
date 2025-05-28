@@ -168,7 +168,7 @@
         <ng-container *ngFor="let plat of plats | slice:0:(plats.length / 2)-1; let i = index" >
           <div *ngIf="plat.categorie === selectedCategory" class="food-menu-tab__item fade-top">
             <div class="food-menu-tab__item-media">
-              <img [src]="plat.imageUrl || '/assets/imgs/our-collections/shape-1.jpg'" alt="plat" class="img-fluid" />
+                      <img [src]="plat.imageUrl" [alt]="plat.name">
           </div>
             <div class="food-menu-tab__item-wrapper">
               <div class="food-menu-tab__item-text">

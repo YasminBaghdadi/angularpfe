@@ -205,7 +205,7 @@ export class CommandeService {
     const totalStorageKey = this.getTotalStorageKey();
     localStorage.removeItem(totalStorageKey);
   }
-
+  
   // Nettoyer toutes les données de tous les utilisateurs (utile pour maintenance)
   clearAllUsersData(): void {
     const keys = Object.keys(localStorage);
@@ -279,5 +279,11 @@ export class CommandeService {
         return throwError(() => error.error?.error || 'Erreur lors du paiement');
       })
     );
+  }
+
+
+
+  getCommandesByUser(idUser: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/user/${idUser}`);
   }
 }

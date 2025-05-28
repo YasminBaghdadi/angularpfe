@@ -236,7 +236,7 @@
                             <div class="dropdown-menu dropdown-menu-end">
                                 <!-- item-->
                                 <h6 class="dropdown-header">Mon compte</h6>
-                                <a class="dropdown-item" href="#"><i class="mdi mdi-account-circle text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Profil</span></a>
+                                <a class="dropdown-item" routerLink="/profil"><i class="mdi mdi-account-circle text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Profil</span></a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" (click)="onLogout()"><i class="mdi mdi-logout text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Déconnexion</span></a>
                             </div>
@@ -375,10 +375,10 @@
                             </a>
                             <div class="collapse menu-dropdown" id="orderMenu">
                                 <ul class="nav nav-sm flex-column">
-                                    <li class="nav-item"><a href="#" class="nav-link">Ajouter une commande</a></li>
-                                    <li class="nav-item"><a href="#" class="nav-link">Supprimer une commande</a></li>
-                                    <li class="nav-item"><a href="#" class="nav-link">Modifier une commande</a></li>
-                                    <li class="nav-item"><a href="#" class="nav-link">Voir la liste des commandes</a></li>
+                                    <li class="nav-item"><a routerLink="/admin/commande" class="nav-link">Ajouter une commande</a></li>
+                                    <li class="nav-item"><a routerLink="/admin/commande" class="nav-link">Supprimer une commande</a></li>
+                                    <li class="nav-item"><a routerLink="/admin/commande" class="nav-link">Modifier une commande</a></li>
+                                    <li class="nav-item"><a routerLink="/admin/commande" class="nav-link">Voir la liste des commandes</a></li>
                                 </ul>
                             </div>
                         </li>
@@ -390,10 +390,10 @@
                             </a>
                             <div class="collapse menu-dropdown" id="reservationMenu">
                                 <ul class="nav nav-sm flex-column">
-                                    <li class="nav-item"><a href="#" class="nav-link">Ajouter une réservation</a></li>
-                                    <li class="nav-item"><a href="#" class="nav-link">Supprimer une réservation</a></li>
-                                    <li class="nav-item"><a href="#" class="nav-link">Modifier une réservation</a></li>
-                                    <li class="nav-item"><a href="#" class="nav-link">Voir la liste des réservations</a></li>
+                                    <li class="nav-item"><a routerLink="/admin/reservation" class="nav-link">Ajouter une réservation</a></li>
+                                    <li class="nav-item"><a routerLink="/admin/reservation" class="nav-link">Supprimer une réservation</a></li>
+                                    <li class="nav-item"><a routerLink="/admin/reservation" class="nav-link">Modifier une réservation</a></li>
+                                    <li class="nav-item"><a routerLink="/admin/reservation" class="nav-link">Voir la liste des réservations</a></li>
                                 </ul>
                             </div>
                         </li>
@@ -421,6 +421,8 @@
         </div>
         <!-- Left Sidebar End -->
         <div class="vertical-overlay"></div>
+
+
 
 
 <div class="main-content">
@@ -558,7 +560,8 @@
                 <div class="table-responsive">
                     <table class="table align-middle table-nowrap table-striped mb-0">
                         <thead class="table-light">
-                            <tr>
+                            <tr>                                
+                                <th scope="col">Numéro</th>
                                 <th scope="col">Nom</th>
                                 <th scope="col">Prix</th>
                                 <th scope="col">Description</th>
@@ -568,6 +571,8 @@
                         </thead>
                        <tbody>
                           <tr *ngFor="let plat of plats">
+                            <td>{{ plat.idPlat }}</td>
+
                             <td>{{ plat.name }}</td>
                             <td>{{ plat.prix }} TND</td>
                             <td class="truncate" [title]="plat.description">{{ plat.description }}</td>

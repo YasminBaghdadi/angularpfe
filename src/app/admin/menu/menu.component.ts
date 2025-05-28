@@ -149,35 +149,45 @@ export class MenuComponent implements OnInit {
   }
 
   // Méthode pour mettre à jour un plat
-  updatePlat(): void {
-    if (!this.currentPlat.idPlat) {
-      this.errorMessage = "ID du plat non valide";
-      return;
-    }
-
-    if (
-      !this.currentPlat.name.trim() ||
-      !this.currentPlat.description.trim() ||
-      this.currentPlat.prix === null ||
-      this.currentPlat.prix <= 0 ||
-      !this.currentPlat.categorie
-    ) {
-      this.errorMessage = 'Veuillez remplir tous les champs correctement.';
-      return;
-    }
-
-    this.http.put<any>(`http://localhost:8081/Plat/update/${this.currentPlat.idPlat}`, this.currentPlat).subscribe({
-      next: () => {
-        this.successMessage = 'Plat modifié avec succès';
-        this.closeEditModal();
-        this.loadPlats(); // Recharge la liste après modification
-      },
-      error: (error) => {
-        console.error("Erreur lors de la modification du plat:", error);
-        this.errorMessage = "Erreur lors de la modification du plat: " + (error?.message || 'Erreur inconnue');
-      }
-    });
+ updatePlat(): void {
+  if (!this.currentPlat.idPlat) {
+    this.errorMessage = "ID du plat non valide";
+    return;
   }
+
+  if (
+    !this.currentPlat.name.trim() ||
+    !this.currentPlat.description.trim() ||
+    this.currentPlat.prix === null ||
+    this.currentPlat.prix <= 0 ||
+    !this.currentPlat.categorie
+  ) {
+    this.errorMessage = 'Veuillez remplir tous les champs correctement.';
+    return;
+  }
+
+  const token = localStorage.getItem('access_token');
+  const headers = {
+    'Authorization': `Bearer ${token}`
+  };
+
+  this.http.put<any>(
+    `http://localhost:8081/Plat/update/${this.currentPlat.idPlat}`,
+    this.currentPlat,
+    { headers }
+  ).subscribe({
+    next: () => {
+      this.successMessage = 'Plat modifié avec succès';
+      this.closeEditModal();
+      this.loadPlats(); // Recharge la liste après modification
+    },
+    error: (error) => {
+      console.error("Erreur lors de la modification du plat:", error);
+      this.errorMessage = "Erreur lors de la modification du plat: " + (error?.message || 'Erreur inconnue');
+    }
+  });
+}
+
 
   // Nouvelle méthode pour ouvrir le modal de suppression
   openDeleteModal(idPlat: number): void {

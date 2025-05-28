@@ -222,101 +222,121 @@ export class PanierPassagerComponent implements OnInit, OnDestroy {
     return this.hasActiveOrder && this.totalCommandeEnCours > 0 && this.idCommandeEnCours !== null;
   }
 
- passerCommande(): void {
-  this.clearMessages();
-
-  if (!this.tableNumber) {
-    this.errorMessage = 'Numéro de table non trouvé. Veuillez scanner à nouveau le QR code.';
-    return;
+  // NOUVELLE MÉTHODE: Vérifier si on peut passer une nouvelle commande
+  peutPasserNouvelleCommande(): boolean {
+    return !this.hasCommandeEnCours();
   }
 
-  if (this.platsDansPanier.length === 0) {
-    this.errorMessage = 'Votre panier est vide. Veuillez ajouter des plats avant de commander.';
-    return;
+  // NOUVELLE MÉTHODE: Obtenir le message d'erreur pour commande bloquée
+  getMessageCommandeBloquee(): string {
+    if (this.hasCommandeEnCours()) {
+      return `Vous avez déjà une commande en cours (n°${this.idCommandeEnCours}) d'un montant de ${this.totalCommandeEnCours.toFixed(2)} TND. Veuillez d'abord procéder au paiement avant de passer une nouvelle commande.`;
+    }
+    return '';
   }
 
-  const sessionToken = localStorage.getItem('token');
-  if (!sessionToken) {
-    this.errorMessage = 'Session expirée. Veuillez scanner à nouveau le QR code.';
-    return;
-  }
+  passerCommande(): void {
+    this.clearMessages();
 
-  const platQuantites = this.platsDansPanier.map(plat => ({
-    idPlat: plat.idPlat,
-    quantite: plat.quantite
-  }));
+    // NOUVELLE VÉRIFICATION: Empêcher une nouvelle commande si une commande non payée existe
+    if (!this.peutPasserNouvelleCommande()) {
+      this.errorMessage = this.getMessageCommandeBloquee();
+      this.clearMessagesDelayed();
+      return;
+    }
 
-  if (platQuantites.some(p => !p.idPlat || p.quantite < 1)) {
-    this.errorMessage = 'Certains plats sont invalides. Veuillez vérifier votre panier.';
-    return;
-  }
+    if (!this.tableNumber) {
+      this.errorMessage = 'Numéro de table non trouvé. Veuillez scanner à nouveau le QR code.';
+      return;
+    }
 
-  const headers = new HttpHeaders({
-    'Content-Type': 'application/json',
-    'X-Session-Token': sessionToken
-  });
+    if (this.platsDansPanier.length === 0) {
+      this.errorMessage = 'Votre panier est vide. Veuillez ajouter des plats avant de commander.';
+      return;
+    }
 
-  this.isProcessing = true;
-  const totalCommande = this.calculerTotal();
+    const sessionToken = localStorage.getItem('token');
+    if (!sessionToken) {
+      this.errorMessage = 'Session expirée. Veuillez scanner à nouveau le QR code.';
+      return;
+    }
 
-  this.http.post<any>(
-    `http://localhost:8081/commande/passerCommande/${this.tableNumber}`,
-    platQuantites,
-    { headers }
-  ).subscribe({
-    next: (response) => {
-      this.isProcessing = false;
-      this.orderSuccess = true;
+    const platQuantites = this.platsDansPanier.map(plat => ({
+      idPlat: plat.idPlat,
+      quantite: plat.quantite
+    }));
 
-      if (response && response.idCommande) {
-        this.idCommandeEnCours = response.idCommande;
-        this.totalCommandeEnCours = totalCommande;
-        this.hasActiveOrder = true;
-        
-        // CORRECTION: Synchroniser avec le service
-        this.commandeService.setTotalCommandeEnCours(totalCommande);
-        
-        // Sauvegarder avec la clé correcte - FIXED NULL CHECK
-        localStorage.setItem(`commandeEnCours_table_${this.tableNumber}`, totalCommande.toString());
-        
-        // Fixed line - add null check
-        if (this.idCommandeEnCours !== null) {
-          localStorage.setItem(`idCommande_table_${this.tableNumber}`, this.idCommandeEnCours.toString());
+    if (platQuantites.some(p => !p.idPlat || p.quantite < 1)) {
+      this.errorMessage = 'Certains plats sont invalides. Veuillez vérifier votre panier.';
+      return;
+    }
+
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'X-Session-Token': sessionToken
+    });
+
+    this.isProcessing = true;
+    const totalCommande = this.calculerTotal();
+
+    this.http.post<any>(
+      `http://localhost:8081/commande/passerCommande/${this.tableNumber}`,
+      platQuantites,
+      { headers }
+    ).subscribe({
+      next: (response) => {
+        this.isProcessing = false;
+        this.orderSuccess = true;
+
+        if (response && response.idCommande) {
+          this.idCommandeEnCours = response.idCommande;
+          this.totalCommandeEnCours = totalCommande;
+          this.hasActiveOrder = true;
+          
+          // CORRECTION: Synchroniser avec le service
+          this.commandeService.setTotalCommandeEnCours(totalCommande);
+          
+          // Sauvegarder avec la clé correcte - FIXED NULL CHECK
+          localStorage.setItem(`commandeEnCours_table_${this.tableNumber}`, totalCommande.toString());
+          
+          // Fixed line - add null check
+          if (this.idCommandeEnCours !== null) {
+            localStorage.setItem(`idCommande_table_${this.tableNumber}`, this.idCommandeEnCours.toString());
+          }
+          
+          const commandeDetails = {
+            idCommande: this.idCommandeEnCours,
+            montantTotal: totalCommande,
+            plats: this.platsDansPanier.map(plat => ({
+              idPlat: plat.idPlat,
+              nom: plat.name,
+              quantite: plat.quantite,
+              prix: plat.prix
+            })),
+            tableNumber: this.tableNumber,
+            date: new Date()
+          };
+          localStorage.setItem(`detailsCommande_table_${this.tableNumber}`, JSON.stringify(commandeDetails));
+
+          // Vider le panier uniquement
+          this.panierService.clearPanier();
+          this.platsDansPanier = [];
+
+          this.successMessage = `Votre commande #${this.idCommandeEnCours} a été passée avec succès! Le montant reste disponible pour le paiement.`;
+        } else {
+          this.errorMessage = 'Erreur: ID de commande non reçu du serveur.';
         }
         
-        const commandeDetails = {
-          idCommande: this.idCommandeEnCours,
-          montantTotal: totalCommande,
-          plats: this.platsDansPanier.map(plat => ({
-            idPlat: plat.idPlat,
-            nom: plat.name,
-            quantite: plat.quantite,
-            prix: plat.prix
-          })),
-          tableNumber: this.tableNumber,
-          date: new Date()
-        };
-        localStorage.setItem(`detailsCommande_table_${this.tableNumber}`, JSON.stringify(commandeDetails));
-
-        // Vider le panier uniquement
-        this.panierService.clearPanier();
-        this.platsDansPanier = [];
-
-        this.successMessage = `Votre commande #${this.idCommandeEnCours} a été passée avec succès! Le montant reste disponible pour le paiement.`;
-      } else {
-        this.errorMessage = 'Erreur: ID de commande non reçu du serveur.';
+        this.clearMessagesDelayed();
+      },
+      error: (error) => {
+        this.isProcessing = false;
+        this.errorMessage = error.error?.error || 'Une erreur est survenue lors de la commande. Veuillez réessayer.';
+        this.clearCommandeEnCours();
+        this.clearMessagesDelayed();
       }
-      
-      this.clearMessagesDelayed();
-    },
-    error: (error) => {
-      this.isProcessing = false;
-      this.errorMessage = error.error?.error || 'Une erreur est survenue lors de la commande. Veuillez réessayer.';
-      this.clearCommandeEnCours();
-      this.clearMessagesDelayed();
-    }
-  });
-}
+    });
+  }
 
   procederAuPaiement(): void {
     this.clearMessages();
@@ -373,6 +393,30 @@ export class PanierPassagerComponent implements OnInit, OnDestroy {
         console.error('Erreur paiement:', error);
       }
     });
+  }
+
+  // NOUVELLE MÉTHODE: Annuler la commande en cours (optionnel)
+  annulerCommandeEnCours(): void {
+    if (this.hasCommandeEnCours() && this.idCommandeEnCours) {
+      // Appel API pour annuler la commande côté serveur (si disponible)
+      const headers = new HttpHeaders({
+        'Content-Type': 'application/json',
+        'X-Session-Token': localStorage.getItem('token') || ''
+      });
+
+      this.http.delete(`http://localhost:8081/commande/annuler/${this.idCommandeEnCours}`, { headers })
+        .subscribe({
+          next: () => {
+            this.clearCommandeEnCours();
+            this.successMessage = 'Commande annulée avec succès. Vous pouvez maintenant passer une nouvelle commande.';
+            this.clearMessagesDelayed();
+          },
+          error: (error) => {
+            this.errorMessage = 'Erreur lors de l\'annulation de la commande: ' + (error.error?.message || error.message);
+            this.clearMessagesDelayed();
+          }
+        });
+    }
   }
 
   calculerSousTotal(plat: any): number {

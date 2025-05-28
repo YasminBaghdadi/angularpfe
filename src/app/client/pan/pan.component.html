@@ -133,10 +133,10 @@
                 </td>
                 <td class="product__wrapper">
                   <a class="product__thumbnail" href="javascript:void(0)">
-                    <img [src]="plat.image" [alt]="plat.nom">
-                  </a>
+                      <img [src]="plat.imageUrl" [alt]="plat.name">
+                    </a>
                   <div class="product__name">
-                    <h6 class="title text-uppercase">{{ plat.nom }}</h6>
+                    <h6 class="title text-uppercase">{{ plat.name }}</h6>
                   </div>
                 </td>
                 <td class="product__price">
@@ -309,7 +309,7 @@
 
         <ng-container *ngFor="let plat of platsAffichage">
           <div class="facture-item d-flex justify-content-between align-items-center px-3 py-2 border rounded-3" style="font-size: 0.95rem;">
-            <span style="flex: 3; font-weight: 500;">{{ plat.nom }}</span>
+            <span style="flex: 3; font-weight: 500;">{{ plat.name }}</span>
             <span style="flex: 1; text-align: center;">{{ plat.quantite }}</span>
             <span style="flex: 1; text-align: right;">{{ plat.prix }} TND</span>
             <span style="flex: 1; text-align: right;">{{ plat.prix * plat.quantite }} TND</span>

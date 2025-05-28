@@ -208,7 +208,15 @@
             </div>
           </div>
         </div>
+ <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show col-md-6 mx-auto text-center">
+    {{ successMessage }}
+    <button type="button" class="btn-close" (click)="successMessage = ''"></button>
+  </div>
 
+  <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show col-md-6 mx-auto text-center">
+    {{ errorMessage }}
+    <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
+  </div>
         <div class="text-center mt-4">
           <button type="submit" class="rr-btn hover-anim">
             Réserver une table <span class="hover-bg"></span>
@@ -218,7 +226,7 @@
     </div>
   </div>
 </div>
-
+ 
 
 <footer>
     <section class="footer-2__area-common overflow-hidden">

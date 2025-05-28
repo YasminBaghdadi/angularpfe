@@ -1,61 +1,120 @@
-<!--reservation-->
 <div class="reservation reservation__space">
   <div class="container">
     <div class="reservation__wrapper">
       <h2 class="text-uppercase text-center rr-fw-bold mb-50 mb-xs-30">Créer une réservation</h2>
-      <div class="row">
-        <!-- Nombre de personnes - toute la ligne -->
-        <div class="col-md-6 col-sm-6 d-flex justify-content-end flex-column">
-          <div class="reservation__select">
-            <label>NOMBRE DE PERSONNES *</label>
-            <input id="nombre" name="nombre" type="number" placeholder="1">
+
+      <form #reservationForm="ngForm" (ngSubmit)="reserver()">
+        <div class="row">
+          <!-- Nombre de personnes -->
+          <div class="col-md-6 col-sm-6 d-flex justify-content-end flex-column mb-3">
+            <div class="reservation__select">
+              <label for="numberPersonne">NOMBRE DE PERSONNES *</label>
+              <input id="numberPersonne" name="numberPersonne" type="number" placeholder="1"
+                     min="1" max="20"
+                     class="form-control"
+                     [(ngModel)]="reservation.numberPersonne"
+                     #numberPersonne="ngModel"
+                     required>
+              <div *ngIf="numberPersonne.invalid && (numberPersonne.touched || reservationForm.submitted)" class="text-danger">
+                <small *ngIf="numberPersonne.errors?.['required']">Ce champ est requis</small>
+                <small *ngIf="numberPersonne.errors?.['min']">Minimum 1 personne</small>
+                <small *ngIf="numberPersonne.errors?.['max']">Maximum 20 personnes</small>
+              </div>
+            </div>
           </div>
-        </div>
- <div class="col-md-6 col-sm-6 d-flex justify-content-end flex-column">
-        
-        </div>
-        <!-- Date et Heure -->
-        <div class="col-md-6 col-sm-6 d-flex justify-content-end flex-column">
-          <div class="reservation__input">
-            <label>SÉLECTIONNER UNE DATE *</label>
-            <input id="datepicker" name="date" type="text" class="datepicker" placeholder="AA-MM-JJ">
+
+          <!-- Date -->
+          <div class="col-md-6 col-sm-6 d-flex justify-content-end flex-column mb-3">
+            <div class="reservation__input">
+              <label for="dateReservation">SÉLECTIONNER UNE DATE *</label>
+              <input id="dateReservation" name="dateReservation" type="date"
+                     class="form-control"
+                     [(ngModel)]="reservation.dateReservation"
+                     [min]="getCurrentDate()"
+                     #dateReservation="ngModel"
+                     required>
+              <div *ngIf="dateReservation.invalid && (dateReservation.touched || reservationForm.submitted)" class="text-danger">
+                <small>Date invalide</small>
+              </div>
+            </div>
           </div>
-        </div>
-        <div class="col-md-6 col-sm-6 d-flex justify-content-end flex-column">
-          <div class="reservation__input time">
-            <label>SÉLECTIONNER L’HEURE *</label>
-            <input type="time" value="09:00:00">
+
+          <!-- Heure -->
+          <div class="col-md-6 col-sm-6 d-flex justify-content-end flex-column mb-3">
+            <div class="reservation__input time">
+              <label for="heure">SÉLECTIONNER L’HEURE *</label>
+              <input id="heure" name="heure" type="time"
+                     class="form-control"
+                     [(ngModel)]="reservation.heure"
+                     min="11:00" max="22:00"
+                     #heure="ngModel"
+                     required>
+              <div *ngIf="heure.invalid && (heure.touched || reservationForm.submitted)" class="text-danger">
+                <small>Heure invalide (entre 11:00 et 22:00)</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Nom -->
+          <div class="col-md-6 col-sm-6 d-flex justify-content-end flex-column mb-3">
+            <div class="reservation__input">
+              <label for="nomClient">Votre nom *</label>
+              <input id="nomClient" name="nomClient" type="text"
+                     class="form-control"
+                     [(ngModel)]="reservation.nomClient"
+                     #nomClient="ngModel"
+                     required>
+              <div *ngIf="nomClient.invalid && (nomClient.touched || reservationForm.submitted)" class="text-danger">
+                <small>Nom requis</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Téléphone -->
+          <div class="col-md-6 col-sm-6 d-flex justify-content-end flex-column mb-3">
+            <div class="reservation__input">
+              <label for="numeroTel">Numéro de téléphone *</label>
+              <input id="numeroTel" name="numeroTel" type="tel"
+                     class="form-control"
+                     pattern="[0-9]{8}"
+                     placeholder="8 chiffres (ex: 00112233)"
+                     [(ngModel)]="reservation.numeroTel"
+                     #numeroTel="ngModel"
+                     required>
+              <div *ngIf="numeroTel.invalid && (numeroTel.touched || reservationForm.submitted)" class="text-danger">
+                <small *ngIf="numeroTel.errors?.['required']">Téléphone requis</small>
+                <small *ngIf="numeroTel.errors?.['pattern']">8 chiffres requis</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Message -->
+          <div class="col-md-12 d-flex justify-content-end flex-column mb-3">
+            <div class="reservation__input">
+              <label for="message">Votre message spécial</label>
+              <textarea id="message" name="message"
+                        class="form-control"
+                        [(ngModel)]="reservation.message"
+                        #message="ngModel"></textarea>
+            </div>
           </div>
         </div>
 
-        <!-- Nom et téléphone -->
-        <div class="col-md-6 col-sm-6 d-flex justify-content-end flex-column">
-          <div class="reservation__input">
-            <label>Votre nom *</label>
-            <input type="text" placeholder="Votre nom">
-          </div>
+        <!-- Messages d'erreur / succès -->
+        <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show col-md-6 mx-auto text-center">
+          {{ errorMessage }}
+          <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
         </div>
-        <div class="col-md-6 col-sm-6 d-flex justify-content-end flex-column">
-          <div class="reservation__input">
-            <label>Numéro de téléphone *</label>
-            <input type="tel" placeholder="Numéro de téléphone">
-          </div>
+        <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show col-md-6 mx-auto text-center">
+          {{ successMessage }}
+          <button type="button" class="btn-close" (click)="successMessage = ''"></button>
         </div>
 
-        <!-- Message -->
-        <div class="col-md-12 d-flex justify-content-end flex-column">
-          <div class="reservation__input">
-            <label>Votre message spécial *</label>
-            <textarea name="text" id="text" placeholder="Parlez-nous de votre demande spéciale"></textarea>
-          </div>
+        <!-- Bouton -->
+        <div class="reservation__btn text-center mt-4">
+          <button type="submit" class="rr-btn hover-anim">Réserver une table <span class="hover-bg"></span></button>
         </div>
-      </div>
-
-      <!-- Bouton -->
-      <div class="reservation__btn text-center">
-        <a href="food-menu.html" class="rr-btn hover-anim">Réserver une table<span class="hover-bg"></span></a>
-      </div>
+      </form>
     </div>
   </div>
 </div>
-<!--reservation-->

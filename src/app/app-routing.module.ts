@@ -28,6 +28,8 @@ import { PaymentSuccessComponent } from './payment-success/payment-success.compo
 import { SimplePaymentCancelComponent} from './simple-payment-cancel/simple-payment-cancel.component';
 import { SimplePaymentSuccessComponent } from './simple-payment-success/simple-payment-success.component';
 import { ModifierprofilComponent } from './modifierprofil/modifierprofil.component';
+import { CommandeeComponent } from './admin/commandee/commandee.component';
+import { AdminReservationComponent } from './admin/admin-reservation/admin-reservation.component';
 const routes: Routes = [
   { path: '', redirectTo: 'accueil', pathMatch: 'full' },
   { 
@@ -117,6 +119,17 @@ const routes: Routes = [
     
   },
 
+{ 
+    path: 'admin/commande',  
+    component: CommandeeComponent,
+    
+  },
+
+  { 
+    path: 'admin/reservation',  
+    component: AdminReservationComponent,
+    
+  },
 
 
  
