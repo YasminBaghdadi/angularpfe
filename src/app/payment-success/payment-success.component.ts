@@ -95,7 +95,7 @@ private handlePaymentSuccess(response: any): void {
     
     // Mettre à jour les données affichées
     if (response.amount) {
-        this.montantPaye = response.amount + ' €';
+        this.montantPaye = response.amount + ' $';
     }
 
     // Nettoyage après succès

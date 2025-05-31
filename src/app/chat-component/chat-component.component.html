@@ -1,0 +1,79 @@
+<!-- chat-component.component.html -->
+<!-- Modal Backdrop -->
+<div *ngIf="isModalOpen" 
+     class="chat-modal-backdrop" 
+     (click)="onBackdropClick($event)"
+     (keydown)="onKeyDown($event)"
+     tabindex="0">
+  
+  <!-- Modal Container -->
+  <div class="chat-modal-container" (click)="$event.stopPropagation()">
+    
+    <!-- Bouton de fermeture -->
+    <button class="modal-close-btn" (click)="onCloseModal()">
+      <span>&times;</span>
+    </button>
+
+    <!-- Contenu du chat existant -->
+    <div class="chat-container">
+      <div class="chat-header">
+        <div class="restaurant-info">
+          <h2>🍽️ Restau </h2>
+        </div>
+        <button (click)="resetChat()" class="reset-btn">
+          Nouvelle conversation
+        </button>
+      </div>
+
+      <div class="chat-messages" #chatMessages>
+        <div *ngIf="messages.length === 0" class="welcome-message">
+          <div class="maria-avatar">🤖</div>
+          <div class="message-content">
+            <p><strong>Maria :</strong> Bonjour ! Je suis votre assistante virtuelle du restaurant Restau.</p>
+            <p>Comment puis-je vous aider aujourd'hui ? 🌟</p>
+          </div>
+        </div>
+
+        <div *ngFor="let message of messages" 
+             [class]="'message ' + message.role">
+          <div class="message-avatar">
+            <span *ngIf="message.role === 'user'">👤</span>
+            <span *ngIf="message.role === 'assistant'">🤖</span>
+          </div>
+          <div class="message-content">
+            <div class="message-text">{{ message.content }}</div>
+            <div class="message-time">
+              {{ message.timestamp | date:'HH:mm' }}
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="isLoading" class="message assistant">
+          <div class="message-avatar">🤖</div>
+          <div class="message-content">
+            <div class="typing-indicator">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+        
+        <div class="input-group">
+          <input 
+            [(ngModel)]="currentMessage"
+            (keyup.enter)="sendMessage()"
+            [disabled]="isLoading"
+            placeholder="Posez votre question sur notre menu..."
+            class="message-input"
+            #messageInput>
+          <button 
+            (click)="sendMessage()"
+            [disabled]="isLoading || !currentMessage.trim()"
+            class="send-btn">
+            ↗️
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>

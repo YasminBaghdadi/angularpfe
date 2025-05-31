@@ -254,6 +254,7 @@
         <th>Date Réservation</th>
         <th>Nombre de personnes</th>
         <th>Numéro Table</th> <!-- optionnel si tu veux afficher le numéro -->
+        <th>Actions</th>
       </tr>
     </thead>
     <tbody>
@@ -263,13 +264,137 @@
         <td>{{ reservation.dateReservation | date: 'dd/MM/yyyy HH:mm' }}</td>
         <td>{{ reservation.numberPersonne }}</td>
         <td>{{ reservation.tab?.number }}</td> <!-- si tu veux aussi afficher le numéro -->
+  <td>
+  <div class="btn-group" role="group">
+    <button class="btn btn-primary btn-sm" (click)="editReservation(reservation)">
+      <i class="bi bi-pencil-square"></i> Modifier
+    </button>
+    <button class="btn btn-danger btn-sm" (click)="openDeleteModal(reservation.idReservation)">
+      <i class="bi bi-trash"></i> Supprimer
+    </button>
+  </div>
+</td>
       </tr>
     </tbody>
   </table>
 </div>
 
+
+</div>
+<div
+  class="modal fade"
+  id="deleteTableModal"
+  tabindex="-1"
+  aria-labelledby="deleteTableModalLabel"
+  aria-hidden="true"
+  [ngClass]="{ show: showDeleteModal }"
+  [ngStyle]="{ display: showDeleteModal ? 'block' : 'none', backgroundColor: showDeleteModal ? 'rgba(0, 0, 0, 0.5)' : 'transparent' }"
+  (click)="closeDeleteModalOnBackdrop($event)"
+>
+  <div class="modal-dialog" (click)="$event.stopPropagation()">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteTableModalLabel">Confirmation</h5>
+        <button
+          type="button"
+          class="btn-close"
+          aria-label="Close"
+          (click)="closeDeleteModal()"
+        ></button>
+      </div>
+      <div class="modal-body text-center py-3">
+        <p>Êtes-vous sûr de vouloir supprimer cette table ?</p>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-outline-secondary"
+          (click)="closeDeleteModal()"
+        >
+          <i class="fas fa-times me-1"></i> Annuler
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger"
+          (click)="confirmDelete()"
+        >
+          <i class="fas fa-trash me-1"></i> Supprimer
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 
+
+<!-- Modal de modification -->
+<!-- Modal de modification réservation -->
+<div class="modal" tabindex="-1" [ngClass]="{'show d-block': isEditingReservation}" (click)="closeEditModalOnBackdrop($event)">
+  <div class="modal-dialog" (click)="$event.stopPropagation()">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Modifier la réservation</h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="cancelEditReservation()"></button>
+      </div>
+      <form #reservationForm="ngForm" (ngSubmit)="updateReservation(reservationForm)">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="nomClient" class="form-label">Nom Client</label>
+            <input
+              type="text"
+              id="nomClient"
+              name="nomClient"
+              class="form-control"
+              [(ngModel)]="reservationFormData.nomClient"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="dateReservation" class="form-label">Date et heure de réservation</label>
+            <input
+              type="datetime-local"
+              id="dateReservation"
+              name="dateReservation"
+              class="form-control"
+              [(ngModel)]="reservationFormData.dateReservation"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="numberPersonne" class="form-label">Nombre de personnes</label>
+            <input
+              type="number"
+              id="numberPersonne"
+              name="numberPersonne"
+              class="form-control"
+              [(ngModel)]="reservationFormData.numberPersonne"
+              min="1"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="numeroTel" class="form-label">Numéro de téléphone</label>
+            <input
+              type="tel"
+              id="numeroTel"
+              name="numeroTel"
+              class="form-control"
+              [(ngModel)]="reservationFormData.numeroTel"
+              required
+              pattern="^[0-9]+$"
+            />
+          </div>
+          <div *ngIf="reservationsError" class="alert alert-danger">{{ reservationsError }}</div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="cancelEditReservation()">Annuler</button>
+          <button type="submit" class="btn btn-primary" [disabled]="reservationForm.invalid || reservationsLoading">
+            {{ reservationsLoading ? 'Sauvegarde...' : 'Sauvegarder' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 
         <!-- Affichage profil (visible seulement quand on n'est pas en mode édition et qu'on ne regarde pas l'historique) -->
         <div *ngIf="!isEditing && !isShowingHistorique">

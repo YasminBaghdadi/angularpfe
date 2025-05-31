@@ -427,6 +427,102 @@
 <div class="main-content">
   <div class="page-content">
     <div class="container-fluid">
+
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header align-items-center d-flex">
+        <h4 class="card-title mb-0 flex-grow-1">Ajouter une réservation</h4>
+      </div>
+      <div class="card-body">
+        <div class="live-preview">
+          <form [formGroup]="reservationForm" (ngSubmit)="onSubmit()">
+            <div class="row gy-3">
+
+              <!-- Nom du client -->
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="clientName" class="form-label">Nom du client</label>
+                  <input type="text" class="form-control" id="clientName" formControlName="clientName" placeholder="Entrez le nom du client">
+                  <div *ngIf="f['clientName'].touched && f['clientName'].errors" class="text-danger">
+                    <small *ngIf="f['clientName'].errors['required']">Le nom du client est requis</small>
+                    <small *ngIf="f['clientName'].errors['minlength']">Au moins 3 caractères</small>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Date de réservation -->
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="reservationDate" class="form-label">Date de réservation</label>
+                  <input type="date" class="form-control" id="reservationDate" formControlName="reservationDate">
+                  <div *ngIf="f['reservationDate'].touched && f['reservationDate'].errors" class="text-danger">
+                    <small *ngIf="f['reservationDate'].errors['required']">La date est requise</small>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Heure -->
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="reservationTime" class="form-label">Heure</label>
+                  <input type="time" class="form-control" id="reservationTime" formControlName="reservationTime">
+                  <div *ngIf="f['reservationTime'].touched && f['reservationTime'].errors" class="text-danger">
+                    <small *ngIf="f['reservationTime'].errors['required']">L'heure est requise</small>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Nombre de personnes -->
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="numberOfPeople" class="form-label">Nombre de personnes</label>
+                  <input type="number" class="form-control" id="numberOfPeople" formControlName="numberOfPeople" min="1" placeholder="Entrez le nombre de personnes">
+                  <div *ngIf="f['numberOfPeople'].touched && f['numberOfPeople'].errors" class="text-danger">
+                    <small *ngIf="f['numberOfPeople'].errors['required']">Le nombre de personnes est requis</small>
+                    <small *ngIf="f['numberOfPeople'].errors['min']">Au moins 1 personne</small>
+                  </div>
+                </div>
+              </div>
+
+             <!-- Email de contact -->
+<div class="col-md-6">
+  <div class="mb-3">
+    <label for="numeroTel" class="form-label">Numéro</label>
+<input type="tel" class="form-control" id="numeroTel" formControlName="numeroTel" placeholder="12345678">
+<div *ngIf="f['numeroTel'].touched && f['numeroTel'].errors" class="text-danger">
+  <small *ngIf="f['numeroTel'].errors['required']">Le numéro est requis</small>
+  <small *ngIf="f['numeroTel'].errors['pattern']">Numéro invalide (8 à 15 chiffres)</small>
+</div>
+</div>
+  
+</div>
+
+
+              <!-- Bouton Submit -->
+              <div class="col-12">
+                <button type="submit" class="btn btn-primary" [disabled]="reservationForm.invalid">
+                  Réserver
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Messages de succès/erreur -->
+    <div class="col-12 mt-3">
+      <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+      <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
       <div class="row mt-4">
         <div class="col-12">
           <div class="card">
@@ -467,9 +563,9 @@
                       <td>{{ reservation.numeroTel }}</td>
                       <td>Table #{{ reservation.tab?.number }}</td>
                       <td>
-                        <button class="btn btn-sm btn-primary me-1">
-                          <i class="fas fa-edit me-1"></i> Modifier
-                        </button>
+                        <button class="btn btn-sm btn-primary me-1" (click)="openEditModal(reservation)">
+  <i class="fas fa-edit me-1"></i> Modifier
+</button>
                         <button type="button" class="btn btn-sm btn-danger" (click)="openDeleteModal(reservation)">
                           <i class="fas fa-trash me-1"></i> Supprimer
                         </button>
@@ -516,6 +612,122 @@
       </div>
     </div>
   </div>
+
+
+
+  <!-- Modal de modification -->
+<div 
+  class="modal fade" 
+  tabindex="-1" 
+  [ngClass]="{'show': showEditModal}" 
+  [ngStyle]="{'display': showEditModal ? 'block' : 'none'}" 
+  aria-labelledby="editReservationModalLabel" 
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editReservationModalLabel">Modifier la réservation</h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="closeEditModal()"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="editForm" (ngSubmit)="submitEdit()">
+
+          <div class="mb-3">
+            <label for="nomClient" class="form-label">Nom du client</label>
+            <input 
+              type="text" 
+              id="nomClient" 
+              class="form-control" 
+              formControlName="nomClient"
+              [ngClass]="{'is-invalid': editForm.get('nomClient')?.touched && editForm.get('nomClient')?.invalid}"
+            >
+            <div class="invalid-feedback" *ngIf="editForm.get('nomClient')?.errors?.['required'] && editForm.get('nomClient')?.touched">
+              Le nom du client est requis.
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="dateReservation" class="form-label">Date de réservation</label>
+            <input 
+              type="datetime-local" 
+              id="dateReservation" 
+              class="form-control" 
+              formControlName="dateReservation"
+              [ngClass]="{'is-invalid': editForm.get('dateReservation')?.touched && editForm.get('dateReservation')?.invalid}"
+            >
+            <div class="invalid-feedback" *ngIf="editForm.get('dateReservation')?.errors?.['required'] && editForm.get('dateReservation')?.touched">
+              La date de réservation est requise.
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="numberPersonne" class="form-label">Nombre de personnes</label>
+            <input 
+              type="number" 
+              id="numberPersonne" 
+              class="form-control" 
+              formControlName="numberPersonne"
+              min="1"
+              [ngClass]="{'is-invalid': editForm.get('numberPersonne')?.touched && editForm.get('numberPersonne')?.invalid}"
+            >
+            <div class="invalid-feedback" *ngIf="editForm.get('numberPersonne')?.errors && editForm.get('numberPersonne')?.touched">
+              Veuillez saisir un nombre de personnes valide (minimum 1).
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="numeroTel" class="form-label">Numéro de téléphone</label>
+            <input 
+              type="text" 
+              id="numeroTel" 
+              class="form-control" 
+              formControlName="numeroTel"
+              [ngClass]="{'is-invalid': editForm.get('numeroTel')?.touched && editForm.get('numeroTel')?.invalid}"
+            >
+            <div class="invalid-feedback" *ngIf="editForm.get('numeroTel')?.errors?.['required'] && editForm.get('numeroTel')?.touched">
+              Le numéro de téléphone est requis.
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="idTable" class="form-label">Numéro de la table</label>
+            <input 
+              type="number" 
+              id="idTable" 
+              class="form-control" 
+              formControlName="idTable"
+              min="1"
+              [ngClass]="{'is-invalid': editForm.get('idTable')?.touched && editForm.get('idTable')?.invalid}"
+            >
+            <div class="invalid-feedback" *ngIf="editForm.get('idTable')?.errors?.['required'] && editForm.get('idTable')?.touched">
+              Le numéro de table est requis.
+            </div>
+          </div>
+
+          <div *ngIf="updateErrorMessage" class="alert alert-danger">
+            {{ updateErrorMessage }}
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" (click)="closeEditModal()">
+              <i class="fas fa-times me-1"></i> Annuler
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="isUpdating">
+              <i *ngIf="isUpdating" class="fas fa-spinner fa-spin me-1"></i>
+              Enregistrer
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Overlay pour le fond sombre derrière la modal -->
+<div class="modal-backdrop fade show" *ngIf="showEditModal"></div>
+
 
   <!-- Overlay pour le fond sombre derrière la modal -->
   <div class="modal-backdrop fade show" *ngIf="showDeleteModal"></div>

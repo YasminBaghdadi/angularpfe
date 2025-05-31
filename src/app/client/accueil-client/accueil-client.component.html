@@ -51,9 +51,7 @@
                                     <li class="has-dropdown">
                                         <a routerLink="/client/reservations" routerLinkActive="active">Réservation</a>
                                    </li>
-                                   <li class="has-dropdown">
-                                    <a  routerLinkActive="active">livraison</a>
-                                   </li>
+                                  
                                     <li class="has-dropdown">
 
                                         <a  routerLinkActive="active">                                        
@@ -434,6 +432,261 @@
     </section>
 </footer>
 
+
+ <!-- Bouton de chat flottant -->
+<div class="chat-button"(click)="openChatModal()" >
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2ZM20 16H5.17L4 17.17V4H20V16Z" fill="white"/>
+        <circle cx="8" cy="10" r="1" fill="white"/>
+        <circle cx="12" cy="10" r="1" fill="white"/>
+        <circle cx="16" cy="10" r="1" fill="white"/>
+    </svg>
+</div>
+
+    <!-- Composant chat modal -->
+    <app-chat 
+      [isModalOpen]="isChatModalOpen"
+      (closeModal)="closeChatModal()">
+    </app-chat>
+    <!-- Votre contenu de page existant -->
+    <div class="page-content">
+      <!-- Contenu de votre page -->
+    </div>
+<style>
+/* Bouton de chat flottant */
+.chat-button {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.chat-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 25px rgba(0,0,0,0.4);
+}
+
+/* Modal du chatbot */
+.chat-modal {
+    display: none;
+    position: fixed;
+    z-index: 1001;
+    right: 30px;
+    bottom: 100px;
+    width: 350px;
+    height: 500px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    overflow: hidden;
+}
+
+.chat-modal-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.close {
+    font-size: 24px;
+    cursor: pointer;
+    color: white;
+    opacity: 0.8;
+    transition: opacity 0.3s;
+}
+
+.close:hover {
+    opacity: 1;
+}
+
+.chat-body {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: #f8f9fa;
+}
+
+.message {
+    margin-bottom: 15px;
+    display: flex;
+}
+
+.bot-message .message-content {
+    background: #e9ecef;
+    color: #333;
+    padding: 10px 15px;
+    border-radius: 18px 18px 18px 5px;
+    max-width: 80%;
+}
+
+.user-message {
+    justify-content: flex-end;
+}
+
+.user-message .message-content {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 18px 18px 5px 18px;
+    max-width: 80%;
+}
+
+.chat-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    gap: 10px;
+}
+
+.chat-footer input {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    outline: none;
+    font-size: 14px;
+}
+
+.chat-footer input:focus {
+    border-color: #667eea;
+}
+
+.chat-footer button {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: opacity 0.3s;
+}
+
+.chat-footer button:hover {
+    opacity: 0.9;
+}
+
+/* Animation d'apparition */
+.chat-modal.show {
+    display: block;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .chat-modal {
+        right: 15px;
+        left: 15px;
+        width: auto;
+        bottom: 90px;
+    }
+    
+    .chat-button {
+        right: 20px;
+        bottom: 20px;
+    }
+}
+</style>
+<script>
+function openChatModal() {
+    const modal = document.getElementById('chatModal');
+    modal.style.display = 'block';
+    modal.classList.add('show');
+}
+
+function closeChatModal() {
+    const modal = document.getElementById('chatModal');
+    modal.style.display = 'none';
+    modal.classList.remove('show');
+}
+
+function sendMessage() {
+    const input = document.getElementById('chatInput');
+    const message = input.value.trim();
+    
+    if (message) {
+        addMessage(message, 'user');
+        input.value = '';
+        
+        // Simuler une réponse du bot après un délai
+        setTimeout(() => {
+            const responses = [
+                "Merci pour votre message ! Comment puis-je vous aider davantage ?",
+                "C'est une excellente question ! Laissez-moi vous aider avec cela.",
+                "Je comprends votre demande. Voici ce que je peux vous suggérer...",
+                "Parfait ! Je suis là pour vous assister."
+            ];
+            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+            addMessage(randomResponse, 'bot');
+        }, 1000);
+    }
+}
+
+function addMessage(text, sender) {
+    const chatBody = document.querySelector('.chat-body');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${sender}-message`;
+    
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'message-content';
+    contentDiv.textContent = text;
+    
+    messageDiv.appendChild(contentDiv);
+    chatBody.appendChild(messageDiv);
+    
+    // Scroll vers le bas
+    chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+function handleKeyPress(event) {
+    if (event.key === 'Enter') {
+        sendMessage();
+    }
+}
+
+// Fermer le modal en cliquant à l'extérieur
+window.onclick = function(event) {
+    const modal = document.getElementById('chatModal');
+    if (event.target === modal) {
+        closeChatModal();
+    }
+}
+</script>
 
 <body>
 

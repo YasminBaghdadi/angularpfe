@@ -35,7 +35,15 @@ export class PanComponent implements OnInit {
     private route: ActivatedRoute
   ) {}// Dans PanComponent, ajoutez ceci dans ngOnInit() :
 
+  isChatModalOpen = false;
 
+  openChatModal(): void {
+    this.isChatModalOpen = true;
+  }
+
+  closeChatModal(): void {
+    this.isChatModalOpen = false;
+  }
   ngOnInit(): void {
     this.verifierParametresRetour();
     this.verifierCommandeEnAttente();

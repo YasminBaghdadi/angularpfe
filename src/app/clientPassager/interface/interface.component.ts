@@ -35,7 +35,15 @@ messageConfirmation: string = '';
     private imageplatService: ImageplatService,
     private panierService: PanierService
   ) {}
+  isChatModalOpen = false;
 
+  openChatModal(): void {
+    this.isChatModalOpen = true;
+  }
+
+  closeChatModal(): void {
+    this.isChatModalOpen = false;
+  }
   ngOnInit(): void {
     this.loadPlats();
   this.panierService.nombreArticles$

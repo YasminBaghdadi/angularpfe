@@ -81,7 +81,7 @@ export class SimplePaymentSuccessComponent implements OnInit {
   private handlePaymentSuccess(response: any): void {
     this.paymentSuccess = true;
     if (response.amount) {
-      this.montantPaye = response.amount + ' €';
+      this.montantPaye = response.amount + ' $';
     }
     this.cleanupAfterSuccess();
 

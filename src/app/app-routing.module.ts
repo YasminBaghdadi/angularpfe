@@ -30,6 +30,7 @@ import { SimplePaymentSuccessComponent } from './simple-payment-success/simple-p
 import { ModifierprofilComponent } from './modifierprofil/modifierprofil.component';
 import { CommandeeComponent } from './admin/commandee/commandee.component';
 import { AdminReservationComponent } from './admin/admin-reservation/admin-reservation.component';
+import { ChatComponent } from './chat-component/chat-component.component';
 const routes: Routes = [
   { path: '', redirectTo: 'accueil', pathMatch: 'full' },
   { 
@@ -118,7 +119,11 @@ const routes: Routes = [
     component: PanierPassagerComponent,  
     
   },
-
+ { 
+    path: 'chat',  
+    component: ChatComponent,  
+    
+  },
 { 
     path: 'admin/commande',  
     component: CommandeeComponent,

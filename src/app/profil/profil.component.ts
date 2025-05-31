@@ -20,7 +20,7 @@ interface Commande {
 interface Reservation {
   idReservation: number;
   nomClient: string;
-  dateReservation: Date;
+  dateReservation: Date | string;
   numberPersonne: number;
   numeroTel: number;
   tab: {
@@ -75,6 +75,12 @@ export class ProfilComponent implements OnInit {
   reservationsLoading = false;
   reservationsError: string | null = null;
   isShowingReservations = false;
+showDeleteModal = false;
+reservationToDeleteId: number | null = null;
+  // Variables pour la modification de réservation
+  isEditingReservation = false;
+  editedReservation: Reservation | null = null;
+  reservationFormData: any = {};
 
   isShowingHistorique = false;
   historique: string[] = [];
@@ -297,8 +303,139 @@ export class ProfilComponent implements OnInit {
     });
   }
 
+  // Méthodes pour la modification de réservation
+  editReservation(reservation: Reservation): void {
+    this.isEditingReservation = true;
+    this.editedReservation = reservation;
+    
+    // Pré-remplir le formulaire avec les données de la réservation
+    this.reservationFormData = {
+      nomClient: reservation.nomClient,
+      dateReservation: this.formatDateForInput(new Date(reservation.dateReservation)),
+      numberPersonne: reservation.numberPersonne,
+      numeroTel: reservation.numeroTel
+    };
+  }
+
+  updateReservation(form: NgForm): void {
+    if (form.invalid) {
+      this.errorMessage = 'Veuillez remplir tous les champs requis correctement.';
+      return;
+    }
+
+    if (!this.editedReservation) {
+      this.errorMessage = 'Aucune réservation sélectionnée pour modification.';
+      return;
+    }
+
+    // Convertir le format datetime-local vers le format attendu par le backend
+    const formattedDate = this.reservationFormData.dateReservation.replace('T', ' ');
+
+    const updatedData = {
+      nomClient: this.reservationFormData.nomClient,
+      dateReservation: formattedDate,
+      numberPersonne: this.reservationFormData.numberPersonne,
+      numeroTel: this.reservationFormData.numeroTel
+    };
+
+    this.reservationsLoading = true;
+    this.clearMessages();
+
+    this.reservationService.updateReservationparclient(
+      this.editedReservation.idReservation,
+      updatedData
+    ).subscribe({
+      next: (updatedReservation) => {
+        this.successMessage = 'Réservation mise à jour avec succès.';
+        this.isEditingReservation = false;
+        this.loadReservations();
+      },
+      error: (err) => {
+        console.error('Erreur mise à jour réservation:', err);
+        this.reservationsError = err.error?.message || 'Erreur lors de la mise à jour de la réservation.';
+        this.reservationsLoading = false;
+      }
+    });
+  }
+
+  deleteReservation(idReservation: number): void {
+  this.reservationsLoading = true;
+  this.clearMessages();
+
+  this.reservationService.deleteReservation(idReservation).subscribe({
+    next: () => {
+      this.successMessage = 'Réservation supprimée avec succès.';
+      this.loadReservations();
+    },
+    error: (err) => {
+      console.error('Erreur suppression réservation:', err);
+      this.reservationsError = err.error?.message || 'Erreur lors de la suppression de la réservation.';
+      this.reservationsLoading = false;
+    }
+  });
+}
+
+  // Helper pour formater la date pour l'input datetime-local
+  private formatDateForInput(date: Date): string {
+    const pad = (num: number) => num.toString().padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  }
+
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
   }
+
+  openEditModal(reservation: Reservation): void {
+    this.isEditingReservation = true;
+    this.editedReservation = reservation;
+
+    this.reservationFormData = {
+      nomClient: reservation.nomClient,
+      dateReservation: this.formatDateForInput(new Date(reservation.dateReservation)),
+      numberPersonne: reservation.numberPersonne,
+      numeroTel: reservation.numeroTel
+    };
+  }
+
+  cancelEditReservation(): void {
+    this.isEditingReservation = false;
+    this.editedReservation = null;
+    this.reservationFormData = {};
+    this.clearMessages();
+  }
+
+  // Pour fermer modal en cliquant sur le fond (backdrop)
+  closeEditModalOnBackdrop(event: MouseEvent): void {
+    if ((event.target as HTMLElement).classList.contains('modal')) {
+      this.cancelEditReservation();
+    }
+  }
+
+
+
+
+  openDeleteModal(id: number): void {
+  this.reservationToDeleteId = id;
+  this.showDeleteModal = true;
+}
+
+confirmDelete(): void {
+  if (this.reservationToDeleteId !== null) {
+    this.deleteReservation(this.reservationToDeleteId);
+  }
+  this.closeDeleteModal();
+}
+
+closeDeleteModal(): void {
+  this.showDeleteModal = false;
+  this.reservationToDeleteId = null;
+}
+
+closeDeleteModalOnBackdrop(event: MouseEvent): void {
+  if ((<HTMLElement>event.target).classList.contains('modal')) {
+    this.closeDeleteModal();
+  }
+}
+
 }

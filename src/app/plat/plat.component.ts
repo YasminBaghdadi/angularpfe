@@ -25,6 +25,15 @@ export class PlatComponent implements OnInit, OnDestroy {
     private panierService: AccueilpanierService
   ) {}
 
+   isChatModalOpen = false;
+
+  openChatModal(): void {
+    this.isChatModalOpen = true;
+  }
+
+  closeChatModal(): void {
+    this.isChatModalOpen = false;
+  }
   ngOnInit(): void {
     this.loadPlats();
   }

@@ -30,7 +30,8 @@ export class PanierPassagerComponent implements OnInit, OnDestroy {
   errorMessage: string | null = null;
 
   showFactureModal: boolean = false;
-  
+  showDetailsCommande: boolean = false;
+
   // Variables pour gérer le montant de commande en cours
   totalCommandeEnCours: number = 0;
   hasActiveOrder: boolean = false;
@@ -41,6 +42,7 @@ export class PanierPassagerComponent implements OnInit, OnDestroy {
   paymentSuccess: boolean = false;
   
   private subscriptions: Subscription[] = [];
+  platsCommandeEnCours: any[] = [];
 
   constructor(
     private panierService: PanierService,
@@ -50,7 +52,15 @@ export class PanierPassagerComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute
   ) {}
+  isChatModalOpen = false;
 
+  openChatModal(): void {
+    this.isChatModalOpen = true;
+  }
+
+  closeChatModal(): void {
+    this.isChatModalOpen = false;
+  }
   ngOnInit(): void {
     // S'abonner aux paramètres de route pour obtenir le numéro de table
     this.subscriptions.push(
@@ -112,39 +122,64 @@ export class PanierPassagerComponent implements OnInit, OnDestroy {
     );
   }
 
-  private loadCommandeData(): void {
-    if (this.tableNumber) {
-      // Récupérer l'ID de commande depuis le localStorage
-      const storedCommandeId = localStorage.getItem(`idCommande_table_${this.tableNumber}`);
-      if (storedCommandeId) {
-        this.idCommandeEnCours = parseInt(storedCommandeId);
-        console.log('ID Commande chargé:', this.idCommandeEnCours);
-      }
+toggleDetailsCommande(): void {
+  this.showDetailsCommande = !this.showDetailsCommande;
+}
+// Modifiez la méthode loadCommandeData pour charger aussi les plats
+private loadCommandeData(): void {
+  if (this.tableNumber) {
+    // Récupérer l'ID de commande depuis le localStorage
+    const storedCommandeId = localStorage.getItem(`idCommande_table_${this.tableNumber}`);
+    if (storedCommandeId) {
+      this.idCommandeEnCours = parseInt(storedCommandeId);
+      console.log('ID Commande chargé:', this.idCommandeEnCours);
+    }
 
-      // Récupérer le montant total
-      const storedTotal = localStorage.getItem(`commandeEnCours_table_${this.tableNumber}`);
-      if (storedTotal) {
-        this.totalCommandeEnCours = parseFloat(storedTotal);
-        this.hasActiveOrder = true;
-        
-        // CORRECTION: Synchroniser avec le service
-        this.commandeService.setTotalCommandeEnCours(this.totalCommandeEnCours);
-        console.log('Total commande chargé:', this.totalCommandeEnCours);
-      }
+    // Récupérer le montant total
+    const storedTotal = localStorage.getItem(`commandeEnCours_table_${this.tableNumber}`);
+    if (storedTotal) {
+      this.totalCommandeEnCours = parseFloat(storedTotal);
+      this.hasActiveOrder = true;
+      
+      // CORRECTION: Synchroniser avec le service
+      this.commandeService.setTotalCommandeEnCours(this.totalCommandeEnCours);
+      console.log('Total commande chargé:', this.totalCommandeEnCours);
+    }
 
-      // Récupérer les détails de la commande
-      const storedDetails = localStorage.getItem(`detailsCommande_table_${this.tableNumber}`);
-      if (storedDetails) {
-        try {
-          const details = JSON.parse(storedDetails);
-          console.log('Détails commande chargés:', details);
-        } catch (e) {
-          console.error('Erreur parsing commande details', e);
+    // Récupérer les détails de la commande ET les plats
+    const storedDetails = localStorage.getItem(`detailsCommande_table_${this.tableNumber}`);
+    if (storedDetails) {
+      try {
+        const details = JSON.parse(storedDetails);
+        // NOUVEAU: Charger les plats de la commande
+        if (details.plats) {
+          this.platsCommandeEnCours = details.plats;
         }
+        console.log('Détails commande chargés:', details);
+      } catch (e) {
+        console.error('Erreur parsing commande details', e);
       }
     }
   }
+}
 
+// Nouvelle méthode pour obtenir le résumé des plats commandés
+getResumePlatsCommandes(): string {
+  if (!this.platsCommandeEnCours || this.platsCommandeEnCours.length === 0) {
+    return '';
+  }
+  
+  return this.platsCommandeEnCours
+    .map(plat => `${plat.nom} x${plat.quantite}`)
+    .join(', ');
+}
+getNombreArticlesCommandes(): number {
+  if (!this.platsCommandeEnCours || this.platsCommandeEnCours.length === 0) {
+    return 0;
+  }
+  
+  return this.platsCommandeEnCours.reduce((total, plat) => total + plat.quantite, 0);
+}
   private handlePaymentReturn(paymentId: string, payerId: string): void {
     // CORRECTION: Vérifier d'abord dans localStorage si pas en mémoire
     if (!this.idCommandeEnCours) {
@@ -461,19 +496,21 @@ export class PanierPassagerComponent implements OnInit, OnDestroy {
     this.passerCommande();
   }
 
-  clearCommandeEnCours(): void {
-    this.totalCommandeEnCours = 0;
-    this.hasActiveOrder = false;
-    this.idCommandeEnCours = null;
-    this.commandeService.clearTotalCommande();
-    
-    if (this.tableNumber) {
-      localStorage.removeItem(`commandeEnCours_table_${this.tableNumber}`);
-      localStorage.removeItem(`idCommande_table_${this.tableNumber}`);
-      localStorage.removeItem(`detailsCommande_table_${this.tableNumber}`);
-    }
-    localStorage.removeItem('pendingPayment');
+clearCommandeEnCours(): void {
+  this.totalCommandeEnCours = 0;
+  this.hasActiveOrder = false;
+  this.idCommandeEnCours = null;
+  this.platsCommandeEnCours = [];
+  this.showDetailsCommande = false; // NOUVEAU: Réinitialiser l'état du collapse
+  this.commandeService.clearTotalCommande();
+  
+  if (this.tableNumber) {
+    localStorage.removeItem(`commandeEnCours_table_${this.tableNumber}`);
+    localStorage.removeItem(`idCommande_table_${this.tableNumber}`);
+    localStorage.removeItem(`detailsCommande_table_${this.tableNumber}`);
   }
+  localStorage.removeItem('pendingPayment');
+}
 
   onPaiementReussi(): void {
     this.clearCommandeEnCours();

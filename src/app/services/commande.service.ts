@@ -264,26 +264,71 @@ export class CommandeService {
     this.saveToStorage();
   }
 
-  confirmerPaiementEspeces(idCommande: number): Observable<any> {
-    const headers = new HttpHeaders({
-      'X-Session-Token': localStorage.getItem('token') || ''
-    });
 
-    return this.http.post(
-      `${this.baseUrl}/confirmerPaiementEspeces/${idCommande}`,
-      null,
-      { headers }
-    ).pipe(
-      catchError(error => {
-        console.error('Erreur paiement espèces:', error);
-        return throwError(() => error.error?.error || 'Erreur lors du paiement');
-      })
-    );
-  }
 
 
 
   getCommandesByUser(idUser: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}/user/${idUser}`);
   }
+
+
+// 1. First, update your CommandeService method to better handle the response:
+
+ajouterPlatsACommande(idCmnd: number, plats: PlatQuantite[]): Observable<any> {
+  console.log('URL appelée:', `${this.baseUrl}/ajouterPlats/${idCmnd}`);
+  console.log('Données envoyées:', plats);
+  console.log('Headers:', this.getAuthHeaders());
+
+  return this.http.post<any>(
+    `${this.baseUrl}/ajouterPlats/${idCmnd}`,
+    plats,
+    { 
+      headers: this.getAuthHeaders(),
+      // Add this to see the full response
+      observe: 'response'
+    }
+  ).pipe(
+    catchError(error => {
+      console.error('Erreur détaillée:', {
+        status: error.status,
+        statusText: error.statusText,
+        url: error.url,
+        headers: error.headers,
+        error: error.error,
+        message: error.message
+      });
+      
+      // Check if it's a parsing error
+      if (error.error instanceof ProgressEvent) {
+        return throwError(() => 'Erreur de connexion au serveur. Vérifiez que le serveur est démarré.');
+      }
+      
+      // Check for specific HTTP status codes
+      if (error.status === 0) {
+        return throwError(() => 'Impossible de joindre le serveur. Vérifiez la connexion.');
+      }
+      
+      if (error.status === 404) {
+        return throwError(() => 'Endpoint non trouvé. Vérifiez l\'URL du serveur.');
+      }
+      
+      return throwError(() => error.error?.message || error.message || 'Erreur lors de l\'ajout de plats');
+    })
+  );
+}
+
+
+
+
+getCommandeById(idCommande: number): Observable<any> {
+  return this.http.get<any>(`${this.baseUrl}/getcommande/${idCommande}`, {
+    headers: this.getAuthHeaders()
+  }).pipe(
+    catchError(error => {
+      console.error('Erreur lors de la récupération de la commande:', error);
+      return throwError(() => error.error?.message || error.message || 'Erreur lors de la récupération de la commande');
+    })
+  );
+}
 }

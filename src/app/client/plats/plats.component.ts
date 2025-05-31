@@ -39,7 +39,15 @@ messageConfirmation: string = '';
     this.username = localStorage.getItem('username');
     this.loadPlats();
   }
+  isChatModalOpen = false;
 
+  openChatModal(): void {
+    this.isChatModalOpen = true;
+  }
+
+  closeChatModal(): void {
+    this.isChatModalOpen = false;
+  }
   onLogout(): void {
     this.authService.logout();
   }

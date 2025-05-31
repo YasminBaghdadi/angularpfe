@@ -15,7 +15,15 @@ export class AccueilClientComponent implements OnInit {
     private panierService: AccueilpanierService, // ✅ corrigé ici
     private authService: AuthService
   ) {}
+  isChatModalOpen = false;
 
+  openChatModal(): void {
+    this.isChatModalOpen = true;
+  }
+
+  closeChatModal(): void {
+    this.isChatModalOpen = false;
+  }
   ngOnInit(): void {
     // ✅ S'abonner au nombre d'articles via AccueilpanierService
     this.panierService.nombreArticles$.subscribe(nombre => {

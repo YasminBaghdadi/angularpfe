@@ -65,18 +65,67 @@ export class ReservationService {
     );
   }
 
-  
- updateReservation(idReservation: number, reservationData: any): Observable<Reservation> {
+  // Modifier une réservation
+  updateReservation(idReservation: number, reservationData: {
+    nomClient: string;
+    dateReservation: Date | string;
+    numberPersonne: number;
+    numeroTel: number | string;
+    idTable: number | string;
+  }): Observable<Reservation> {
+    // Préparer le corps de la requête avec tout en string
+    const body = {
+      nomClient: reservationData.nomClient,
+      dateReservation: typeof reservationData.dateReservation === 'string'
+        ? reservationData.dateReservation
+        : this.formatDate(reservationData.dateReservation),
+      numberPersonne: reservationData.numberPersonne.toString(),
+      numeroTel: reservationData.numeroTel.toString(),
+      idTable: reservationData.idTable.toString()
+    };
+
     return this.http.put<Reservation>(
       `${this.baseApiUrl}/modifier/${idReservation}`, 
-      reservationData,
+      body,
       { headers: this.getAuthHeaders() }
     ).pipe(
       catchError(error => throwError(() => error))
     );
   }
 
-  // Méthode pour supprimer une réservation
+
+
+
+  
+ updateReservationparclient(idReservation: number, reservationData: {
+    nomClient: string;
+    dateReservation: Date | string;
+    numberPersonne: number;
+    numeroTel: number | string;
+  }): Observable<Reservation> {
+    // Préparer le corps de la requête avec tout en string
+    const body = {
+      nomClient: reservationData.nomClient,
+      dateReservation: typeof reservationData.dateReservation === 'string'
+        ? reservationData.dateReservation
+        : this.formatDate(reservationData.dateReservation),
+      numberPersonne: reservationData.numberPersonne.toString(),
+      numeroTel: reservationData.numeroTel.toString()
+    };
+
+    return this.http.put<Reservation>(
+      `${this.baseApiUrl}/update/${idReservation}`, 
+      body,
+      { headers: this.getAuthHeaders() }
+    ).pipe(
+      catchError(error => throwError(() => error))
+    );
+  }
+
+
+
+
+  // Supprimer une réservation
   deleteReservation(idReservation: number): Observable<void> {
     return this.http.delete<void>(
       `${this.baseApiUrl}/delete/${idReservation}`,
@@ -85,5 +134,22 @@ export class ReservationService {
       catchError(error => throwError(() => error))
     );
   }
-  
+
+  // Méthode privée pour formatter la date au format attendu par le backend
+  private formatDate(date: Date | string): string {
+    if (typeof date === 'string') return date;
+
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  }
+
+
+  reserveradmin(data: {nomClient: string; dateReservation: string; numberPersonne: number; numeroTel: number}): Observable<any> {
+  return this.http.post<any>(`${this.baseApiUrl}/reserver`, data, {
+    headers: this.getAuthHeaders()
+  }).pipe(
+    catchError(error => throwError(() => error))
+  );
+}
+
 }

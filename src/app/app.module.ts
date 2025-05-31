@@ -25,7 +25,7 @@ import { DashComponent } from './livreur/dash/dash.component';
 import { DashboardComponent } from './admin/dashboard/dashboard.component';
 import { CustomersComponent } from './admin/customers/customers.component';
 import { AccueilClientComponent } from './client/accueil-client/accueil-client.component';
-
+import { ChatComponent } from './chat-component/chat-component.component';
 // Services
 import { PlatService } from './services/plat.service';
 import { PanierService } from './services/panier.service';
@@ -101,7 +101,8 @@ function initializeKeycloak(keycloak: KeycloakService) {
     SimplePaymentCancelComponent,
     ModifierprofilComponent,
     CommandeeComponent,
-    AdminReservationComponent  
+    AdminReservationComponent,
+    ChatComponent
      ],
   imports: [
     BrowserModule,

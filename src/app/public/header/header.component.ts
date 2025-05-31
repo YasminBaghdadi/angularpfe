@@ -11,6 +11,15 @@ export class HeaderComponent implements OnInit {
   nombreArticles: number = 0;
 
   constructor(private accueilPanierService: AccueilpanierService) { }
+   isChatModalOpen = false;
+
+  openChatModal(): void {
+    this.isChatModalOpen = true;
+  }
+
+  closeChatModal(): void {
+    this.isChatModalOpen = false;
+  }
   ngOnInit(): void {
     // S'abonner au service pour récupérer le nombre d'articles dans le panier
     this.accueilPanierService.nombreArticles$.subscribe(nombre => {

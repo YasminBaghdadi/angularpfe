@@ -33,7 +33,15 @@ export class ReservationsComponent implements OnInit {
     private authService: AuthService,
     private reservationService: ReservationService
   ) {}
+  isChatModalOpen = false;
 
+  openChatModal(): void {
+    this.isChatModalOpen = true;
+  }
+
+  closeChatModal(): void {
+    this.isChatModalOpen = false;
+  }
   ngOnInit(): void {
     this.loadUserData();
     this.subscribeToCart();
