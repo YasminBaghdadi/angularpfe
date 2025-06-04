@@ -14,10 +14,13 @@ import { Subscription } from 'rxjs';
 export class PanComponent implements OnInit, OnDestroy {
   nombreArticles: number = 0;
   panier: any[] = [];
+  sousTotal: number = 0;
+  fraisLivraison: number = 0;
   total: number = 0;
   username: string | null = '';
   adresseLivraison: string = '';
   telephone: string = '';
+  instructionsClient: string = ''; // Nouvelle propriété pour les instructions
   isProcessing: boolean = false;
   errorMessage: string | null = null;
   successMessage: string | null = null;
@@ -41,7 +44,6 @@ export class PanComponent implements OnInit, OnDestroy {
   ) {}
 
   isChatModalOpen = false;
-
   openChatModal(): void {
     this.isChatModalOpen = true;
   }
@@ -51,6 +53,7 @@ export class PanComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.fraisLivraison = this.panierService.getFraisLivraison();
     this.verifierParametresRetour();
     this.verifierCommandeEnAttente();
     this.verifierPaiementEnCours();
@@ -75,6 +78,7 @@ export class PanComponent implements OnInit, OnDestroy {
     const panierSub = this.panierService.panier$.subscribe(panier => {
       this.panier = panier;
       if (!this.commandePassee) {
+        this.sousTotal = this.panierService.calculerSousTotal();
         this.total = this.panierService.calculerTotal();
       }
     });
@@ -124,6 +128,9 @@ export class PanComponent implements OnInit, OnDestroy {
       if (this.commandeEnAttente) {
         this.adresseLivraison = this.commandeEnAttente.adresse || '';
         this.telephone = this.commandeEnAttente.telephone || '';
+        this.instructionsClient = this.commandeEnAttente.instructions || ''; // Charger les instructions existantes
+        this.sousTotal = this.commandeEnAttente.sousTotal || 0;
+        this.fraisLivraison = this.commandeEnAttente.fraisLivraison || this.panierService.getFraisLivraison();
       }
     }
   }
@@ -210,7 +217,8 @@ export class PanComponent implements OnInit, OnDestroy {
     try {
       const infoLivraison = {
         adresse: this.adresseLivraison,
-        telephone: this.telephone
+        telephone: this.telephone,
+        instructions: this.instructionsClient // Inclure les instructions dans les données de commande
       };
 
       const response = await this.panierService.passerCommandeLivraison(infoLivraison);
@@ -284,6 +292,8 @@ export class PanComponent implements OnInit, OnDestroy {
       this.commandeEnAttente = null;
       this.adresseLivraison = '';
       this.telephone = '';
+      this.instructionsClient = ''; // Réinitialiser les instructions
+      this.sousTotal = this.panierService.calculerSousTotal();
       this.total = this.panierService.calculerTotal();
       this.successMessage = 'Commande annulée. Vous pouvez maintenant passer une nouvelle commande.';
       this.clearMessagesAfterDelay();
@@ -306,6 +316,17 @@ export class PanComponent implements OnInit, OnDestroy {
     return this.panierService.peutPasserCommande();
   }
 
+  // Nouvelle méthode pour compter les caractères des instructions
+  get instructionsRestants(): number {
+    const maxLength = 500; // Limite de caractères
+    return maxLength - this.instructionsClient.length;
+  }
+
+  // Méthode pour vérifier si les instructions sont trop longues
+  get instructionsTropLongues(): boolean {
+    return this.instructionsClient.length > 500;
+  }
+
   get texteBoutonPrincipal(): string {
     if (this.commandePassee) {
       return this.isProcessing ? 'INITIALISATION DU PAIEMENT...' : 'PAYER AVEC PAYPAL';
@@ -322,6 +343,14 @@ export class PanComponent implements OnInit, OnDestroy {
       return this.commandeEnAttente.plats;
     }
     return this.panier;
+  }
+
+  get montantSousTotalTND(): string {
+    return `${this.sousTotal.toFixed(2)} TND`;
+  }
+
+  get montantFraisLivraisonTND(): string {
+    return `${this.fraisLivraison.toFixed(2)} TND`;
   }
 
   get montantTotalTND(): string {
@@ -361,5 +390,4 @@ export class PanComponent implements OnInit, OnDestroy {
     this.simplePaymentService.clearPaymentDetails();
     this.authService.logout();
   }
-  
 }

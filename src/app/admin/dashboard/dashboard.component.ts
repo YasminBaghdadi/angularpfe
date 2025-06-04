@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/co
 import { Subscription } from 'rxjs';
 import { AuthService } from 'src/app/services/auth.service';
 import { NotificationService, Notification } from 'src/app/services/notification.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-notifications',
@@ -24,9 +25,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   constructor(
     private authService: AuthService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private http: HttpClient
   ) {}
  isChatModalOpen = false;
+ platCount: number = 0;
+commandeCount: number = 0;
+livraisonCount: number = 0;
+UserCount: number = 0;
+ReservationCount: number = 0;
+TablesCount: number = 0;
+
+
+
 
   openChatModal(): void {
     this.isChatModalOpen = true;
@@ -38,8 +49,57 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.username = localStorage.getItem('username');
     this.subscribeToNotifications();
+    this.loadPlatCount();  
+    this.loadCommandeCount();  
+    this.loadlivraisonCount();  
+    this.loadUserCount(); 
+    this.loadReservationCount(); 
+    this.loadTableCount(); 
+
+
+
+
+  }
+  loadTableCount(): void {
+  this.http.get<number>('http://localhost:8081/tab/countTables')
+    .subscribe(count => {
+      this.TablesCount = count;
+    });
+  }
+loadReservationCount(): void {
+  this.http.get<number>('http://localhost:8081/reservation/countreservation')
+    .subscribe(count => {
+      this.ReservationCount = count;
+    });
+  }
+  loadUserCount(): void {
+  this.http.get<number>('http://localhost:8081/projet/countuser')
+    .subscribe(count => {
+      this.UserCount = count;
+    });
   }
 
+
+
+  loadlivraisonCount(): void {
+  this.http.get<number>('http://localhost:8081/livraison/countlivraison')
+    .subscribe(count => {
+      this.livraisonCount = count;
+    });
+  }
+  loadCommandeCount(): void {
+  this.http.get<number>('http://localhost:8081/commande/countcommande')
+    .subscribe(count => {
+      this.commandeCount = count;
+    });
+}
+
+loadPlatCount(): void {
+  this.http.get<number>('http://localhost:8081/Plat/count')
+    .subscribe(count => {
+      this.platCount = count;
+    });
+}
   private subscribeToNotifications(): void {
     this.notificationSubscription = this.notificationService.getNotifications().subscribe(notifs => {
       this.notifications = notifs;

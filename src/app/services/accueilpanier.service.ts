@@ -18,6 +18,9 @@ export class AccueilpanierService {
   panierBloque$ = this.panierBloqueSubject.asObservable();
   
   private readonly PANIER_BASE_KEY = 'panier_user_';
+  
+  // Frais de livraison constants
+  private readonly FRAIS_LIVRAISON = 5.00; // 5 TND
 
   constructor(
     private commandeService: CommandeService,
@@ -36,6 +39,11 @@ export class AccueilpanierService {
         this.panierBloqueSubject.next(false);
       }
     });
+  }
+
+  // Méthode pour obtenir les frais de livraison
+  getFraisLivraison(): number {
+    return this.FRAIS_LIVRAISON;
   }
 
   // Générer la clé unique pour chaque utilisateur
@@ -149,9 +157,16 @@ export class AccueilpanierService {
     this.mettreAJourPanier();
   }
 
-  calculerTotal(): number {
+  // Calculer le sous-total sans frais de livraison
+  calculerSousTotal(): number {
     const panier = this.getPanier();
     return panier.reduce((total, plat) => total + (plat.prix * plat.quantite), 0);
+  }
+
+  // Calculer le total avec frais de livraison
+  calculerTotal(): number {
+    const sousTotal = this.calculerSousTotal();
+    return sousTotal + this.FRAIS_LIVRAISON;
   }
 
   // Vérifier si l'utilisateur peut passer une nouvelle commande
@@ -182,7 +197,8 @@ export class AccueilpanierService {
         quantite: plat.quantite
       })),
       adresse: infoLivraison.adresse,
-      telephone: infoLivraison.telephone
+      telephone: infoLivraison.telephone,
+      fraisLivraison: this.FRAIS_LIVRAISON // Ajouter les frais de livraison
     };
 
     try {
@@ -192,10 +208,13 @@ export class AccueilpanierService {
       
       const response = await this.commandeService.passerCommandeLivraison(userIdNumber, commandeRequest).toPromise();
       
-      // Sauvegarder la commande en attente
+      // Sauvegarder la commande en attente avec frais de livraison
+      const sousTotal = this.calculerSousTotal();
       const commandeEnAttente = {
         id: response.idCmnd,
-        montantTotal: this.calculerTotal(),
+        sousTotal: sousTotal,
+        fraisLivraison: this.FRAIS_LIVRAISON,
+        montantTotal: sousTotal + this.FRAIS_LIVRAISON,
         plats: panier.map(plat => ({
           idPlat: plat.idPlat,
           nom: plat.name,

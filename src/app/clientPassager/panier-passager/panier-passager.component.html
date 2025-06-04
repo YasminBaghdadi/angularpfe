@@ -169,14 +169,17 @@
             <!-- Section Message Client - Ajoutée ici -->
             <div class="cart__message mb-4" *ngIf="platsDansPanier.length > 0">
               <div class="card border-0 shadow-sm">
+
                 <div class="card-body p-4">
+                                                <h5>Demande particulière ? C'est ici !</h5>
+
                   <div class="form-group mb-0">
                     <textarea 
                       class="form-control rounded-0" 
                       rows="3" 
                       placeholder="Ajoutez des instructions pour la préparation de vos plats (ex: sans oignon, bien cuite, etc.)"
                       [(ngModel)]="clientMessage"
-                      maxlength="200"
+                      maxlength="500"
                     ></textarea>
                     
                   </div>

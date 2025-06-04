@@ -587,7 +587,7 @@
           </select>
         </div>
       </div>
-      
+
       <div class="card-body">
         <!-- Messages et chargement... -->
 
@@ -598,6 +598,7 @@
                 <th scope="col">Numéro</th>
                 <th scope="col">Client</th>
                 <th scope="col">Type</th>
+                <th scope="col">Table</th> <!-- Colonne ajoutée -->
                 <th scope="col">Plats</th>
                 <th scope="col">Total</th>
                 <th scope="col">Statut Paiement</th>
@@ -617,6 +618,12 @@
                   }">
                     {{ cmd.typeCommande === 'A_DOMICILE' ? 'À domicile' : 'Sur place' }}
                   </span>
+                </td>
+                <td>
+                  <span *ngIf="cmd.typeCommande === 'SUR_PLACE'">
+                    {{ cmd.numeroTable  }}
+                  </span>
+                  <span *ngIf="cmd.typeCommande !== 'SUR_PLACE'" class="text-muted">-</span>
                 </td>
                 <td>
                   <div *ngIf="cmd.details && cmd.details.length > 0">
@@ -648,7 +655,6 @@
                   <div *ngIf="cmd.adresseLivraison" class="text-muted small">
                     {{ cmd.adresseLivraison }}
                   </div>
-                  <!-- Ajout des informations de livraison pour les commandes à domicile -->
                   <div *ngIf="cmd.typeCommande === 'A_DOMICILE' && cmd.etatLivraison" class="mt-2">
                     <span [ngClass]="{
                       'badge bg-warning': cmd.etatLivraison === 'EN_ATTENTE',
@@ -679,6 +685,7 @@
     </div>
   </div>
 </div>
+
 
 
 <div class="modal fade" tabindex="-1" [ngClass]="{'show d-block': showDeleteModal}" [ngStyle]="{'background': showDeleteModal ? 'rgba(0,0,0,0.5)' : 'transparent'}">
