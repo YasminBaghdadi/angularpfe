@@ -3,6 +3,7 @@ import { NgForm } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth.service';
 import { PanierclientService } from 'src/app/services/panierclient.service';
 import { ReservationService } from 'src/app/services/reservation.service';
+import { NotificationService } from 'src/app/services/notification.service';
 
 @Component({
   selector: 'app-reservations',
@@ -18,6 +19,7 @@ export class ReservationsComponent implements OnInit {
   successMessage: string = '';
   errorMessage: string = '';
   isLoading: boolean = false;
+  isChatModalOpen = false;
 
   reservation = {
     nomClient: '',
@@ -31,17 +33,10 @@ export class ReservationsComponent implements OnInit {
   constructor(
     private panierclientService: PanierclientService,
     private authService: AuthService,
-    private reservationService: ReservationService
+    private reservationService: ReservationService,
+    private notificationService: NotificationService
   ) {}
-  isChatModalOpen = false;
 
-  openChatModal(): void {
-    this.isChatModalOpen = true;
-  }
-
-  closeChatModal(): void {
-    this.isChatModalOpen = false;
-  }
   ngOnInit(): void {
     this.loadUserData();
     this.subscribeToCart();
@@ -56,6 +51,14 @@ export class ReservationsComponent implements OnInit {
     this.panierclientService.nombreArticles$.subscribe(nombre => {
       this.nombreArticles = nombre;
     });
+  }
+
+  openChatModal(): void {
+    this.isChatModalOpen = true;
+  }
+
+  closeChatModal(): void {
+    this.isChatModalOpen = false;
   }
 
   reserver(): void {
@@ -102,14 +105,89 @@ export class ReservationsComponent implements OnInit {
   }
 
   private handleSuccess(response: any): void {
+    // Message de succès pour l'utilisateur
     this.successMessage = `Réservation réussie! Table: ${response.table}, Date: ${new Date(response.date).toLocaleString()}`;
     this.errorMessage = '';
+
+    // Envoyer la notification à l'admin
+    this.sendAdminNotification(response);
+
+    // Réinitialiser le formulaire
     this.resetForm();
     this.clearMessageAfterTimeout();
   }
 
+  private sendAdminNotification(response: any): void {
+    try {
+      // Formater la date pour l'affichage
+      const formattedDate = this.formatDate(this.reservation.dateReservation);
+      const formattedTime = this.reservation.heure;
+      
+      // Créer le message de notification avec le message du client
+      const notificationMessage = this.createNotificationMessage(
+        this.reservation.nomClient,
+        formattedDate,
+        formattedTime,
+        this.reservation.numberPersonne,
+        response.table,
+        this.reservation.message
+      );
+
+      // Envoyer la notification avec tous les détails
+      this.notificationService.addReservationNotificationWithMessage(
+        this.reservation.nomClient,
+        formattedDate,
+        formattedTime,
+        this.reservation.numberPersonne,
+        response.table,
+        this.reservation.numeroTel,
+        this.reservation.message
+      );
+
+      console.log('Notification envoyée à l\'admin:', notificationMessage);
+    } catch (error) {
+      console.error('Erreur lors de l\'envoi de la notification:', error);
+      // Ne pas interrompre le processus si la notification échoue
+    }
+  }
+
+  private createNotificationMessage(
+    nomClient: string, 
+    date: string, 
+    heure: string, 
+    nombrePersonnes: number, 
+    table?: string,
+    message?: string
+  ): string {
+    let notificationText = `Nouvelle réservation de ${nomClient} pour ${nombrePersonnes} personne${nombrePersonnes > 1 ? 's' : ''} le ${date} à ${heure}`;
+    
+    if (table) {
+      notificationText += ` - Table: ${table}`;
+    }
+
+    if (message && message.trim()) {
+      notificationText += `\nMessage: "${message}"`;
+    }
+    
+    return notificationText;
+  }
+
+  private formatDate(dateString: string): string {
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('fr-FR', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch (error) {
+      return dateString; // Retourner la date originale si le formatage échoue
+    }
+  }
+
   private handleError(error: any): void {
-    console.error('Erreur:', error);
+    console.error('Erreur lors de la réservation:', error);
     this.errorMessage = error.error?.error || 'Une erreur est survenue lors de la réservation';
     this.successMessage = '';
     this.clearMessageAfterTimeout();

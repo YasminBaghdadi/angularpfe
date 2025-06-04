@@ -7,6 +7,7 @@ interface AdminCommandeRequest {
   typeCommande: string;
   platQuantites: { idPlat: number; quantite: number }[];
   userId?: number;
+  username?: string;
   adresse?: string;
   telephone?: string;
   tableNumber?: number;
@@ -28,41 +29,67 @@ export class DashcommandeService {
     return this.http.delete(`${this.apiUrl}/supprimer/${idCmnd}`, { responseType: 'text' });
   }
 
-  // Méthode modifiée pour supporter le statut de paiement
-  modifierCommande(idCmnd: number, platQuantites: any[], statutPaiement?: string): Observable<any> {
+  // Méthode modifiée pour supporter le statut de paiement ET l'état de livraison
+  modifierCommande(idCmnd: number, platQuantites: any[], statutPaiement?: string, etatLivraison?: string): Observable<any> {
     let params = new HttpParams();
     
     // Ajouter le statut de paiement en paramètre si fourni
     if (statutPaiement && statutPaiement.trim() !== '') {
       params = params.set('statutPaiement', statutPaiement);
     }
-
+    
+    // Ajouter l'état de livraison en paramètre si fourni
+    if (etatLivraison && etatLivraison.trim() !== '') {
+      params = params.set('etatLivraison', etatLivraison);
+    }
     console.log('🔄 Service - Modification commande ID:', idCmnd);
     console.log('📦 Service - Plats:', platQuantites);
     console.log('💳 Service - Statut paiement:', statutPaiement);
-
+    console.log('🚚 Service - État livraison:', etatLivraison);
     return this.http.put(
       `${this.apiUrl}/modifier/${idCmnd}`, 
       platQuantites, 
       { 
         params: params,
-        responseType: 'text' 
+        responseType: 'json' // Changé pour recevoir la liste des plats
       }
     );
   }
-
+  
   getCommande(idCmnd: number): Observable<any> {
     return this.http.get(`${this.apiUrl}/getcommande/${idCmnd}`);
   }
 
-  // Méthode mise à jour pour adminCreateCommande
   adminCreateCommande(request: AdminCommandeRequest): Observable<any> {
     console.log('🚀 Service - Création commande admin:', request);
     
     return this.http.post(
       `${this.apiUrl}/admin/create`, 
       request,
-      { responseType: 'json' } // Changé de 'text' à 'json' pour recevoir l'objet de réponse
+      { responseType: 'json' }
     );
+  }
+
+  // Méthode pour changer l'état de livraison (méthode dédiée)
+  changerEtatLivraison(idCmnd: number, nouvelEtat: string): Observable<any> {
+    return this.http.put(
+      `${this.apiUrl}/livraison/${idCmnd}/etat`, 
+      { etatLivraison: nouvelEtat },
+      { responseType: 'text' }
+    );
+  }
+
+  // Méthode pour assigner un livreur
+  assignerLivreur(idCmnd: number, idLivreur: number): Observable<any> {
+    return this.http.put(
+      `${this.apiUrl}/livraison/${idCmnd}/livreur`, 
+      { idLivreur: idLivreur },
+      { responseType: 'text' }
+    );
+  }
+
+  // Méthode pour obtenir les détails de livraison
+  getDetailsLivraison(idCmnd: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/livraison/${idCmnd}`);
   }
 }

@@ -31,6 +31,7 @@ import { ModifierprofilComponent } from './modifierprofil/modifierprofil.compone
 import { CommandeeComponent } from './admin/commandee/commandee.component';
 import { AdminReservationComponent } from './admin/admin-reservation/admin-reservation.component';
 import { ChatComponent } from './chat-component/chat-component.component';
+import { LivraisonComponent } from './admin/livraison/livraison.component';
 const routes: Routes = [
   { path: '', redirectTo: 'accueil', pathMatch: 'full' },
   { 
@@ -112,6 +113,10 @@ const routes: Routes = [
     
   },
 
+  {
+    path: 'livraison',
+    component: LivraisonComponent,
+  },
  
 
   { 

@@ -21,6 +21,11 @@ interface Commande {
     dateCommande: string;
     details?: DetailCommande[];
     plats?: any[];
+    livraison?: {
+        idLivraison: number;
+        etatLivraison: string;
+        livreur?: any;
+    };
 }
 
 interface AdminCommandeRequest {
@@ -49,10 +54,13 @@ export class CommandeeComponent implements OnInit {
   showModal: boolean = false;
   platQuantites: any[] = [];
   showDeleteModal: boolean = false;
-idCommandeToDelete: number | null = null;
+  idCommandeToDelete: number | null = null;
   
-  // Nouveau: Statut de paiement sélectionné
+  // Statut de paiement sélectionné
   selectedStatutPaiement: string = '';
+  
+  // NOUVEAU: État de livraison sélectionné
+  selectedEtatLivraison: string = '';
   
   // Liste des statuts de paiement disponibles
   statutsPaiement = [
@@ -61,39 +69,46 @@ idCommandeToDelete: number | null = null;
     { value: 'PAYER_ESPECE', label: 'Payé en espèces' }
   ];
 
-  // Nouvelles propriétés pour la création de commande admin
+  // NOUVEAU: Liste des états de livraison disponibles
+  etatsLivraison = [
+    { value: 'EN_ATTENTE', label: 'En attente' },
+    { value: 'LIVREE', label: 'Livrée' }
+  ];
+
+  // Propriétés pour la création de commande admin
   adminCommandeForm: AdminCommandeRequest = {
     typeCommande: 'SUR_PLACE',
     platQuantites: [],
     username: ''
   };
   adminPlatQuantites: any[] = [];
-  availablePlats: any[] = []; // À remplir avec la liste des plats disponibles
+  availablePlats: any[] = [];
 
   constructor(
     private authService: AuthService,
     private commandeService: DashcommandeService
   ) {}
-openDeleteModal(idCmnd: number): void {
-  this.idCommandeToDelete = idCmnd;
-  this.showDeleteModal = true;
-}
 
-closeDeleteModal(): void {
-  this.idCommandeToDelete = null;
-  this.showDeleteModal = false;
-}
-
-confirmDeleteCommande(): void {
-  if (this.idCommandeToDelete !== null) {
-    this.supprimerCommande(this.idCommandeToDelete);
-    this.closeDeleteModal();
+  openDeleteModal(idCmnd: number): void {
+    this.idCommandeToDelete = idCmnd;
+    this.showDeleteModal = true;
   }
-}
+
+  closeDeleteModal(): void {
+    this.idCommandeToDelete = null;
+    this.showDeleteModal = false;
+  }
+
+  confirmDeleteCommande(): void {
+    if (this.idCommandeToDelete !== null) {
+      this.supprimerCommande(this.idCommandeToDelete);
+      this.closeDeleteModal();
+    }
+  }
+
   ngOnInit(): void {
     this.username = localStorage.getItem('username');
     this.loadCommandes();
-    // this.loadAvailablePlats(); // Décommentez si vous avez une méthode pour charger les plats
   }
 
   loadCommandes(): void {
@@ -124,6 +139,9 @@ confirmDeleteCommande(): void {
     
     // Initialiser le statut de paiement sélectionné avec la valeur actuelle
     this.selectedStatutPaiement = commande.statutPaiement || 'EN_ATTENTE';
+    
+    // NOUVEAU: Initialiser l'état de livraison sélectionné
+    this.selectedEtatLivraison = commande.livraison?.etatLivraison || 'EN_ATTENTE';
 
     console.log('🔍 Structure complète de la commande :', commande);
     
@@ -134,6 +152,10 @@ confirmDeleteCommande(): void {
             next: (commandeDetails) => {
                 console.log('✅ Détails reçus:', commandeDetails);
                 this.extractPlatsFromCommande(commandeDetails);
+                // Mettre à jour les informations de livraison si disponibles
+                if (commandeDetails.livraison) {
+                    this.selectedEtatLivraison = commandeDetails.livraison.etatLivraison || 'EN_ATTENTE';
+                }
                 this.isLoading = false;
             },
             error: (err) => {
@@ -151,7 +173,6 @@ confirmDeleteCommande(): void {
   private extractPlatsFromCommande(commande: any): void {
     this.platQuantites = [];
     
-    // Créer un objet temporaire pour regrouper les plats par id
     const platsGroupes: {[key: number]: any} = {};
 
     if (commande.details && Array.isArray(commande.details)) {
@@ -169,24 +190,8 @@ confirmDeleteCommande(): void {
                 platsGroupes[idPlat].quantite = detail.quantite || 1;
             }
         });
-    } else if (commande.plats && Array.isArray(commande.plats)) {
-        commande.plats.forEach((plat: any) => {
-            const idPlat = plat.platId || plat.idPlat || plat.id;
-            if (idPlat) {
-                if (!platsGroupes[idPlat]) {
-                    platsGroupes[idPlat] = {
-                        idPlat: idPlat,
-                        nom: plat.platName || plat.nom || plat.name,
-                        quantite: 0,
-                        prix: plat.prixUnitaire || plat.prix || 0
-                    };
-                }
-                platsGroupes[idPlat].quantite = plat.quantite || 1;
-            }
-        });
     }
 
-    // Convertir l'objet groupé en tableau
     this.platQuantites = Object.values(platsGroupes);
 
     if (this.platQuantites.length === 0) {
@@ -201,6 +206,7 @@ confirmDeleteCommande(): void {
     this.showModal = false;
     this.selectedCommande = null;
     this.selectedStatutPaiement = '';
+    this.selectedEtatLivraison = '';
   }
 
   modifierCommande(): void {
@@ -215,21 +221,23 @@ confirmDeleteCommande(): void {
       }));
 
     console.log('📤 Données des plats envoyées au backend :', platQuantitesForBackend);
-    console.log('💳 Nouveau statut de paiement :', this.selectedStatutPaiement);
-
-    if (platQuantitesForBackend.length === 0) {
-      this.errorMessage = 'Aucun plat valide à modifier';
-      return;
-    }
+    console.log('💳 Statut de paiement :', this.selectedStatutPaiement);
+    console.log('🚚 État de livraison :', this.selectedEtatLivraison);
 
     this.isLoading = true;
+    
+    // Déterminer si l'état de livraison doit être envoyé
+    const etatLivraisonToSend = (this.selectedCommande.typeCommande === 'A_DOMICILE' && 
+                                 this.selectedCommande.livraison) ? this.selectedEtatLivraison : undefined;
+
     this.commandeService.modifierCommande(
       this.selectedCommande.idCmnd, 
       platQuantitesForBackend, 
-      this.selectedStatutPaiement
+      this.selectedStatutPaiement,
+      etatLivraisonToSend
     ).subscribe({
       next: (response) => {
-        this.successMessage = response;
+        this.successMessage = 'Commande modifiée avec succès';
         this.loadCommandes();
         this.closeModal();
         this.isLoading = false;
@@ -241,6 +249,17 @@ confirmDeleteCommande(): void {
         setTimeout(() => this.errorMessage = '', 5000);
       }
     });
+  }
+
+  // Méthode pour vérifier si la commande a une livraison
+  hasLivraison(commande: any): boolean {
+    return commande.typeCommande === 'A_DOMICILE' && commande.livraison;
+  }
+
+  // Méthode pour obtenir le libellé de l'état de livraison
+  getEtatLivraisonLabel(etat: string): string {
+    const etatObj = this.etatsLivraison.find(e => e.value === etat);
+    return etatObj ? etatObj.label : etat;
   }
 
   confirmDelete(idCmnd: number): void {
@@ -273,15 +292,14 @@ confirmDeleteCommande(): void {
     const input = event.target as HTMLInputElement;
     const newQuantite = parseInt(input.value);
     
-    // Réinitialiser complètement la valeur
     if (!isNaN(newQuantite) && newQuantite >= 1) {
-      plat.quantite = newQuantite; // Remplace la valeur directement
+      plat.quantite = newQuantite;
     } else {
       plat.quantite = 1;
       input.value = '1';
     }
     
-    console.log('Quantité mise à jour:', plat.quantite); // Pour débogage
+    console.log('Quantité mise à jour:', plat.quantite);
   }
 
   supprimerPlat(index: number): void {
@@ -300,7 +318,6 @@ confirmDeleteCommande(): void {
   }
 
   onAdminTypeCommandeChange(): void {
-    // Réinitialiser les champs spécifiques selon le type
     if (this.adminCommandeForm.typeCommande === 'SUR_PLACE') {
       this.adminCommandeForm.userId = undefined;
       this.adminCommandeForm.username = ''; 
@@ -337,13 +354,11 @@ confirmDeleteCommande(): void {
   }
 
   adminCreateCommande(): void {
-    // Validation des données
     if (this.adminPlatQuantites.length === 0) {
       this.errorMessage = 'Veuillez ajouter au moins un plat';
       return;
     }
 
-    // Validation spécifique selon le type de commande
     if (this.adminCommandeForm.typeCommande === 'A_DOMICILE') {
       if (!this.adminCommandeForm.username || !this.adminCommandeForm.adresse || !this.adminCommandeForm.telephone) {
         this.errorMessage = 'Veuillez remplir tous les champs requis pour une commande à domicile';
@@ -356,7 +371,6 @@ confirmDeleteCommande(): void {
       }
     }
 
-    // Préparer les données des plats
     const platQuantitesForBackend = this.adminPlatQuantites
       .filter(plat => plat.idPlat && plat.quantite > 0)
       .map(plat => ({
@@ -369,15 +383,13 @@ confirmDeleteCommande(): void {
       return;
     }
 
-    // Préparer la requête
     const request: AdminCommandeRequest = {
       typeCommande: this.adminCommandeForm.typeCommande,
       platQuantites: platQuantitesForBackend
     };
 
-    // Ajouter les champs spécifiques selon le type
     if (this.adminCommandeForm.typeCommande === 'A_DOMICILE') {
-      request.username = this.adminCommandeForm.username;  // Utiliser username au lieu de userId
+      request.username = this.adminCommandeForm.username;
       request.adresse = this.adminCommandeForm.adresse;
       request.telephone = this.adminCommandeForm.telephone;
     } else {
@@ -391,10 +403,9 @@ confirmDeleteCommande(): void {
 
     this.commandeService.adminCreateCommande(request).subscribe({
       next: (response) => {
-        console.log('Réponse complète du serveur:', response); // Debug important
+        console.log('Réponse complète du serveur:', response);
         this.successMessage = 'Commande ajoutée avec succès !';
         this.errorMessage = '';
-        console.log('Message de succès défini:', this.successMessage); // Vérifiez ce log
         
         this.loadCommandes();
         this.resetAdminForm();
@@ -402,11 +413,10 @@ confirmDeleteCommande(): void {
         
         setTimeout(() => {
           this.successMessage = '';
-          console.log('Message de succès effacé'); // Vérifiez ce log
         }, 3000);
       },
       error: (err) => {
-        console.error('Erreur complète:', err); // Debug important
+        console.error('Erreur complète:', err);
         this.errorMessage = 'Erreur: ' + (err.error?.message || err.message || 'Erreur inconnue');
         this.successMessage = '';
         this.isLoading = false;
@@ -414,16 +424,7 @@ confirmDeleteCommande(): void {
     });
   }
 
-  // Méthode pour charger les plats disponibles (à implémenter selon votre API)
   loadAvailablePlats(): void {
-    // Exemple d'implémentation - adaptez selon votre service
-    // this.platService.getAllPlats().subscribe({
-    //   next: (plats) => {
-    //     this.availablePlats = plats;
-    //   },
-    //   error: (err) => {
-    //     console.error('Erreur lors du chargement des plats:', err);
-    //   }
-    // });
+    // À implémenter selon votre service de plats
   }
 }

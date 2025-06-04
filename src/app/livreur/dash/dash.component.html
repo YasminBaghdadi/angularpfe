@@ -79,11 +79,12 @@
     </div>
 </header>
 
+
 <!-- ========== Liste des livraisons ========== -->
 <div class="main-content">
   <div class="page-content">
     <div class="container-fluid">
-      <div class="row mt-4">
+      <div class="row mt-10">
         <div class="col-12">
           <!-- Carte avec la liste des livraisons -->
           <div class="card">
@@ -92,42 +93,39 @@
             </div>
             
             <div class="card-body">
-              <!-- Message d'information quand aucune livraison n'est disponible -->
-              <div class="alert alert-info">
-                Aucune livraison disponible pour le moment.
-              </div>
+              
               
               <!-- Tableau des livraisons -->
-              <div class="table-responsive" >
-                <table class="table align-middle table-nowrap table-striped mb-0">
-                  <thead class="table-light">
-                    <tr>
-                      <th scope="col">Nom de livreur</th>
-                      <th scope="col">Numéro de livraison</th>
-                      <th scope="col">Nom de client</th>
-                      <th scope="col">Adresse</th>
-                      <th scope="col">Total</th>
-                      <th scope="col" style="width: 150px;">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr >
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td>
-                        <button class="btn btn-sm btn-primary me-1" >
-                          <i class="fas fa-check me-1"></i> Confirmer
-                        </button>
-                       
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              
+             <div *ngIf="livraisons.length > 0" class="table-responsive">
+             <table class="table align-middle table-nowrap table-striped mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Numéro de livraison</th>
+                  <th>Nom Client</th>
+                  <th>Adresse</th>
+                  <th>Téléphone</th>
+                  <th>Date de commande</th>
+                  <th>État</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let livraison of livraisons">
+                  <td>{{ livraison.idLivraison }}</td>
+                  <td>{{ livraison.nomClient }}</td>
+                  <td>{{ livraison.adresseLivraison }}</td>
+                  <td>{{ livraison.telephone }}</td>
+                  <td>{{ livraison.dateCommande | date:'short' }}</td>
+                  <td>{{ livraison.etatLivraison }}</td>
+                  <td> 
+                    <button class="btn btn-sm btn-primary me-1" (click)="changerEtatLivraison(livraison.idLivraison, 'LIVREE')">
+                      <i class="fas fa-check me-1" ></i> Confirmer
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
              
             </div>
           </div>

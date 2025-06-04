@@ -1,16 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AccueilpanierService } from 'src/app/services/accueilpanier.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { CommandeService } from 'src/app/services/commande.service';
 import { SimplePaymentService } from 'src/app/services/simple-payment.service';
 import { ActivatedRoute, Router, NavigationExtras } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-pan',
   templateUrl: './pan.component.html',
   styleUrls: ['./pan.component.css']
 })
-export class PanComponent implements OnInit {
+export class PanComponent implements OnInit, OnDestroy {
   nombreArticles: number = 0;
   panier: any[] = [];
   total: number = 0;
@@ -25,6 +26,10 @@ export class PanComponent implements OnInit {
   // Propriétés pour gérer l'état de la commande
   commandePassee: boolean = false;
   commandeEnAttente: any = null;
+  panierBloque: boolean = false;
+
+  // Gestion des subscriptions
+  private subscriptions: Subscription[] = [];
 
   constructor(
     private panierService: AccueilpanierService,
@@ -33,7 +38,7 @@ export class PanComponent implements OnInit {
     private simplePaymentService: SimplePaymentService,
     private router: Router,
     private route: ActivatedRoute
-  ) {}// Dans PanComponent, ajoutez ceci dans ngOnInit() :
+  ) {}
 
   isChatModalOpen = false;
 
@@ -44,32 +49,52 @@ export class PanComponent implements OnInit {
   closeChatModal(): void {
     this.isChatModalOpen = false;
   }
+
   ngOnInit(): void {
     this.verifierParametresRetour();
     this.verifierCommandeEnAttente();
     this.verifierPaiementEnCours();
-  console.log('Panier:', this.panier);
-  console.log('Commande en attente:', this.commandeEnAttente?.plats);
-  
-    this.panierService.nombreArticles$.subscribe(nombre => {
+    this.setupSubscriptions();
+    
+    this.username = localStorage.getItem('username');
+  }
+
+  ngOnDestroy(): void {
+    // Nettoyer les subscriptions
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
+
+  private setupSubscriptions(): void {
+    // Subscription pour le nombre d'articles
+    const nombreSub = this.panierService.nombreArticles$.subscribe(nombre => {
       this.nombreArticles = nombre;
     });
+    this.subscriptions.push(nombreSub);
 
-    this.panierService.panier$.subscribe(panier => {
+    // Subscription pour le panier
+    const panierSub = this.panierService.panier$.subscribe(panier => {
       this.panier = panier;
       if (!this.commandePassee) {
         this.total = this.panierService.calculerTotal();
       }
     });
+    this.subscriptions.push(panierSub);
 
-    this.commandeService.getTotalCommandeObservable().subscribe(totalCommande => {
+    // Subscription pour l'état de blocage du panier
+    const bloqueSub = this.panierService.panierBloque$.subscribe(bloque => {
+      this.panierBloque = bloque;
+      console.log('État panier bloqué:', bloque);
+    });
+    this.subscriptions.push(bloqueSub);
+
+    // Subscription pour le total de commande
+    const totalSub = this.commandeService.getTotalCommandeObservable().subscribe(totalCommande => {
       if (totalCommande > 0) {
         this.total = totalCommande;
         this.commandePassee = true;
       }
     });
-
-    this.username = localStorage.getItem('username');
+    this.subscriptions.push(totalSub);
   }
 
   private verifierParametresRetour(): void {
@@ -118,24 +143,40 @@ export class PanComponent implements OnInit {
   }
 
   modifierQuantite(index: number, nouvelleQuantite: number): void {
-    if (this.commandePassee) {
-      this.errorMessage = 'Impossible de modifier le panier, commande déjà passée. Veuillez procéder au paiement.';
+    if (this.panierBloque || this.commandePassee) {
+      this.errorMessage = 'Impossible de modifier le panier : une commande est en attente de paiement.';
       this.clearMessagesAfterDelay();
       return;
     }
-    this.panierService.mettreAJourQuantite(index, nouvelleQuantite);
+
+    const success = this.panierService.mettreAJourQuantite(index, nouvelleQuantite);
+    if (!success) {
+      this.errorMessage = 'Impossible de modifier la quantité.';
+      this.clearMessagesAfterDelay();
+    }
   }
 
   supprimerPlat(index: number): void {
-    if (this.commandePassee) {
-      this.errorMessage = 'Impossible de modifier le panier, commande déjà passée. Veuillez procéder au paiement.';
+    if (this.panierBloque || this.commandePassee) {
+      this.errorMessage = 'Impossible de modifier le panier : une commande est en attente de paiement.';
       this.clearMessagesAfterDelay();
       return;
     }
-    this.panierService.supprimerDuPanier(index);
+
+    const success = this.panierService.supprimerDuPanier(index);
+    if (!success) {
+      this.errorMessage = 'Impossible de supprimer le plat.';
+      this.clearMessagesAfterDelay();
+    }
   }
 
   ouvrirFactureModal(): void {
+    if (this.panierBloque && !this.peutPasserNouvelleCommande()) {
+      this.errorMessage = 'Une commande est déjà en attente de paiement. Veuillez d\'abord payer ou annuler la commande actuelle.';
+      this.clearMessagesAfterDelay();
+      return;
+    }
+
     if (!this.adresseLivraison || !this.telephone) {
       this.errorMessage = 'Veuillez remplir tous les champs obligatoires';
       this.clearMessagesAfterDelay();
@@ -156,6 +197,12 @@ export class PanComponent implements OnInit {
   }
 
   async confirmerCommande(): Promise<void> {
+    if (!this.peutPasserNouvelleCommande()) {
+      this.errorMessage = 'Une commande est déjà en attente de paiement.';
+      this.clearMessagesAfterDelay();
+      return;
+    }
+
     this.isProcessing = true;
     this.errorMessage = null;
     this.successMessage = null;
@@ -171,7 +218,7 @@ export class PanComponent implements OnInit {
       this.commandePassee = true;
       this.commandeEnAttente = this.commandeService.getCommandeEnAttente();
       
-      this.successMessage = `Commande #${response.idCmnd} passée avec succès! Vous pouvez maintenant procéder au paiement.`;
+      this.successMessage = `Commande #${response.idCmnd} passée avec succès! Procédez au paiement.`;
       this.clearMessagesAfterDelay();
       
       this.fermerFactureModal();
@@ -179,8 +226,6 @@ export class PanComponent implements OnInit {
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.errorMessage = error.message;
-      } else if (typeof error === 'string') {
-        this.errorMessage = error;
       } else {
         this.errorMessage = 'Erreur lors de la commande';
       }
@@ -230,8 +275,9 @@ export class PanComponent implements OnInit {
   }
 
   annulerCommande(): void {
-    if (confirm('Êtes-vous sûr de vouloir annuler votre commande ?')) {
-      this.commandeService.clearToutCommande();
+    if (confirm('Êtes-vous sûr de vouloir annuler votre commande ? Cela vous permettra de passer une nouvelle commande.')) {
+      // Utiliser la nouvelle méthode du service
+      this.panierService.annulerCommandeEnAttente();
       this.simplePaymentService.clearPaymentDetails();
       
       this.commandePassee = false;
@@ -239,7 +285,7 @@ export class PanComponent implements OnInit {
       this.adresseLivraison = '';
       this.telephone = '';
       this.total = this.panierService.calculerTotal();
-      this.successMessage = 'Commande annulée. Vous pouvez modifier votre panier.';
+      this.successMessage = 'Commande annulée. Vous pouvez maintenant passer une nouvelle commande.';
       this.clearMessagesAfterDelay();
     }
   }
@@ -255,6 +301,11 @@ export class PanComponent implements OnInit {
     }
   }
 
+  // Méthode pour vérifier si on peut passer une nouvelle commande
+  peutPasserNouvelleCommande(): boolean {
+    return this.panierService.peutPasserCommande();
+  }
+
   get texteBoutonPrincipal(): string {
     if (this.commandePassee) {
       return this.isProcessing ? 'INITIALISATION DU PAIEMENT...' : 'PAYER AVEC PAYPAL';
@@ -263,7 +314,7 @@ export class PanComponent implements OnInit {
   }
 
   get peutModifierPanier(): boolean {
-    return !this.commandePassee;
+    return !this.commandePassee && !this.panierBloque;
   }
 
   get platsAffichage(): any[] {
@@ -292,6 +343,13 @@ export class PanComponent implements OnInit {
     return paymentError ? paymentError.error : '';
   }
 
+  get messageEtatPanier(): string {
+    if (this.panierBloque && this.commandeEnAttente) {
+      return `Commande #${this.commandeEnAttente.id} en attente de paiement. Payez ou annulez pour passer une nouvelle commande.`;
+    }
+    return '';
+  }
+
   private clearMessagesAfterDelay(): void {
     setTimeout(() => {
       this.errorMessage = null;
@@ -303,4 +361,5 @@ export class PanComponent implements OnInit {
     this.simplePaymentService.clearPaymentDetails();
     this.authService.logout();
   }
+  
 }

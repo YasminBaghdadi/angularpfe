@@ -561,7 +561,7 @@
                       <td>{{ reservation.dateReservation | date: 'dd/MM/yyyy HH:mm' }}</td>
                       <td>{{ reservation.numberPersonne }}</td>
                       <td>{{ reservation.numeroTel }}</td>
-                      <td>Table #{{ reservation.tab?.number }}</td>
+                      <td>Table #{{ reservation.tab.number }}</td>
                       <td>
                         <button class="btn btn-sm btn-primary me-1" (click)="openEditModal(reservation)">
   <i class="fas fa-edit me-1"></i> Modifier

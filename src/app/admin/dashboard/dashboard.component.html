@@ -53,77 +53,167 @@
 
                     <div class="d-flex align-items-center">
                         <!-- Mobile search -->
-                        <div class="dropdown d-md-none topbar-head-dropdown header-item">
-                            <button type="button" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle" id="page-header-search-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="bx bx-search fs-22"></i>
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0" aria-labelledby="page-header-search-dropdown">
-                                <form class="p-3">
-                                    <div class="form-group m-0">
-                                        <div class="input-group">
-                                            <input type="text" class="form-control" placeholder="Search ..." aria-label="Search input">
-                                            <button class="btn btn-primary" type="submit"><i class="mdi mdi-magnify"></i></button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
+                        
 
-                        <!-- Notifications dropdown -->
-                        <div class="dropdown topbar-head-dropdown ms-1 header-item" id="notificationDropdown">
-  <button type="button"
-          class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle"
+<!-- Notifications dropdown -->
+<div class="dropdown d-inline-block">
+  <button type="button" class="btn header-item noti-icon position-relative" 
           id="page-header-notifications-dropdown"
-          data-bs-toggle="dropdown"
-          data-bs-auto-close="outside"
-          aria-haspopup="true"
-          aria-expanded="false">
-    <i class='bx bx-bell fs-22'></i>
-    <span class="position-absolute topbar-badge fs-10 translate-middle badge rounded-pill bg-danger">
-      {{ notifications.length }}
-      <span class="visually-hidden">unread messages</span>
+          data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <i class="bx bx-bell fs-20"></i>
+    <span *ngIf="unreadCount > 0" 
+          class="badge bg-danger rounded-pill position-absolute"
+          style="top: -2px; right: -6px; font-size: 10px; min-width: 16px; height: 16px; line-height: 16px;">
+      {{ unreadCount > 99 ? '99+' : unreadCount }}
     </span>
   </button>
 
-  <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0" aria-labelledby="page-header-notifications-dropdown">
+  <!-- Menu déroulant des notifications -->
+  <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0" 
+       aria-labelledby="page-header-notifications-dropdown">
+    
+    <!-- Header du dropdown -->
     <div class="dropdown-head bg-primary bg-pattern rounded-top">
       <div class="p-3">
         <div class="row align-items-center">
           <div class="col">
-            <h6 class="m-0 fs-16 fw-semibold text-white"> Notifications </h6>
+            <h6 class="m-0 fs-16 fw-semibold text-white">Notifications</h6>
           </div>
           <div class="col-auto dropdown-tabs">
-            <span class="badge bg-light-subtle text-body fs-13"> {{ notifications.length }} New</span>
+            <span class="badge bg-light-subtle text-body fs-13">
+              {{ unreadCount }} Nouvelle{{ unreadCount !== 1 ? 's' : '' }}
+            </span>
           </div>
+        </div>
+      </div>
+
+      <!-- Actions rapides -->
+      <div class="px-2 pt-0 pb-2" *ngIf="notifications.length > 0">
+        <div class="d-flex gap-1">
+          <button type="button" 
+                  class="btn btn-link btn-sm text-white p-1"
+                  (click)="markAllAsRead()"
+                  title="Marquer tout comme lu">
+            <i class="bx bx-check-double fs-16"></i>
+          </button>
+          <button type="button" 
+                  class="btn btn-link btn-sm text-white p-1"
+                  (click)="clearAllNotifications()"
+                  title="Supprimer toutes les notifications">
+            <i class="bx bx-trash fs-16"></i>
+          </button>
         </div>
       </div>
     </div>
 
+    <!-- Contenu des notifications -->
     <div class="tab-content position-relative" id="notificationItemsTabContent">
-      <!-- All Notifications Tab -->
       <div class="tab-pane fade show active py-2 ps-2" id="all-noti-tab" role="tabpanel">
-        <div data-simplebar style="max-height: 300px;" class="pe-2">
-          <!-- Loop through notifications -->
-          <div *ngFor="let notif of notifications; let i = index" class="text-reset notification-item d-block dropdown-item position-relative">
-            <div class="d-flex">
+        <div data-simplebar style="max-height: 400px;" class="pe-2">
+          
+          <!-- Message si aucune notification -->
+          <div *ngIf="displayedNotifications.length === 0" class="text-center py-4">
+            <div class="avatar-md mx-auto mb-3">
+              <div class="avatar-title bg-light text-muted rounded-circle fs-20">
+                <i class="bx bx-bell-off"></i>
+              </div>
+            </div>
+            <p class="text-muted mb-0">Aucune notification</p>
+          </div>
+
+          <!-- Liste des notifications (limitée à 2) -->
+          <div *ngFor="let notif of displayedNotifications; let i = index" 
+               class="text-reset notification-item d-block dropdown-item position-relative"
+               [class.unread]="!notif.read"
+               (click)="markAsRead(notif.id)">
+            
+            <div class="d-flex align-items-start">
+              <!-- Icône de la notification -->
               <div class="avatar-xs me-3 flex-shrink-0">
-                <span class="avatar-title bg-info-subtle text-info rounded-circle fs-16">
-                  <i class="bx bx-badge-check"></i>
+                <span class="avatar-title rounded-circle fs-16" 
+                      [ngClass]="getNotificationColor(notif.type)">
+                  <i [ngClass]="getNotificationIcon(notif.type)"></i>
                 </span>
               </div>
-              <div class="flex-grow-1">
-                <a href="#!" class="stretched-link">
-                  <h6 class="mt-0 mb-2 lh-base">{{ notif }}</h6>
-                </a>
-                <p class="mb-0 fs-11 fw-medium text-uppercase text-muted">
-                  <span><i class="mdi mdi-clock-outline"></i> just now</span>
+
+              <!-- Contenu de la notification -->
+              <div class="flex-grow-1 min-width-0">
+                <!-- Titre -->
+                <h6 class="mt-0 mb-1 lh-base fw-semibold" 
+                    [class.text-primary]="!notif.read">
+                  {{ getNotificationTitle(notif) }}
+                </h6>
+                
+                <!-- Message principal -->
+                <p class="mb-1 text-muted lh-base" 
+                   [class.fw-medium]="!notif.read">
+                  {{ notif.message }}
                 </p>
+                
+                <!-- Détails supplémentaires pour les réservations -->
+                <div *ngIf="notif.type === 'reservation' && notif.details" 
+                     class="mb-1">
+                  <small class="text-info">
+                    <i class="bx bx-group me-1"></i>
+                    {{ notif.details.persons }} personne{{ notif.details.persons > 1 ? 's' : '' }}
+                    <span *ngIf="notif.table"> - Table: {{ notif.table }}</span>
+                    <span *ngIf="notif.details.phone"> - Tél: {{ notif.details.phone }}</span>
+                  </small>
+                </div>
+                
+                <!-- Message du client pour les réservations -->
+                <div *ngIf="notif.type === 'reservation' && notif.clientMessage" 
+                     class="mb-1 p-2 bg-light rounded">
+                  <small class="text-muted">
+                    <i class="bx bx-message-dots me-1"></i>
+                    <strong>Message:</strong> "{{ notif.clientMessage }}"
+                  </small>
+                </div>
+                
+                <!-- Timestamp -->
+                <p class="mb-0 fs-11 fw-medium text-uppercase text-muted">
+                  <i class="mdi mdi-clock-outline me-1"></i>
+                  {{ formatTime(notif.timestamp) }}
+                </p>
+              </div>
+
+              <!-- Actions et indicateurs -->
+              <div class="flex-shrink-0 ms-2">
+                <!-- Bouton supprimer -->
+                <button type="button" 
+                        class="btn btn-sm btn-link text-muted p-1"
+                        (click)="removeNotification(notif.id, $event)"
+                        title="Supprimer">
+                  <i class="bx bx-x fs-16"></i>
+                </button>
+                
+                <!-- Indicateur non lu -->
+                <div *ngIf="!notif.read" class="mt-1">
+                  <span class="badge bg-primary rounded-pill fs-11">Nouveau</span>
+                </div>
               </div>
             </div>
           </div>
 
-          <div class="my-3 text-center view-all">
-            <button type="button" class="btn btn-soft-success waves-effect waves-light">View All Notifications <i class="ri-arrow-right-line align-middle"></i></button>
+          <!-- Indicateur pour les notifications cachées -->
+          <div *ngIf="hiddenNotificationsCount > 0" 
+               class="text-center py-2 border-top">
+            <small class="text-muted">
+              <i class="bx bx-dots-horizontal-rounded me-1"></i>
+              {{ hiddenNotificationsCount }} notification{{ hiddenNotificationsCount > 1 ? 's' : '' }} supplémentaire{{ hiddenNotificationsCount > 1 ? 's' : '' }}
+            </small>
+          </div>
+
+          <!-- Footer avec actions -->
+          <div *ngIf="notifications.length > 0" class="my-3 text-center view-all border-top pt-3">
+            <div class="d-flex gap-2 justify-content-center">
+              <button type="button" 
+                      class="btn btn-soft-primary btn-sm waves-effect waves-light"
+                      (click)="openModal()">
+                <i class="bx bx-list-ul me-1"></i>
+                Voir toutes ({{ notifications.length }})
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -131,11 +221,204 @@
   </div>
 </div>
 
+<!-- Modal utilisant l'API native dialog -->
+<dialog #allNotificationsModal class="modal-dialog">
+  <div class="modal-content">
+    <!-- Header de la modal -->
+    <div class="modal-header bg-primary">
+      <h5 class="modal-title text-white">
+        <i class="bx bx-bell me-2"></i>
+        Toutes les notifications
+      </h5>
+      <button type="button" class="btn-close btn-close-white" (click)="closeModal()" aria-label="Close"></button>
+    </div>
 
-                    
+    <!-- Sous-header avec statistiques et actions -->
+    <div class="modal-header bg-light border-bottom">
+      <div class="d-flex w-100 justify-content-between align-items-center">
+        <div class="d-flex gap-3">
+          <span class="badge bg-primary fs-12">
+            Total: {{ notifications.length }}
+          </span>
+          <span class="badge bg-warning fs-12" *ngIf="unreadCount > 0">
+            Non lues: {{ unreadCount }}
+          </span>
+        </div>
+        
+        <div class="d-flex gap-2">
+          <button type="button" 
+                  class="btn btn-sm btn-outline-success"
+                  (click)="handleModalAction('markAllAsRead')"
+                  [disabled]="unreadCount === 0"
+                  title="Marquer tout comme lu">
+            <i class="bx bx-check-double me-1"></i>
+            Marquer tout comme lu
+          </button>
+          <button type="button" 
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="handleModalAction('clearAll')"
+                  [disabled]="notifications.length === 0"
+                  title="Supprimer toutes">
+            <i class="bx bx-trash me-1"></i>
+            Supprimer tout
+          </button>
+        </div>
+      </div>
+    </div>
 
+    <!-- Filtres -->
+    <div class="modal-header bg-light border-bottom">
+      <div class="d-flex gap-2 w-100">
+        <select class="form-select form-select-sm" 
+                [(ngModel)]="selectedFilter" 
+                (change)="applyFilter()">
+          <option value="all">Toutes les notifications</option>
+          <option value="unread">Non lues seulement</option>
+          <option value="reservation">Réservations</option>
+          <option value="info">Informations</option>
+          <option value="warning">Avertissements</option>
+          <option value="error">Erreurs</option>
+        </select>
+        
+        <select class="form-select form-select-sm" 
+                [(ngModel)]="selectedSort" 
+                (change)="applySorting()">
+          <option value="newest">Plus récentes</option>
+          <option value="oldest">Plus anciennes</option>
+          <option value="unread-first">Non lues en premier</option>
+        </select>
+      </div>
+    </div>
+    
+    <!-- Corps de la modal -->
+    <div class="modal-body p-0" style="max-height: 60vh; overflow-y: auto;">
+      <!-- Message si aucune notification -->
+      <div *ngIf="filteredNotifications.length === 0" class="text-center py-5">
+        <div class="avatar-lg mx-auto mb-4">
+          <div class="avatar-title bg-light text-muted rounded-circle fs-24">
+            <i class="bx bx-bell-off"></i>
+          </div>
+        </div>
+        <h6 class="text-muted">Aucune notification</h6>
+        <p class="text-muted mb-0 small">
+          {{ selectedFilter !== 'all' ? 'Aucune notification ne correspond aux filtres sélectionnés.' : 'Vous êtes à jour !' }}
+        </p>
+      </div>
 
-                                    
+      <!-- Liste des notifications -->
+      <div class="list-group list-group-flush">
+        <div *ngFor="let notif of filteredNotifications; let i = index; trackBy: trackByNotificationId" 
+             class="list-group-item list-group-item-action notification-item"
+             [class.list-group-item-light]="!notif.read"
+             [class.border-start-primary]="!notif.read"
+             style="border-left-width: 4px !important; cursor: pointer;"
+             (click)="handleModalAction('markAsRead', notif.id)">
+          
+          <div class="d-flex align-items-start">
+            <div class="avatar-sm me-3 flex-shrink-0">
+              <span class="avatar-title rounded-circle fs-18" 
+                    [ngClass]="getNotificationColor(notif.type)">
+                <i [ngClass]="getNotificationIcon(notif.type)"></i>
+              </span>
+            </div>
+
+            <div class="flex-grow-1 min-width-0">
+              <div class="d-flex justify-content-between align-items-start mb-1">
+                <h6 class="mb-0 fw-semibold" 
+                    [class.text-primary]="!notif.read">
+                  {{ getNotificationTitle(notif) }}
+                </h6>
+                <small class="text-muted ms-2 flex-shrink-0">
+                  {{ formatTime(notif.timestamp) }}
+                </small>
+              </div>
+              
+              <p class="mb-2 text-muted lh-sm" 
+                 [class.fw-medium]="!notif.read">
+                {{ notif.message }}
+              </p>
+              
+              <div *ngIf="notif.type === 'reservation' && notif.details" 
+                   class="mb-2">
+                <div class="row g-2">
+                  <div class="col-auto">
+                    <span class="badge bg-info-subtle text-info">
+                      <i class="bx bx-group me-1"></i>
+                      {{ notif.details.persons }} personne{{ notif.details.persons > 1 ? 's' : '' }}
+                    </span>
+                  </div>
+                  <div class="col-auto" *ngIf="notif.table">
+                    <span class="badge bg-secondary-subtle text-secondary">
+                      <i class="bx bx-table me-1"></i>
+                      Table {{ notif.table }}
+                    </span>
+                  </div>
+                  <div class="col-auto" *ngIf="notif.details.phone">
+                    <span class="badge bg-primary-subtle text-primary">
+                      <i class="bx bx-phone me-1"></i>
+                      {{ notif.details.phone }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              <div *ngIf="notif.type === 'reservation' && notif.clientMessage" 
+                   class="alert alert-info alert-sm mb-2 py-2">
+                <i class="bx bx-message-dots me-2"></i>
+                <strong>Message client:</strong> "{{ notif.clientMessage }}"
+              </div>
+              
+              <div class="d-flex gap-2 mt-2">
+                <button *ngIf="!notif.read" 
+                        type="button" 
+                        class="btn btn-sm btn-outline-primary"
+                        (click)="handleModalAction('markAsRead', notif.id, $event)">
+                  <i class="bx bx-check me-1"></i>
+                  Marquer comme lu
+                </button>
+                
+                <button type="button" 
+                        class="btn btn-sm btn-outline-danger"
+                        (click)="handleModalAction('remove', notif.id, $event)">
+                  <i class="bx bx-trash me-1"></i>
+                  Supprimer
+                </button>
+                
+                <button *ngIf="notif.type === 'reservation'" 
+                        type="button" 
+                        class="btn btn-sm btn-outline-success"
+                        (click)="handleModalAction('viewDetails', notif.id, $event)">
+                  <i class="bx bx-show me-1"></i>
+                  Voir détails
+                </button>
+              </div>
+            </div>
+
+            <div *ngIf="!notif.read" class="flex-shrink-0 ms-2">
+              <span class="badge bg-primary rounded-pill">Nouveau</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer bg-light" *ngIf="filteredNotifications.length > 0">
+      <div class="d-flex w-100 justify-content-between align-items-center">
+        <small class="text-muted">
+          Affichage de {{ filteredNotifications.length }} notification{{ filteredNotifications.length > 1 ? 's' : '' }}
+        </small>
+        
+        <div class="d-flex gap-2">
+          <button type="button" 
+                  class="btn btn-light btn-sm"
+                  (click)="closeModal()">
+            Fermer
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</dialog>
                         <!-- User profile dropdown -->
                         <div class="dropdown ms-sm-3 header-item topbar-user">
                             <button type="button" class="btn" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -143,8 +426,7 @@
                                     <span class="text-start ms-xl-2">
                                         <span class="d-none d-xl-inline-block ms-1 fw-medium user-name-text">Administrateur</span>
                                         <span class="d-none d-xl-block ms-1 fs-12 user-name-sub-text"> Bienvenue {{ username }} ! </span>
-                                        
-                                            
+                                      
                                     </span>
                                 </span>
                             </button>
@@ -320,10 +602,10 @@
                             </a>
                             <div class="collapse menu-dropdown" id="deliveryMenu">
                                 <ul class="nav nav-sm flex-column">
-                                    <li class="nav-item"><a href="#" class="nav-link">Ajouter une livraison</a></li>
-                                    <li class="nav-item"><a href="#" class="nav-link">Supprimer une livraison</a></li>
-                                    <li class="nav-item"><a href="#" class="nav-link">Modifier une livraison</a></li>
-                                    <li class="nav-item"><a href="#" class="nav-link">Voir la liste des livraisons</a></li>
+                                    <li class="nav-item"><a routerLink="/livraison" class="nav-link">Ajouter une livraison</a></li>
+                                    <li class="nav-item"><a routerLink="/livraison" class="nav-link">Supprimer une livraison</a></li>
+                                    <li class="nav-item"><a routerLink="/livraison" class="nav-link">Modifier une livraison</a></li>
+                                    <li class="nav-item"><a routerLink="/livraison" class="nav-link">Voir la liste des livraisons</a></li>
                                 </ul>
                             </div>
                         </li>

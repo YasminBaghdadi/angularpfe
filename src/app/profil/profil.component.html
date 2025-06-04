@@ -263,7 +263,7 @@
         <td>{{ reservation.nomClient }}</td>
         <td>{{ reservation.dateReservation | date: 'dd/MM/yyyy HH:mm' }}</td>
         <td>{{ reservation.numberPersonne }}</td>
-        <td>{{ reservation.tab?.number }}</td> <!-- si tu veux aussi afficher le numéro -->
+        <td>{{ reservation.tab.number }}</td> <!-- si tu veux aussi afficher le numéro -->
   <td>
   <div class="btn-group" role="group">
     <button class="btn btn-primary btn-sm" (click)="editReservation(reservation)">
@@ -309,25 +309,19 @@
         <button
           type="button"
           class="btn btn-outline-secondary"
-          (click)="closeDeleteModal()"
-        >
+          (click)="closeDeleteModal()">
           <i class="fas fa-times me-1"></i> Annuler
         </button>
         <button
           type="button"
           class="btn btn-danger"
-          (click)="confirmDelete()"
-        >
+          (click)="confirmDelete()">
           <i class="fas fa-trash me-1"></i> Supprimer
         </button>
       </div>
     </div>
   </div>
 </div>
-
-
-<!-- Modal de modification -->
-<!-- Modal de modification réservation -->
 <div class="modal" tabindex="-1" [ngClass]="{'show d-block': isEditingReservation}" (click)="closeEditModalOnBackdrop($event)">
   <div class="modal-dialog" (click)="$event.stopPropagation()">
     <div class="modal-content">
@@ -395,15 +389,12 @@
     </div>
   </div>
 </div>
-
-        <!-- Affichage profil (visible seulement quand on n'est pas en mode édition et qu'on ne regarde pas l'historique) -->
         <div *ngIf="!isEditing && !isShowingHistorique">
           <h6 class="section-title" style="color: rgb(214, 115, 115);">
             <i class="fas fa-user me-2" style="color: rgb(214, 115, 115);"></i>
             Informations personnelles
           </h6>
           <hr class="section-divider" />
-
           <div class="row">
             <div class="col-md-6 mb-3">
               <h6 class="info-label">Prénom</h6>
@@ -411,40 +402,29 @@
             </div>
             <div class="col-md-6 mb-3">
               <h6 class="info-label">Nom</h6>
-              <div class="info-value">{{ user.lastname }}</div>
+              <div class="info-value">{{ user.username }}</div>
             </div>
           </div>
-
           <h6 class="section-title" style="color: rgb(214, 115, 115);">
             <i class="fas fa-envelope me-2" style="color: rgb(214, 115, 115);"></i>
             Contact
           </h6>
           <hr class="section-divider" />
-
           <div class="mb-3">
             <h6 class="info-label">Email</h6>
             <div class="info-value">{{ user.email }}</div>
           </div>
-
-          
           <hr class="section-divider" />
-
           <div *ngIf="commandesLoading" class="text-center">
             <div class="spinner-border text-primary" role="status">
               <span class="visually-hidden">Chargement...</span>
             </div>
           </div>
-
           <div *ngIf="commandesError" class="alert alert-danger">
             <i class="fas fa-exclamation-triangle me-2"></i>
             {{ commandesError }}
           </div>
-
-          
-
-          
         </div>
-
         <!-- Formulaire édition (visible seulement quand isEditing est true) -->
         <form *ngIf="isEditing && !isShowingHistorique" #profileForm="ngForm" (ngSubmit)="updateProfile(profileForm)" novalidate>
           <h6 class="section-title" style="color: rgb(214, 115, 115);">
@@ -452,7 +432,6 @@
             Modifier mon profil
           </h6>
           <hr class="section-divider" />
-
           <div class="row">
             <div class="col-md-6 mb-3">
               <label for="firstname" class="form-label">Prénom</label>
@@ -468,14 +447,13 @@
                 <i class="fas fa-exclamation-circle me-1"></i> Le prénom est obligatoire.
               </div>
             </div>
-
             <div class="col-md-6 mb-3">
               <label for="lastname" class="form-label">Nom</label>
               <input
                 id="lastname"
                 name="lastname"
                 class="form-control"
-                [(ngModel)]="user.lastname"
+                [(ngModel)]="user.username"
                 required
                 #lastname="ngModel"
               />
