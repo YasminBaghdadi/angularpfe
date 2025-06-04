@@ -42,6 +42,7 @@
                         <!-- Mobile search -->
                         
 
+                        
 <!-- Notifications dropdown -->
 <div class="dropdown d-inline-block">
   <button type="button" class="btn header-item noti-icon position-relative" 
@@ -147,6 +148,69 @@
                     <span *ngIf="notif.details.phone"> - Tél: {{ notif.details.phone }}</span>
                   </small>
                 </div>
+
+                <!-- Détails supplémentaires pour les commandes -->
+                <div *ngIf="notif.type === 'commande'" class="mb-1">
+                  <div class="d-flex flex-wrap gap-2">
+                    <span class="badge bg-success-subtle text-success">
+                      <i class="bx bx-money me-1"></i>
+                      {{ notif.montantTotal?.toFixed(2) }} TND
+                    </span>
+                    <span class="badge bg-info-subtle text-info">
+                      <i class="bx bx-dish me-1"></i>
+                      {{ notif.nombrePlats }} article{{ (notif.nombrePlats || 0) > 1 ? 's' : '' }}
+                    </span>
+                    <span *ngIf="notif.table" class="badge bg-secondary-subtle text-secondary">
+                      <i class="bx bx-table me-1"></i>
+                      Table {{ notif.table }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Détails supplémentaires pour les livraisons -->
+                <div *ngIf="notif.type === 'livraison'" class="mb-1">
+                  <div class="d-flex flex-wrap gap-2">
+                    <span class="badge bg-success-subtle text-success">
+                      <i class="bx bx-money me-1"></i>
+                      {{ notif.montantTotal?.toFixed(2) }} TND
+                    </span>
+                    <span class="badge bg-info-subtle text-info">
+                      <i class="bx bx-dish me-1"></i>
+                      {{ notif.nombrePlats }} article{{ (notif.nombrePlats || 0) > 1 ? 's' : '' }}
+                    </span>
+                    <span *ngIf="notif.adresseLivraison" class="badge bg-warning-subtle text-warning">
+                      <i class="bx bx-map me-1"></i>
+                      {{ notif.adresseLivraison }}
+                    </span>
+                    <span *ngIf="notif.tempsEstimeLivraison" class="badge bg-primary-subtle text-primary">
+                      <i class="bx bx-time me-1"></i>
+                      {{ notif.tempsEstimeLivraison }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Détails des plats pour les livraisons -->
+                <div *ngIf="notif.type === 'livraison' && notif.plats && notif.plats.length > 0" class="mt-1 p-2 bg-light rounded">
+                  <small class="text-muted">
+                    <i class="bx bx-food-menu me-1"></i>
+                    <strong>Plats à livrer:</strong>
+                    <span *ngFor="let plat of notif.plats; let last = last">
+                      {{ plat.nom }} x{{ plat.quantite }}{{ !last ? ', ' : '' }}
+                    </span>
+                  </small>
+                </div>
+
+                <!-- Détails des plats pour les commandes -->
+                <div *ngIf="notif.type === 'commande' && notif.plats && notif.plats.length > 0" 
+                     class="mb-1 p-2 bg-light rounded">
+                  <small class="text-muted">
+                    <i class="bx bx-food-menu me-1"></i>
+                    <strong>Plats:</strong>
+                    <span *ngFor="let plat of notif.plats; let last = last">
+                      {{ plat.nom }} x{{ plat.quantite }}{{ !last ? ', ' : '' }}
+                    </span>
+                  </small>
+                </div>
                 
                 <!-- Message du client pour les réservations -->
                 <div *ngIf="notif.type === 'reservation' && notif.clientMessage" 
@@ -154,6 +218,24 @@
                   <small class="text-muted">
                     <i class="bx bx-message-dots me-1"></i>
                     <strong>Message:</strong> "{{ notif.clientMessage }}"
+                  </small>
+                </div>
+
+                <!-- Message du client pour les commandes -->
+                <div *ngIf="notif.type === 'commande' && notif.clientMessage" 
+                     class="mb-1 p-2 bg-warning-subtle rounded">
+                  <small class="text-muted">
+                    <i class="bx bx-message-dots me-1"></i>
+                    <strong>Message client:</strong> "{{ notif.clientMessage }}"
+                  </small>
+                </div>
+
+                <!-- Instructions de livraison -->
+                <div *ngIf="notif.type === 'livraison' && notif.clientMessage" 
+                     class="mb-1 p-2 bg-info-subtle rounded">
+                  <small class="text-muted">
+                    <i class="bx bx-message-dots me-1"></i>
+                    <strong>Instructions de livraison:</strong> "{{ notif.clientMessage }}"
                   </small>
                 </div>
                 
@@ -262,9 +344,8 @@
           <option value="all">Toutes les notifications</option>
           <option value="unread">Non lues seulement</option>
           <option value="reservation">Réservations</option>
-          <option value="info">Informations</option>
-          <option value="warning">Avertissements</option>
-          <option value="error">Erreurs</option>
+          <option value="commande">Commandes</option>
+          <option value="livraison">Livraisons</option>
         </select>
         
         <select class="form-select form-select-sm" 
@@ -291,7 +372,7 @@
           {{ selectedFilter !== 'all' ? 'Aucune notification ne correspond aux filtres sélectionnés.' : 'Vous êtes à jour !' }}
         </p>
       </div>
-
+      
       <!-- Liste des notifications -->
       <div class="list-group list-group-flush">
         <div *ngFor="let notif of filteredNotifications; let i = index; trackBy: trackByNotificationId" 
@@ -324,14 +405,60 @@
                  [class.fw-medium]="!notif.read">
                 {{ notif.message }}
               </p>
-              
-              <div *ngIf="notif.type === 'reservation' && notif.details" 
-                   class="mb-2">
+
+              <!-- Détails pour les livraisons -->
+              <div *ngIf="notif.type === 'livraison'" class="mb-2">
                 <div class="row g-2">
                   <div class="col-auto">
+                    <span class="badge bg-success-subtle text-success">
+                      <i class="bx bx-money me-1"></i>
+                      {{ notif.montantTotal?.toFixed(2) }} TND
+                    </span>
+                  </div>
+                
+                  <div class="col-auto" *ngIf="notif.adresseLivraison">
+                    <span class="badge bg-warning-subtle text-warning">
+                      <i class="bx bx-map me-1"></i>
+                      {{ notif.adresseLivraison }}
+                    </span>
+                  </div>
+                 
+                
+                </div>
+
+                <!-- Liste des plats pour les livraisons -->
+                <div *ngIf="notif.plats && notif.plats.length > 0" class="mt-2">
+                  <div class="card card-body bg-light p-2">
+                    <h6 class="card-title mb-2 fs-14">
+                      <i class="bx bx-food-menu me-1"></i>
+                      Détail des plats:
+                    </h6>
+                    <div class="row g-1">
+                      <div *ngFor="let plat of notif.plats" class="col-12">
+                        <small class="text-muted d-flex justify-content-between">
+                          <span>{{ plat.nom }}</span>
+                          <span class="fw-semibold">x{{ plat.quantite }}</span>
+                          <span *ngIf="plat.prix" class="text-success">{{ plat.prix?.toFixed(2) }} TND</span>
+                        </small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Détails pour les commandes -->
+              <div *ngIf="notif.type === 'commande'" class="mb-2">
+                <div class="row g-2">
+                  <div class="col-auto">
+                    <span class="badge bg-success-subtle text-success">
+                      <i class="bx bx-money me-1"></i>
+                      {{ notif.montantTotal?.toFixed(2) }} TND
+                    </span>
+                  </div>
+                  <div class="col-auto">
                     <span class="badge bg-info-subtle text-info">
-                      <i class="bx bx-group me-1"></i>
-                      {{ notif.details.persons }} personne{{ notif.details.persons > 1 ? 's' : '' }}
+                      <i class="bx bx-dish me-1"></i>
+                      {{ notif.nombrePlats }} article{{ (notif.nombrePlats || 0) > 1 ? 's' : '' }}
                     </span>
                   </div>
                   <div class="col-auto" *ngIf="notif.table">
@@ -340,19 +467,53 @@
                       Table {{ notif.table }}
                     </span>
                   </div>
-                  <div class="col-auto" *ngIf="notif.details.phone">
+                  <div class="col-auto" *ngIf="notif.commandeId">
                     <span class="badge bg-primary-subtle text-primary">
-                      <i class="bx bx-phone me-1"></i>
-                      {{ notif.details.phone }}
+                      <i class="bx bx-receipt me-1"></i>
+                      #{{ notif.commandeId }}
                     </span>
+                  </div>
+                </div>
+
+                <!-- Liste des plats pour les commandes -->
+                <div *ngIf="notif.plats && notif.plats.length > 0" class="mt-2">
+                  <div class="card card-body bg-light p-2">
+                    <h6 class="card-title mb-2 fs-14">
+                      <i class="bx bx-food-menu me-1"></i>
+                      Détail des plats:
+                    </h6>
+                    <div class="row g-1">
+                      <div *ngFor="let plat of notif.plats" class="col-12">
+                        <small class="text-muted d-flex justify-content-between">
+                          <span>{{ plat.nom }}</span>
+                          <span class="fw-semibold">x{{ plat.quantite }}</span>
+                          <span *ngIf="plat.prix" class="text-success">{{ plat.prix?.toFixed(2) }} TND</span>
+                        </small>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
               
+              <!-- Message client pour les réservations -->
               <div *ngIf="notif.type === 'reservation' && notif.clientMessage" 
                    class="alert alert-info alert-sm mb-2 py-2">
                 <i class="bx bx-message-dots me-2"></i>
                 <strong>Message client:</strong> "{{ notif.clientMessage }}"
+              </div>
+
+              <!-- Message client pour les commandes -->
+              <div *ngIf="notif.type === 'commande' && notif.clientMessage" 
+                   class="alert alert-warning alert-sm mb-2 py-2">
+                <i class="bx bx-message-dots me-2"></i>
+                <strong>Message client:</strong> "{{ notif.clientMessage }}"
+              </div>
+
+              <!-- Instructions de livraison -->
+              <div *ngIf="notif.type === 'livraison' && notif.clientMessage" 
+                   class="alert alert-info alert-sm mb-2 py-2">
+                <i class="bx bx-navigation me-2"></i>
+                <strong>Instructions de livraison:</strong> "{{ notif.clientMessage }}"
               </div>
               
               <div class="d-flex gap-2 mt-2">
@@ -377,6 +538,24 @@
                         (click)="handleModalAction('viewDetails', notif.id, $event)">
                   <i class="bx bx-show me-1"></i>
                   Voir détails
+                </button>
+
+                <!-- Bouton pour voir les détails d'une commande -->
+                <button *ngIf="notif.type === 'commande'" 
+                        type="button" 
+                        class="btn btn-sm btn-outline-info"
+                         routerLink="/admin/commande">
+                  <i class="bx bx-receipt me-1" ></i>
+                  Voir commande
+                </button>
+
+                <!-- Bouton pour voir les détails d'une livraison -->
+                <button *ngIf="notif.type === 'livraison'" 
+                        type="button" 
+                        class="btn btn-sm btn-outline-warning"
+                        routerLink="/admin/commande">
+                  <i class="bx bx-package me-1" ></i>
+                  Suivre livraison
                 </button>
               </div>
             </div>
@@ -406,6 +585,9 @@
     </div>
   </div>
 </dialog>
+
+
+
                         <!-- User profile dropdown -->
                         <div class="dropdown ms-sm-3 header-item topbar-user">
                             <button type="button" class="btn" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

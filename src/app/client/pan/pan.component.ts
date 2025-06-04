@@ -3,6 +3,7 @@ import { AccueilpanierService } from 'src/app/services/accueilpanier.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { CommandeService } from 'src/app/services/commande.service';
 import { SimplePaymentService } from 'src/app/services/simple-payment.service';
+import { NotificationService } from 'src/app/services/notification.service'; // Import du service de notification
 import { ActivatedRoute, Router, NavigationExtras } from '@angular/router';
 import { Subscription } from 'rxjs';
 
@@ -20,7 +21,7 @@ export class PanComponent implements OnInit, OnDestroy {
   username: string | null = '';
   adresseLivraison: string = '';
   telephone: string = '';
-  instructionsClient: string = ''; // Nouvelle propriété pour les instructions
+  instructionsClient: string = '';
   isProcessing: boolean = false;
   errorMessage: string | null = null;
   successMessage: string | null = null;
@@ -39,6 +40,7 @@ export class PanComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private commandeService: CommandeService,
     private simplePaymentService: SimplePaymentService,
+    private notificationService: NotificationService, // Injection du service de notification
     private router: Router,
     private route: ActivatedRoute
   ) {}
@@ -128,7 +130,7 @@ export class PanComponent implements OnInit, OnDestroy {
       if (this.commandeEnAttente) {
         this.adresseLivraison = this.commandeEnAttente.adresse || '';
         this.telephone = this.commandeEnAttente.telephone || '';
-        this.instructionsClient = this.commandeEnAttente.instructions || ''; // Charger les instructions existantes
+        this.instructionsClient = this.commandeEnAttente.instructions || '';
         this.sousTotal = this.commandeEnAttente.sousTotal || 0;
         this.fraisLivraison = this.commandeEnAttente.fraisLivraison || this.panierService.getFraisLivraison();
       }
@@ -218,7 +220,7 @@ export class PanComponent implements OnInit, OnDestroy {
       const infoLivraison = {
         adresse: this.adresseLivraison,
         telephone: this.telephone,
-        instructions: this.instructionsClient // Inclure les instructions dans les données de commande
+        instructions: this.instructionsClient
       };
 
       const response = await this.panierService.passerCommandeLivraison(infoLivraison);
@@ -227,8 +229,11 @@ export class PanComponent implements OnInit, OnDestroy {
       this.commandeEnAttente = this.commandeService.getCommandeEnAttente();
       
       this.successMessage = `Commande #${response.idCmnd} passée avec succès! Procédez au paiement.`;
-      this.clearMessagesAfterDelay();
       
+      // NOUVEAU: Créer une notification de livraison pour l'admin
+      this.creerNotificationLivraison(response);
+      
+      this.clearMessagesAfterDelay();
       this.fermerFactureModal();
       
     } catch (error: unknown) {
@@ -242,6 +247,44 @@ export class PanComponent implements OnInit, OnDestroy {
       this.isProcessing = false;
     }
   }
+
+ private creerNotificationLivraison(response: any): void {
+  try {
+    // Calculer le nombre total de plats
+    const nombrePlats = this.panier.reduce((total, plat) => total + plat.quantite, 0);
+    
+    // Préparer les données des plats pour la notification
+    const platsFormatted = this.panier.map(plat => ({
+      nom: plat.nom,
+      quantite: plat.quantite,
+      prix: plat.prix
+    }));
+
+    // Calculer le temps estimé de livraison
+    const tempsEstimeLivraison = '30-45 minutes';
+
+    // Créer la notification de livraison
+    this.notificationService.addLivraisonNotification(
+      response.idCmnd, // ID de la commande/livraison
+      this.username || 'Client', // Nom du client
+      this.adresseLivraison, // Adresse de livraison
+      this.telephone, // Numéro de téléphone
+      this.total, // Montant total
+      nombrePlats, // Nombre total de plats
+      platsFormatted, // Liste des plats avec leurs détails
+      tempsEstimeLivraison, // Temps estimé
+      this.fraisLivraison, // Frais de livraison
+      this.instructionsClient // Instructions du client
+    );
+
+    console.log('Notification de livraison créée avec succès', {
+      plats: platsFormatted,
+      nombrePlats: nombrePlats
+    });
+  } catch (error) {
+    console.error('Erreur lors de la création de la notification de livraison:', error);
+  }
+}
 
   procederAuPaiementSimple(): void {
     if (!this.commandeEnAttente || !this.commandeEnAttente.id) {
@@ -292,7 +335,7 @@ export class PanComponent implements OnInit, OnDestroy {
       this.commandeEnAttente = null;
       this.adresseLivraison = '';
       this.telephone = '';
-      this.instructionsClient = ''; // Réinitialiser les instructions
+      this.instructionsClient = '';
       this.sousTotal = this.panierService.calculerSousTotal();
       this.total = this.panierService.calculerTotal();
       this.successMessage = 'Commande annulée. Vous pouvez maintenant passer une nouvelle commande.';

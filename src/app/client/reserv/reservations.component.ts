@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth.service';
-import { PanierclientService } from 'src/app/services/panierclient.service';
+import { AccueilpanierService } from 'src/app/services/accueilpanier.service';
 import { ReservationService } from 'src/app/services/reservation.service';
 import { NotificationService } from 'src/app/services/notification.service';
 
@@ -31,7 +31,7 @@ export class ReservationsComponent implements OnInit {
   };
 
   constructor(
-    private panierclientService: PanierclientService,
+    private panierService: AccueilpanierService,
     private authService: AuthService,
     private reservationService: ReservationService,
     private notificationService: NotificationService
@@ -48,7 +48,7 @@ export class ReservationsComponent implements OnInit {
   }
 
   private subscribeToCart(): void {
-    this.panierclientService.nombreArticles$.subscribe(nombre => {
+    this.panierService.nombreArticles$.subscribe(nombre => {
       this.nombreArticles = nombre;
     });
   }
@@ -105,35 +105,18 @@ export class ReservationsComponent implements OnInit {
   }
 
   private handleSuccess(response: any): void {
-    // Message de succès pour l'utilisateur
     this.successMessage = `Réservation réussie! Table: ${response.table}, Date: ${new Date(response.date).toLocaleString()}`;
     this.errorMessage = '';
-
-    // Envoyer la notification à l'admin
     this.sendAdminNotification(response);
-
-    // Réinitialiser le formulaire
     this.resetForm();
     this.clearMessageAfterTimeout();
   }
 
   private sendAdminNotification(response: any): void {
     try {
-      // Formater la date pour l'affichage
       const formattedDate = this.formatDate(this.reservation.dateReservation);
       const formattedTime = this.reservation.heure;
       
-      // Créer le message de notification avec le message du client
-      const notificationMessage = this.createNotificationMessage(
-        this.reservation.nomClient,
-        formattedDate,
-        formattedTime,
-        this.reservation.numberPersonne,
-        response.table,
-        this.reservation.message
-      );
-
-      // Envoyer la notification avec tous les détails
       this.notificationService.addReservationNotificationWithMessage(
         this.reservation.nomClient,
         formattedDate,
@@ -143,11 +126,8 @@ export class ReservationsComponent implements OnInit {
         this.reservation.numeroTel,
         this.reservation.message
       );
-
-      console.log('Notification envoyée à l\'admin:', notificationMessage);
     } catch (error) {
       console.error('Erreur lors de l\'envoi de la notification:', error);
-      // Ne pas interrompre le processus si la notification échoue
     }
   }
 
@@ -161,13 +141,8 @@ export class ReservationsComponent implements OnInit {
   ): string {
     let notificationText = `Nouvelle réservation de ${nomClient} pour ${nombrePersonnes} personne${nombrePersonnes > 1 ? 's' : ''} le ${date} à ${heure}`;
     
-    if (table) {
-      notificationText += ` - Table: ${table}`;
-    }
-
-    if (message && message.trim()) {
-      notificationText += `\nMessage: "${message}"`;
-    }
+    if (table) notificationText += ` - Table: ${table}`;
+    if (message && message.trim()) notificationText += `\nMessage: "${message}"`;
     
     return notificationText;
   }
@@ -182,7 +157,7 @@ export class ReservationsComponent implements OnInit {
         day: 'numeric'
       });
     } catch (error) {
-      return dateString; // Retourner la date originale si le formatage échoue
+      return dateString;
     }
   }
 

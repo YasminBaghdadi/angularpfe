@@ -4,12 +4,24 @@ import { Subject, Observable, BehaviorSubject } from 'rxjs';
 export interface Notification {
   id: string;
   message: string;
-  type: 'reservation' | 'info' | 'warning' | 'error';
+  type: 'reservation' | 'commande' | 'livraison' | 'info' | 'warning' | 'error'; // Ajout du type 'livraison'
   timestamp: Date;
   read: boolean;
   clientName?: string;
   table?: string;
-  clientMessage?: string; // Nouveau champ pour le message du client
+  clientMessage?: string;
+  // Champs pour les commandes
+  commandeId?: number;
+  montantTotal?: number;
+  nombrePlats?: number;
+  plats?: any[];
+  // Nouveaux champs pour les livraisons
+  livraisonId?: number;
+  adresseLivraison?: string;
+  telephone?: string;
+  tempsEstimeLivraison?: string;
+  fraisLivraison?: number;
+  statutLivraison?: string;
   details?: {
     date: string;
     time: string;
@@ -34,7 +46,7 @@ export class NotificationService {
     return this.notificationsSubject.asObservable();
   }
 
-  addNotification(message: string, type: 'reservation' | 'info' | 'warning' | 'error' = 'info', details?: any) {
+  addNotification(message: string, type: 'reservation' | 'commande' | 'livraison' | 'info' | 'warning' | 'error' = 'info', details?: any) {
     const notification: Notification = {
       id: this.generateId(),
       message,
@@ -91,7 +103,7 @@ export class NotificationService {
     const details = {
       clientName: nomClient,
       table: table,
-      clientMessage: clientMessage, // Ajouter le message du client
+      clientMessage: clientMessage,
       details: {
         date: dateReservation,
         time: heure,
@@ -101,6 +113,92 @@ export class NotificationService {
     };
 
     this.addNotification(message, 'reservation', details);
+  }
+
+  // Méthode pour les notifications de commandes
+  addCommandeNotification(
+    commandeId: number | null,
+    tableNumber: number | null,
+    montantTotal: number,
+    nombrePlats: number,
+    plats: any[],
+    clientMessage?: string
+  ) {
+    // Handle null commandeId case
+    if (commandeId === null) {
+      console.warn('Tentative de création de notification avec commandeId null');
+      return;
+    }
+
+    const message = `Nouvelle commande #${commandeId} - Table ${tableNumber} - ${montantTotal.toFixed(2)} TND (${nombrePlats} article${nombrePlats > 1 ? 's' : ''})`;
+    
+    const details = {
+      commandeId: commandeId,
+      table: tableNumber,
+      montantTotal: montantTotal,
+      nombrePlats: nombrePlats,
+      plats: plats,
+      clientMessage: clientMessage
+    };
+
+    this.addNotification(message, 'commande', details);
+  }
+
+  // NOUVELLE MÉTHODE: Ajouter une notification de livraison
+addLivraisonNotification(
+  livraisonId: number,
+  clientName: string,
+  adresseLivraison: string,
+  telephone: string,
+  montantTotal: number,
+  nombrePlats: number,
+  plats: any[],
+  tempsEstimeLivraison?: string,
+  fraisLivraison?: number,
+  clientMessage?: string
+) {
+  const message = `Nouvelle commande livraison #${livraisonId} - ${clientName} - ${montantTotal.toFixed(2)} TND`;
+  
+  const details = {
+    livraisonId: livraisonId,
+    commandeId: livraisonId, // Ajouté pour compatibilité
+    clientName: clientName,
+    adresseLivraison: adresseLivraison,
+    telephone: telephone,
+    montantTotal: montantTotal,
+    nombrePlats: nombrePlats,
+    plats: plats.map(plat => ({
+      nom: plat.nom,
+      quantite: plat.quantite,
+      prix: plat.prix || plat.prixUnitaire // Selon votre structure
+    })),
+    tempsEstimeLivraison: tempsEstimeLivraison || '30-45 min',
+    fraisLivraison: fraisLivraison || 0,
+    statutLivraison: 'En préparation',
+    clientMessage: clientMessage
+  };
+
+  this.addNotification(message, 'livraison', details);
+}
+
+  // NOUVELLE MÉTHODE: Mettre à jour le statut d'une livraison
+  updateLivraisonStatus(livraisonId: number, nouveauStatut: string) {
+    const notification = this.notifications.find(n => 
+      n.type === 'livraison' && n.livraisonId === livraisonId
+    );
+    
+    if (notification) {
+      notification.statutLivraison = nouveauStatut;
+      
+      // Créer une nouvelle notification pour le changement de statut
+      const statusMessage = `Livraison #${livraisonId} - Statut mis à jour: ${nouveauStatut}`;
+      this.addNotification(statusMessage, 'livraison', {
+        livraisonId: livraisonId,
+        statutLivraison: nouveauStatut,
+        clientName: notification.clientName,
+        adresseLivraison: notification.adresseLivraison
+      });
+    }
   }
 
   markAsRead(notificationId: string) {
@@ -138,6 +236,22 @@ export class NotificationService {
 
   getReservationNotifications(): Notification[] {
     return this.notifications.filter(n => n.type === 'reservation');
+  }
+
+  getCommandeNotifications(): Notification[] {
+    return this.notifications.filter(n => n.type === 'commande');
+  }
+
+  // NOUVELLE MÉTHODE: Obtenir les notifications de livraisons
+  getLivraisonNotifications(): Notification[] {
+    return this.notifications.filter(n => n.type === 'livraison');
+  }
+
+  // NOUVELLE MÉTHODE: Obtenir les livraisons par statut
+  getLivraisonsByStatus(statut: string): Notification[] {
+    return this.notifications.filter(n => 
+      n.type === 'livraison' && n.statutLivraison === statut
+    );
   }
 
   private generateId(): string {

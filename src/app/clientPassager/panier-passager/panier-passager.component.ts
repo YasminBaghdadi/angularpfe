@@ -5,7 +5,7 @@ import { PaymentService } from 'src/app/services/payment.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
-
+import { NotificationService } from 'src/app/services/notification.service';
 @Component({
   selector: 'app-panier-passager',
   templateUrl: './panier-passager.component.html',
@@ -49,6 +49,7 @@ clientMessage: string = '';
     private panierService: PanierService,
     private commandeService: CommandeService,
     private paymentService: PaymentService,
+    private notificationService: NotificationService,
     private http: HttpClient,
     private router: Router,
     private route: ActivatedRoute
@@ -296,110 +297,123 @@ getNombreArticlesCommandes(): number {
   }
 
   passerCommande(): void {
-    this.clearMessages();
-   
+  this.clearMessages();
 
-    // NOUVELLE VÉRIFICATION: Empêcher une nouvelle commande si une commande non payée existe
-    if (!this.peutPasserNouvelleCommande()) {
-      this.errorMessage = this.getMessageCommandeBloquee();
-      this.clearMessagesDelayed();
-      return;
-    }
+  // NOUVELLE VÉRIFICATION: Empêcher une nouvelle commande si une commande non payée existe
+  if (!this.peutPasserNouvelleCommande()) {
+    this.errorMessage = this.getMessageCommandeBloquee();
+    this.clearMessagesDelayed();
+    return;
+  }
 
-    if (!this.tableNumber) {
-      this.errorMessage = 'Numéro de table non trouvé. Veuillez scanner à nouveau le QR code.';
-      return;
-    }
+  if (!this.tableNumber) {
+    this.errorMessage = 'Numéro de table non trouvé. Veuillez scanner à nouveau le QR code.';
+    return;
+  }
 
-    if (this.platsDansPanier.length === 0) {
-      this.errorMessage = 'Votre panier est vide. Veuillez ajouter des plats avant de commander.';
-      return;
-    }
+  if (this.platsDansPanier.length === 0) {
+    this.errorMessage = 'Votre panier est vide. Veuillez ajouter des plats avant de commander.';
+    return;
+  }
 
-    const sessionToken = localStorage.getItem('token');
-    if (!sessionToken) {
-      this.errorMessage = 'Session expirée. Veuillez scanner à nouveau le QR code.';
-      return;
-    }
+  const sessionToken = localStorage.getItem('token');
+  if (!sessionToken) {
+    this.errorMessage = 'Session expirée. Veuillez scanner à nouveau le QR code.';
+    return;
+  }
 
-    const platQuantites = this.platsDansPanier.map(plat => ({
-      idPlat: plat.idPlat,
-      quantite: plat.quantite,
-      message: this.clientMessage // Ajoutez le message client ici
+  const platQuantites = this.platsDansPanier.map(plat => ({
+    idPlat: plat.idPlat,
+    quantite: plat.quantite,
+    message: this.clientMessage
+  }));
 
-    }));
+  if (platQuantites.some(p => !p.idPlat || p.quantite < 1)) {
+    this.errorMessage = 'Certains plats sont invalides. Veuillez vérifier votre panier.';
+    return;
+  }
 
-    if (platQuantites.some(p => !p.idPlat || p.quantite < 1)) {
-      this.errorMessage = 'Certains plats sont invalides. Veuillez vérifier votre panier.';
-      return;
-    }
+  const headers = new HttpHeaders({
+    'Content-Type': 'application/json',
+    'X-Session-Token': sessionToken
+  });
 
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'X-Session-Token': sessionToken
-    });
+  this.isProcessing = true;
+  const totalCommande = this.calculerTotal();
 
-    this.isProcessing = true;
-    const totalCommande = this.calculerTotal();
+  this.http.post<any>(
+    `http://localhost:8081/commande/passerCommande/${this.tableNumber}`,
+    platQuantites,
+    { headers }
+  ).subscribe({
+    next: (response) => {
+      this.isProcessing = false;
+      this.orderSuccess = true;
 
-    this.http.post<any>(
-      `http://localhost:8081/commande/passerCommande/${this.tableNumber}`,
-      platQuantites,
-      { headers }
-    ).subscribe({
-      next: (response) => {
-        this.isProcessing = false;
-        this.orderSuccess = true;
-
-        if (response && response.idCommande) {
-          this.idCommandeEnCours = response.idCommande;
-          this.totalCommandeEnCours = totalCommande;
-          this.hasActiveOrder = true;
-          
-          // CORRECTION: Synchroniser avec le service
-          this.commandeService.setTotalCommandeEnCours(totalCommande);
-          
-          // Sauvegarder avec la clé correcte - FIXED NULL CHECK
-          localStorage.setItem(`commandeEnCours_table_${this.tableNumber}`, totalCommande.toString());
-          
-          // Fixed line - add null check
-          if (this.idCommandeEnCours !== null) {
-            localStorage.setItem(`idCommande_table_${this.tableNumber}`, this.idCommandeEnCours.toString());
-          }
-          
-          const commandeDetails = {
-            idCommande: this.idCommandeEnCours,
-            montantTotal: totalCommande,
-            plats: this.platsDansPanier.map(plat => ({
-              idPlat: plat.idPlat,
-              nom: plat.name,
-              quantite: plat.quantite,
-              prix: plat.prix
-            })),
-            tableNumber: this.tableNumber,
-            date: new Date()
-          };
-          localStorage.setItem(`detailsCommande_table_${this.tableNumber}`, JSON.stringify(commandeDetails));
-
-          // Vider le panier uniquement
-          this.panierService.clearPanier();
-          this.platsDansPanier = [];
-
-          this.successMessage = `Votre commande #${this.idCommandeEnCours} a été passée avec succès! Le montant reste disponible pour le paiement.`;
-        } else {
-          this.errorMessage = 'Erreur: ID de commande non reçu du serveur.';
+      if (response && response.idCommande) {
+        this.idCommandeEnCours = response.idCommande;
+        this.totalCommandeEnCours = totalCommande;
+        this.hasActiveOrder = true;
+        
+        // CORRECTION: Synchroniser avec le service
+        this.commandeService.setTotalCommandeEnCours(totalCommande);
+        
+        // Sauvegarder avec la clé correcte - FIXED NULL CHECK
+        localStorage.setItem(`commandeEnCours_table_${this.tableNumber}`, totalCommande.toString());
+        
+        // Fixed line - add null check
+        if (this.idCommandeEnCours !== null) {
+          localStorage.setItem(`idCommande_table_${this.tableNumber}`, this.idCommandeEnCours.toString());
         }
         
-        this.clearMessagesDelayed();
-      },
-      error: (error) => {
-        this.isProcessing = false;
-        this.errorMessage = error.error?.error || 'Une erreur est survenue lors de la commande. Veuillez réessayer.';
-        this.clearCommandeEnCours();
-        this.clearMessagesDelayed();
+        const commandeDetails = {
+          idCommande: this.idCommandeEnCours,
+          montantTotal: totalCommande,
+          plats: this.platsDansPanier.map(plat => ({
+            idPlat: plat.idPlat,
+            nom: plat.name,
+            quantite: plat.quantite,
+            prix: plat.prix
+          })),
+          tableNumber: this.tableNumber,
+          date: new Date()
+        };
+        localStorage.setItem(`detailsCommande_table_${this.tableNumber}`, JSON.stringify(commandeDetails));
+
+        // NOUVEAU: Envoyer une notification à l'admin
+        const nombrePlats = this.platsDansPanier.reduce((total, plat) => total + plat.quantite, 0);
+        this.notificationService.addCommandeNotification(
+          this.idCommandeEnCours,
+          this.tableNumber,
+          totalCommande,
+          nombrePlats,
+          this.platsDansPanier.map(plat => ({
+            nom: plat.name,
+            quantite: plat.quantite,
+            prix: plat.prix
+          })),
+          this.clientMessage // Message optionnel du client
+        );
+
+        // Vider le panier uniquement
+        this.panierService.clearPanier();
+        this.platsDansPanier = [];
+
+        this.successMessage = `Votre commande #${this.idCommandeEnCours} a été passée avec succès! Le montant reste disponible pour le paiement.`;
+      } else {
+        this.errorMessage = 'Erreur: ID de commande non reçu du serveur.';
       }
-    });
-  }
+      
+      this.clearMessagesDelayed();
+    },
+    error: (error) => {
+      this.isProcessing = false;
+      this.errorMessage = error.error?.error || 'Une erreur est survenue lors de la commande. Veuillez réessayer.';
+      this.clearCommandeEnCours();
+      this.clearMessagesDelayed();
+    }
+  });
+}
 
   procederAuPaiement(): void {
     this.clearMessages();
@@ -566,4 +580,3 @@ clearCommandeEnCours(): void {
   }
 
 }
-
