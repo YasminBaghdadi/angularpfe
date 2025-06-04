@@ -29,25 +29,12 @@
                 <div class="navbar-header">
                     <div class="d-flex">
                         <button type="button" class="btn btn-sm px-3 fs-16 header-item vertical-menu-btn topnav-hamburger" id="topnav-hamburger-icon">
-                            <span class="hamburger-icon">
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                            </span>
+                           
                         </button>
 
                         <!-- App Search-->
                         <form class="app-search d-none d-md-block">
-                            <div class="position-relative">
-                                <input type="text" class="form-control" placeholder="Search..." autocomplete="off" id="search-options" value="">
-                                <span class="mdi mdi-magnify search-widget-icon"></span>
-                                <span class="mdi mdi-close-circle search-widget-icon search-widget-icon-close d-none" id="search-close-options"></span>
-                            </div>
-                            <div class="dropdown-menu dropdown-menu-lg" id="search-dropdown">
-                                <div class="text-center pt-3 pb-1">
-                                    <a href="#" class="btn btn-primary btn-sm">View All Results <i class="ri-arrow-right-line ms-1"></i></a>
-                                </div>
-                            </div>
+                            
                         </form>
                     </div>
 
@@ -488,7 +475,7 @@
                 </a>
             </div>
 
-            <div id="scrollbar">
+             <div id="scrollbar">
                 <div class="container-fluid">
                     <ul class="navbar-nav" id="navbar-nav">
                         <li class="menu-title"><span>MENU</span></li>
@@ -504,14 +491,14 @@
                                     <!-- Customers -->
                                     <li class="nav-item">
                                         <a class="nav-link" href="#customerSubmenu" data-bs-toggle="collapse" role="button" aria-expanded="false">
-                                            <span>Clients</span>
+                                            <span routerLink="/customers">Clients</span>
                                         </a>
                                         <div class="collapse" id="customerSubmenu">
                                             <ul class="nav nav-sm flex-column">
-                                                <li class="nav-item"><a routerLink="/customers" class="nav-link">Ajouter un client</a></li>
-                                                <li class="nav-item"><a routerLink="/customers" class="nav-link">Supprimer un client</a></li>
-                                                <li class="nav-item"><a routerLink="/customers" class="nav-link">Modifier un client</a></li>
-                                                <li class="nav-item"><a routerLink="/customers" class="nav-link">Voir la liste des clients</a></li>
+                                                <li class="nav-item"><a  class="nav-link">Ajouter un client</a></li>
+                                                <li class="nav-item"><a  class="nav-link">Supprimer un client</a></li>
+                                                <li class="nav-item"><a  class="nav-link">Modifier un client</a></li>
+                                                <li class="nav-item"><a  class="nav-link">Consulter la liste des clients</a></li>
                                             </ul>
                                         </div>
                                     </li>
@@ -519,15 +506,15 @@
                                     <!-- Delivery Persons -->
                                     <li class="nav-item">
                                         <a class="nav-link" href="#deliveryPersonSubmenu" data-bs-toggle="collapse" role="button" aria-expanded="false">
-                                            <span>Livreurs</span>
+                                            <span routerLink="/livreurs">Livreurs</span>
                                         </a>
 
                                         <div class="collapse" id="deliveryPersonSubmenu">
                                             <ul class="nav nav-sm flex-column">
-                                                <li class="nav-item"><a routerLink="/livreurs" class="nav-link">Ajouter un livreur</a></li>
-                                                <li class="nav-item"><a routerLink="/livreurs" class="nav-link">Supprimer un livreur</a></li>
-                                                <li class="nav-item"><a routerLink="/livreurs" class="nav-link">Modifier un livreur</a></li>
-                                                <li class="nav-item"><a routerLink="/livreurs" class="nav-link">Voir les livreurs</a></li>
+                                                <li class="nav-item"><a  class="nav-link">Ajouter un livreur</a></li>
+                                                <li class="nav-item"><a  class="nav-link">Supprimer un livreur</a></li>
+                                                <li class="nav-item"><a  class="nav-link">Modifier un livreur</a></li>
+                                                <li class="nav-item"><a  class="nav-link">Consulter la liste des livreurs</a></li>
                                             </ul>
                                         </div>
                                     </li>
@@ -538,14 +525,14 @@
                         <!-- Dishes Menu -->
                         <li class="nav-item">
                             <a class="nav-link menu-link" href="#dishesMenu" data-bs-toggle="collapse" role="button" aria-expanded="false">
-                                <i class="ri-restaurant-line"></i> <span>Plats</span>
+                                <i class="ri-restaurant-line"></i> <span routerLink="/menu">Plats</span>
                             </a>
                             <div class="collapse menu-dropdown" id="dishesMenu">
                                 <ul class="nav nav-sm flex-column">
-                                    <li class="nav-item"><a routerLink="/menu" class="nav-link">Ajouter un plat</a></li>
-                                    <li class="nav-item"><a routerLink="/menu" class="nav-link">Supprimer un plat</a></li>
-                                    <li class="nav-item"><a routerLink="/menu" class="nav-link">Modifier un plat</a></li>
-                                    <li class="nav-item"><a routerLink="/menu" class="nav-link">Voir les plats</a></li>
+                                    <li class="nav-item"><a  class="nav-link">Ajouter un plat</a></li>
+                                    <li class="nav-item"><a  class="nav-link">Supprimer un plat</a></li>
+                                    <li class="nav-item"><a  class="nav-link">Modifier un plat</a></li>
+                                    <li class="nav-item"><a  class="nav-link">Consulter la liste des plats</a></li>
                                 </ul>
                             </div>
                         </li>
@@ -553,14 +540,14 @@
                         <!-- Table Menu -->
                         <li class="nav-item">
                             <a class="nav-link menu-link" href="#tableMenu" data-bs-toggle="collapse" role="button" aria-expanded="false">
-                                <i class="ri-layout-grid-line"></i> <span>Tables</span>
+                                <i class="ri-layout-grid-line"></i> <span routerLink="/table">Tables</span>
                             </a>
                             <div class="collapse menu-dropdown" id="tableMenu">
                                 <ul class="nav nav-sm flex-column">
-                                    <li class="nav-item"><a routerLink="/table" class="nav-link">Ajouter un table</a></li>
-                                    <li class="nav-item"><a routerLink="/table" class="nav-link">Supprimer un table</a></li>
-                                    <li class="nav-item"><a routerLink="/table" class="nav-link">Modifier un table</a></li>
-                                    <li class="nav-item"><a routerLink="/table" class="nav-link">Voir la liste des tables</a></li>
+                                    <li class="nav-item"><a  class="nav-link">Ajouter un table</a></li>
+                                    <li class="nav-item"><a  class="nav-link">Supprimer un table</a></li>
+                                    <li class="nav-item"><a  class="nav-link">Modifier un table</a></li>
+                                    <li class="nav-item"><a  class="nav-link">Consulter la liste des tables</a></li>
                                 </ul>
                             </div>
                         </li>
@@ -568,14 +555,14 @@
                         <!-- Orders Menu -->
                         <li class="nav-item">
                             <a class="nav-link menu-link" href="#orderMenu" data-bs-toggle="collapse" role="button" aria-expanded="false">
-                                <i class="ri-shopping-cart-line"></i> <span>Commandes</span>
+                                <i class="ri-shopping-cart-line"></i> <span routerLink="/admin/commande">Commandes</span>
                             </a>
                             <div class="collapse menu-dropdown" id="orderMenu">
                                 <ul class="nav nav-sm flex-column">
-                                    <li class="nav-item"><a routerLink="/admin/commande" class="nav-link">Ajouter une commande</a></li>
-                                    <li class="nav-item"><a routerLink="/admin/commande" class="nav-link">Supprimer une commande</a></li>
-                                    <li class="nav-item"><a routerLink="/admin/commande" class="nav-link">Modifier une commande</a></li>
-                                    <li class="nav-item"><a routerLink="/admin/commande" class="nav-link">Voir la liste des commandes</a></li>
+                                    <li class="nav-item"><a  class="nav-link">Ajouter une commande</a></li>
+                                    <li class="nav-item"><a  class="nav-link">Supprimer une commande</a></li>
+                                    <li class="nav-item"><a  class="nav-link">Modifier une commande</a></li>
+                                    <li class="nav-item"><a  class="nav-link">Consulter la liste des commandes</a></li>
                                 </ul>
                             </div>
                         </li>
@@ -583,14 +570,14 @@
                         <!-- Reservation Menu -->
                         <li class="nav-item">
                             <a class="nav-link menu-link" href="#reservationMenu" data-bs-toggle="collapse" role="button" aria-expanded="false">
-                                <i class="ri-calendar-check-line"></i> <span>Réservations</span>
+                                <i class="ri-calendar-check-line"></i> <span routerLink="/admin/reservation">Réservations</span>
                             </a>
                             <div class="collapse menu-dropdown" id="reservationMenu">
                                 <ul class="nav nav-sm flex-column">
-                                    <li class="nav-item"><a routerLink="/admin/reservation" class="nav-link">Ajouter une réservation</a></li>
-                                    <li class="nav-item"><a routerLink="/admin/reservation" class="nav-link">Supprimer une réservation</a></li>
-                                    <li class="nav-item"><a routerLink="/admin/reservation" class="nav-link">Modifier une réservation</a></li>
-                                    <li class="nav-item"><a routerLink="/admin/reservation" class="nav-link">Voir la liste des réservations</a></li>
+                                    <li class="nav-item"><a  class="nav-link">Ajouter une réservation</a></li>
+                                    <li class="nav-item"><a  class="nav-link">Supprimer une réservation</a></li>
+                                    <li class="nav-item"><a  class="nav-link">Modifier une réservation</a></li>
+                                    <li class="nav-item"><a  class="nav-link">Consulter la liste des réservations</a></li>
                                 </ul>
                             </div>
                         </li>
@@ -598,14 +585,14 @@
                         <!-- Delivery Menu -->
                         <li class="nav-item">
                             <a class="nav-link menu-link" href="#deliveryMenu" data-bs-toggle="collapse" role="button" aria-expanded="false">
-                                <i class="ri-truck-line"></i> <span>Livraisons</span>
+                                <i class="ri-truck-line"></i> <span routerLink="/livraison">Livraisons</span>
                             </a>
                             <div class="collapse menu-dropdown" id="deliveryMenu">
                                 <ul class="nav nav-sm flex-column">
-                                    <li class="nav-item"><a routerLink="/livraison" class="nav-link">Ajouter une livraison</a></li>
-                                    <li class="nav-item"><a routerLink="/livraison" class="nav-link">Supprimer une livraison</a></li>
-                                    <li class="nav-item"><a routerLink="/livraison" class="nav-link">Modifier une livraison</a></li>
-                                    <li class="nav-item"><a routerLink="/livraison" class="nav-link">Voir la liste des livraisons</a></li>
+                                    <li class="nav-item"><a  class="nav-link">Assigner une livraison à un livreur</a></li>
+                                    <li class="nav-item"><a  class="nav-link">Supprimer une livraison</a></li>
+                                    <li class="nav-item"><a  class="nav-link">Modifier une livraison</a></li>
+                                    <li class="nav-item"><a  class="nav-link">Voir la liste des livraisons</a></li>
                                 </ul>
                             </div>
                         </li>
@@ -829,3 +816,258 @@
 
 
                                 
+ <!-- Bouton de chat flottant -->
+<div class="chat-button"(click)="openChatModal()" >
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2ZM20 16H5.17L4 17.17V4H20V16Z" fill="white"/>
+        <circle cx="8" cy="10" r="1" fill="white"/>
+        <circle cx="12" cy="10" r="1" fill="white"/>
+        <circle cx="16" cy="10" r="1" fill="white"/>
+    </svg>
+</div>
+
+    <!-- Composant chat modal -->
+    <app-chat 
+      [isModalOpen]="isChatModalOpen"
+      (closeModal)="closeChatModal()">
+    </app-chat>
+    <!-- Votre contenu de page existant -->
+    <div class="page-content">
+      <!-- Contenu de votre page -->
+    </div>
+<style>
+/* Bouton de chat flottant */
+.chat-button {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.chat-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 25px rgba(0,0,0,0.4);
+}
+
+/* Modal du chatbot */
+.chat-modal {
+    display: none;
+    position: fixed;
+    z-index: 1001;
+    right: 30px;
+    bottom: 100px;
+    width: 350px;
+    height: 500px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    overflow: hidden;
+}
+
+.chat-modal-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.close {
+    font-size: 24px;
+    cursor: pointer;
+    color: white;
+    opacity: 0.8;
+    transition: opacity 0.3s;
+}
+
+.close:hover {
+    opacity: 1;
+}
+
+.chat-body {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: #f8f9fa;
+}
+
+.message {
+    margin-bottom: 15px;
+    display: flex;
+}
+
+.bot-message .message-content {
+    background: #e9ecef;
+    color: #333;
+    padding: 10px 15px;
+    border-radius: 18px 18px 18px 5px;
+    max-width: 80%;
+}
+
+.user-message {
+    justify-content: flex-end;
+}
+
+.user-message .message-content {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 18px 18px 5px 18px;
+    max-width: 80%;
+}
+
+.chat-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    gap: 10px;
+}
+
+.chat-footer input {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    outline: none;
+    font-size: 14px;
+}
+
+.chat-footer input:focus {
+    border-color: #667eea;
+}
+
+.chat-footer button {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: opacity 0.3s;
+}
+
+.chat-footer button:hover {
+    opacity: 0.9;
+}
+
+/* Animation d'apparition */
+.chat-modal.show {
+    display: block;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .chat-modal {
+        right: 15px;
+        left: 15px;
+        width: auto;
+        bottom: 90px;
+    }
+    
+    .chat-button {
+        right: 20px;
+        bottom: 20px;
+    }
+}
+</style>
+<script>
+function openChatModal() {
+    const modal = document.getElementById('chatModal');
+    modal.style.display = 'block';
+    modal.classList.add('show');
+}
+
+function closeChatModal() {
+    const modal = document.getElementById('chatModal');
+    modal.style.display = 'none';
+    modal.classList.remove('show');
+}
+
+function sendMessage() {
+    const input = document.getElementById('chatInput');
+    const message = input.value.trim();
+    
+    if (message) {
+        addMessage(message, 'user');
+        input.value = '';
+        
+        // Simuler une réponse du bot après un délai
+        setTimeout(() => {
+            const responses = [
+                "Merci pour votre message ! Comment puis-je vous aider davantage ?",
+                "C'est une excellente question ! Laissez-moi vous aider avec cela.",
+                "Je comprends votre demande. Voici ce que je peux vous suggérer...",
+                "Parfait ! Je suis là pour vous assister."
+            ];
+            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+            addMessage(randomResponse, 'bot');
+        }, 1000);
+    }
+}
+
+function addMessage(text, sender) {
+    const chatBody = document.querySelector('.chat-body');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${sender}-message`;
+    
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'message-content';
+    contentDiv.textContent = text;
+    
+    messageDiv.appendChild(contentDiv);
+    chatBody.appendChild(messageDiv);
+    
+    // Scroll vers le bas
+    chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+function handleKeyPress(event) {
+    if (event.key === 'Enter') {
+        sendMessage();
+    }
+}
+
+// Fermer le modal en cliquant à l'extérieur
+window.onclick = function(event) {
+    const modal = document.getElementById('chatModal');
+    if (event.target === modal) {
+        closeChatModal();
+    }
+}
+</script>
+ 

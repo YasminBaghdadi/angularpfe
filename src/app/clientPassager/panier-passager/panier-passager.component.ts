@@ -22,6 +22,7 @@ export class PanierPassagerComponent implements OnInit, OnDestroy {
   isProcessing: boolean = false;
   showPaymentOptions = false;
   selectedPaymentMethod: 'especes' | 'paypal' | null = null;
+clientMessage: string = '';
 
   orderSuccess: boolean = false;
   orderError: string | null = null;
@@ -52,6 +53,30 @@ export class PanierPassagerComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute
   ) {}
+
+
+  resetPanierEtCommande(): void {
+  this.platsDansPanier = [];
+  this.totalCommandeEnCours = 0;
+  this.hasActiveOrder = false;
+  this.idCommandeEnCours = null;
+  this.platsCommandeEnCours = [];
+
+  // Nettoyer localStorage pour la table en cours
+  if (this.tableNumber) {
+    localStorage.removeItem(`commandeEnCours_table_${this.tableNumber}`);
+    localStorage.removeItem(`idCommande_table_${this.tableNumber}`);
+    localStorage.removeItem(`detailsCommande_table_${this.tableNumber}`);
+  }
+
+  // Réinitialiser dans les services
+  this.panierService.clearPanier(); // Assure-toi que cette méthode existe dans PanierService
+  this.commandeService.setTotalCommandeEnCours(0);
+
+  this.successMessage = 'Panier et commande réinitialisés.';
+  this.clearMessagesDelayed();
+}
+
   isChatModalOpen = false;
 
   openChatModal(): void {
@@ -272,6 +297,7 @@ getNombreArticlesCommandes(): number {
 
   passerCommande(): void {
     this.clearMessages();
+   
 
     // NOUVELLE VÉRIFICATION: Empêcher une nouvelle commande si une commande non payée existe
     if (!this.peutPasserNouvelleCommande()) {
@@ -298,7 +324,9 @@ getNombreArticlesCommandes(): number {
 
     const platQuantites = this.platsDansPanier.map(plat => ({
       idPlat: plat.idPlat,
-      quantite: plat.quantite
+      quantite: plat.quantite,
+      message: this.clientMessage // Ajoutez le message client ici
+
     }));
 
     if (platQuantites.some(p => !p.idPlat || p.quantite < 1)) {
@@ -536,4 +564,6 @@ clearCommandeEnCours(): void {
       this.clearMessages();
     }, 5000);
   }
+
 }
+

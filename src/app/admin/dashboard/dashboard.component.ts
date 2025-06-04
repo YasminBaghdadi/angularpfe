@@ -26,7 +26,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private notificationService: NotificationService
   ) {}
+ isChatModalOpen = false;
 
+  openChatModal(): void {
+    this.isChatModalOpen = true;
+  }
+
+  closeChatModal(): void {
+    this.isChatModalOpen = false;
+  }
   ngOnInit(): void {
     this.username = localStorage.getItem('username');
     this.subscribeToNotifications();

@@ -136,36 +136,53 @@
                 </tr>
                 <tr *ngIf="platsDansPanier.length === 0 && hasCommandeEnCours()">
                   <td colspan="5" class="text-center py-4">
-                  <div class="alert alert-info col-md-6 mx-auto mt-3" *ngIf="hasCommandeEnCours()">
-  <div class="text-center">
-    <strong>Commande n°{{ idCommandeEnCours }}en cours  - {{ getTotalAffiche() }} TND</strong>
-    <button 
-      class="btn btn-link btn-sm p-0 ml-2" 
-      type="button" 
-      (click)="toggleDetailsCommande()"
-      *ngIf="platsCommandeEnCours.length > 0">
-      <i class="fas fa-info-circle"></i> 
-      {{ showDetailsCommande ? 'Masquer' : 'Détails' }}
-    </button>
-  </div>
-  
-  <div class="mt-2" *ngIf="showDetailsCommande && platsCommandeEnCours.length > 0">
-    <div class="small">
-      <strong>Articles commandés:</strong>
-      <ul class="list-unstyled mb-0">
-        <li *ngFor="let plat of platsCommandeEnCours" class="d-flex justify-content-between">
-          <span>{{ plat.nom }}</span>
-          <span>x{{ plat.quantite }} = {{ (plat.prix * plat.quantite).toFixed(2) }} TND</span>
-        </li>
-      </ul>
-    </div>
-  </div>
-</div>
+                    <div class="alert alert-info col-md-6 mx-auto mt-3" *ngIf="hasCommandeEnCours()">
+                      <div class="text-center">
+                        <strong>Commande n°{{ idCommandeEnCours }} en cours - {{ getTotalAffiche() }} TND</strong>
+                        <button 
+                          class="btn btn-link btn-sm p-0 ml-2" 
+                          type="button" 
+                          (click)="toggleDetailsCommande()"
+                          *ngIf="platsCommandeEnCours.length > 0">
+                          <i class="fas fa-info-circle"></i> 
+                          {{ showDetailsCommande ? 'Masquer' : 'Détails' }}
+                        </button>
+                      </div>
+                      
+                      <div class="mt-2" *ngIf="showDetailsCommande && platsCommandeEnCours.length > 0">
+                        <div class="small">
+                          <strong>Articles commandés:</strong>
+                          <ul class="list-unstyled mb-0">
+                            <li *ngFor="let plat of platsCommandeEnCours" class="d-flex justify-content-between">
+                              <span>{{ plat.nom }}</span>
+                              <span>x{{ plat.quantite }} = {{ (plat.prix * plat.quantite).toFixed(2) }} TND</span>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
                   </td>
                 </tr>
               </tbody>
             </table>
             
+            <!-- Section Message Client - Ajoutée ici -->
+            <div class="cart__message mb-4" *ngIf="platsDansPanier.length > 0">
+              <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                  <div class="form-group mb-0">
+                    <textarea 
+                      class="form-control rounded-0" 
+                      rows="3" 
+                      placeholder="Ajoutez des instructions pour la préparation de vos plats (ex: sans oignon, bien cuite, etc.)"
+                      [(ngModel)]="clientMessage"
+                      maxlength="200"
+                    ></textarea>
+                    
+                  </div>
+                </div>
+              </div>
+            </div>
             
             <!-- Bouton Commander -->
             <div class="cart__btn-wrap" *ngIf="platsDansPanier.length > 0">
@@ -192,6 +209,7 @@
   {{ errorMessage }}
 </div>
 
+
 <section class="checkout section-space__bottom overflow-hidden">
     <div class="container">
       <div class="row">
@@ -209,7 +227,7 @@
                 <span>{{ getTotalAffiche() }} TND</span>
               </div>
             </div>
-        
+      
             
             <div class="checkout-proceed">
                   <div class="checkout__content">

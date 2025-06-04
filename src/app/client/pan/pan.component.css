@@ -69,3 +69,22 @@ th.product-subtotal { width: 20%; }
   color: #000000; /* Optionnel: couleur verte pour mise en valeur */
   font-weight: bold;
 }
+
+
+.checkout__wrapper {
+  border-top: 1px solid #eee;
+  padding-top: 15px;
+}
+
+.checkout__item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.checkout__total {
+  font-weight: bold;
+  border-top: 1px solid #eee;
+  padding-top: 10px;
+  margin-top: 10px;
+}
