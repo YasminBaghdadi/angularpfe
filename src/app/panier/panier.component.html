@@ -1,3 +1,20 @@
+
+<div *ngIf="errorMessage" class="alert alert-danger col-md-3 mx-auto text-center mt-3">
+  {{ errorMessage }}
+</div>
+
+<div *ngIf="showLoginPrompt" class="confirmation-overlay">
+  <div class="confirmation-modal">
+    <p>Pour commander, vous devez avoir un compte. Voulez-vous vous connecter ?</p>
+    <div class="confirmation-buttons">
+      <button class="btn-connect" (click)="confirmerConnexion()">Se connecter</button>
+      <button class="btn-cancel" (click)="annulerConnexion()">Annuler</button>
+    </div>
+  </div>
+</div>
+
+
+
 <section class="cart section-space-120 overflow-hidden">
     <div class="container">
       <div class="row g-24">

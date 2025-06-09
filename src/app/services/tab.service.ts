@@ -5,8 +5,8 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class TabService {
-  private apiUrl = 'http://192.168.1.30:8081/tab';
-  private qrUrl = 'http://192.168.1.30:8081/qr';
+  private apiUrl = 'http://localhost:8081/tab';
+  private qrUrl = 'http://localhost:8081/qr';
 
   constructor(private http: HttpClient) { }
 
@@ -32,7 +32,7 @@ export class TabService {
   }
 
   updateTable(id: number, tableData: any) {
-    return this.http.put(`http://192.168.1.30:8081/tab/update/${id}`, tableData);
+    return this.http.put(`http://localhost:8081/tab/update/${id}`, tableData);
   }
 
 
@@ -43,7 +43,7 @@ getQrCodeImage(id: number): Observable<Blob> {
     'Authorization': `Bearer ${token}`
   });
 
-  return this.http.get(`http://192.168.1.30:8081/qr/getimagedeqr/${id}`, {
+  return this.http.get(`http://localhost:8081/qr/getimagedeqr/${id}`, {
     headers,
     responseType: 'blob'
   });

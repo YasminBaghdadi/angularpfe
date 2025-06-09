@@ -26,19 +26,41 @@ export class AccueilpanierService {
     private commandeService: CommandeService,
     private authService: AuthService
   ) {
-    this.mettreAJourPanier();
+    // Initialiser le panier au démarrage
+    this.initialiserPanier();
     
     // Écouter les changements de connexion pour mettre à jour le panier
     this.authService.isLoggedIn().subscribe(isLoggedIn => {
       if (isLoggedIn) {
-        this.mettreAJourPanier();
+        this.initialiserPanier();
       } else {
-        // Si déconnecté, vider le panier observable
+        // Si déconnecté, vider le panier observable mais garder localStorage pour les anonymes
         this.nombreArticlesSubject.next(0);
         this.panierSubject.next([]);
         this.panierBloqueSubject.next(false);
       }
     });
+  }
+
+  // Nouvelle méthode pour initialiser correctement le panier
+  private initialiserPanier(): void {
+    const panier = this.getFromLocalStorage(this.getPanierKey()) || [];
+    const nombreArticles = panier.reduce((acc, plat) => acc + plat.quantite, 0);
+    
+    console.log('Initialisation panier:', panier); // Debug
+    
+    // Mettre à jour les observables avec les données du localStorage
+    this.panierSubject.next([...panier]); // Créer une nouvelle référence
+    this.nombreArticlesSubject.next(nombreArticles);
+    
+    // Vérifier s'il y a une commande en attente pour bloquer le panier
+    const commandeEnAttente = this.commandeService.getCommandeEnAttente();
+    this.panierBloqueSubject.next(!!commandeEnAttente);
+  }
+
+  private mettreAJourPanier(): void {
+    // Cette méthode est maintenant simplifiée et appelle initialiserPanier
+    this.initialiserPanier();
   }
 
   // Méthode pour obtenir les frais de livraison
@@ -51,26 +73,31 @@ export class AccueilpanierService {
     const userId = this.authService.getUserId();
     return userId ? `${this.PANIER_BASE_KEY}${userId}` : 'panier_anonymous';
   }
-  
-  private mettreAJourPanier(): void {
-    const panier = this.getFromLocalStorage(this.getPanierKey()) || [];
-    const nombreArticles = panier.reduce((acc, plat) => acc + plat.quantite, 0);
-    this.nombreArticlesSubject.next(nombreArticles);
-    this.panierSubject.next(panier);
-    
-    // Vérifier s'il y a une commande en attente pour bloquer le panier
-    const commandeEnAttente = this.commandeService.getCommandeEnAttente();
-    this.panierBloqueSubject.next(!!commandeEnAttente);
-  }
 
   private getFromLocalStorage(key: string): any[] {
-    const items = localStorage.getItem(key);
-    return items ? JSON.parse(items) : [];
+    try {
+      const items = localStorage.getItem(key);
+      const result = items ? JSON.parse(items) : [];
+      console.log(`Lecture localStorage [${key}]:`, result); // Debug
+      return result;
+    } catch (error) {
+      console.error('Erreur lecture localStorage:', error);
+      return [];
+    }
   }
 
-  private saveToLocalStorage(key: string, data: any): void {
-    localStorage.setItem(key, JSON.stringify(data));
-    this.mettreAJourPanier();
+  private saveToLocalStorage(key: string, data: any[]): void {
+    try {
+      console.log(`Sauvegarde localStorage [${key}]:`, data); // Debug
+      localStorage.setItem(key, JSON.stringify(data));
+      
+      // Mettre à jour immédiatement les observables avec les nouvelles données
+      this.panierSubject.next([...data]); // Créer une nouvelle référence
+      const nombreArticles = data.reduce((acc, plat) => acc + plat.quantite, 0);
+      this.nombreArticlesSubject.next(nombreArticles);
+    } catch (error) {
+      console.error('Erreur sauvegarde localStorage:', error);
+    }
   }
 
   // Vérifier si le panier est bloqué avant toute action
@@ -100,7 +127,8 @@ export class AccueilpanierService {
   }
 
   getPanier(): any[] {
-    return this.getFromLocalStorage(this.getPanierKey());
+    // Retourner les données des observables plutôt que localStorage directement
+    return this.panierSubject.value;
   }
 
   supprimerDuPanier(index: number): boolean {
@@ -110,10 +138,14 @@ export class AccueilpanierService {
     }
 
     const panierKey = this.getPanierKey();
-    let panier = this.getFromLocalStorage(panierKey);
-    panier.splice(index, 1);
-    this.saveToLocalStorage(panierKey, panier);
-    return true;
+    let panier = [...this.panierSubject.value]; // Utiliser les données de l'observable
+    
+    if (index >= 0 && index < panier.length) {
+      panier.splice(index, 1);
+      this.saveToLocalStorage(panierKey, panier);
+      return true;
+    }
+    return false;
   }
 
   mettreAJourQuantite(index: number, nouvelleQuantite: number): boolean {
@@ -125,8 +157,9 @@ export class AccueilpanierService {
     if (nouvelleQuantite < 1) return false;
     
     const panierKey = this.getPanierKey();
-    let panier = this.getFromLocalStorage(panierKey);
-    if (panier[index]) {
+    let panier = [...this.panierSubject.value]; // Utiliser les données de l'observable
+    
+    if (index >= 0 && index < panier.length) {
       panier[index].quantite = nouvelleQuantite;
       this.saveToLocalStorage(panierKey, panier);
       return true;
@@ -136,8 +169,19 @@ export class AccueilpanierService {
 
   clearPanier(): void {
     const panierKey = this.getPanierKey();
-    localStorage.removeItem(panierKey);
-    this.mettreAJourPanier();
+    console.log('Suppression panier:', panierKey); // Debug
+    
+    try {
+      localStorage.removeItem(panierKey);
+      
+      // Mettre à jour immédiatement les observables
+      this.panierSubject.next([]);
+      this.nombreArticlesSubject.next(0);
+      
+      console.log('Panier vidé avec succès'); // Debug
+    } catch (error) {
+      console.error('Erreur lors de la suppression du panier:', error);
+    }
   }
 
   // Nouvelle méthode pour forcer le nettoyage du panier (après paiement réussi)
@@ -154,12 +198,15 @@ export class AccueilpanierService {
         localStorage.removeItem(key);
       }
     });
-    this.mettreAJourPanier();
+    
+    // Réinitialiser les observables
+    this.panierSubject.next([]);
+    this.nombreArticlesSubject.next(0);
   }
 
   // Calculer le sous-total sans frais de livraison
   calculerSousTotal(): number {
-    const panier = this.getPanier();
+    const panier = this.panierSubject.value; // Utiliser l'observable
     return panier.reduce((total, plat) => total + (plat.prix * plat.quantite), 0);
   }
 
@@ -175,13 +222,19 @@ export class AccueilpanierService {
     return !commandeEnAttente;
   }
 
+  // Méthode pour forcer la synchronisation (si nécessaire pour le debug)
+  forcerSynchronisation(): void {
+    console.log('Forcer synchronisation du panier');
+    this.initialiserPanier();
+  }
+
   async passerCommandeLivraison(infoLivraison: any): Promise<any> {
     // Vérifier d'abord s'il n'y a pas déjà une commande en attente
     if (!this.peutPasserCommande()) {
       throw new Error('Une commande est déjà en attente de paiement. Veuillez d\'abord la payer ou l\'annuler.');
     }
 
-    const panier = this.getPanier();
+    const panier = this.panierSubject.value; // Utiliser l'observable
     if (panier.length === 0) {
       throw new Error('Le panier est vide');
     }
@@ -198,17 +251,15 @@ export class AccueilpanierService {
       })),
       adresse: infoLivraison.adresse,
       telephone: infoLivraison.telephone,
-      fraisLivraison: this.FRAIS_LIVRAISON // Ajouter les frais de livraison
+      fraisLivraison: this.FRAIS_LIVRAISON
     };
 
     try {
-      // Conversion explicite en nombre pour s'assurer du bon type
       const userIdNumber = Number(userId);
       console.log('UserID utilisé pour la commande:', userIdNumber, 'Type:', typeof userIdNumber);
       
       const response = await this.commandeService.passerCommandeLivraison(userIdNumber, commandeRequest).toPromise();
       
-      // Sauvegarder la commande en attente avec frais de livraison
       const sousTotal = this.calculerSousTotal();
       const commandeEnAttente = {
         id: response.idCmnd,
@@ -229,7 +280,7 @@ export class AccueilpanierService {
       
       this.commandeService.setCommandeEnAttente(commandeEnAttente);
       
-      // Vider le panier de l'utilisateur actuel et bloquer les modifications
+      // Vider le panier et bloquer les modifications
       this.clearPanier();
       this.panierBloqueSubject.next(true);
       

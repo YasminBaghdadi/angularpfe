@@ -17,6 +17,8 @@ export class PlatComponent implements OnInit, OnDestroy {
   selectedCategory: string = 'Petit-déjeuner';
   loading = false;
   error: string | null = null;
+  messageConfirmation: string = '';
+
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -105,6 +107,6 @@ export class PlatComponent implements OnInit, OnDestroy {
     const quantite = plat.quantite ?? 1;
     const total = plat.prix * quantite;
     this.panierService.ajouterAuPanier({ ...plat, quantite });
-    alert(`Commande : ${quantite} x ${plat.name} = ${total.toFixed(2)} TND`);
+  this.messageConfirmation = `✔️ ${quantite} x ${plat.name} ajouté au panier (${total.toFixed(2)} TND)`;
   }
 }

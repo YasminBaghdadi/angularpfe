@@ -92,4 +92,13 @@ export class DashcommandeService {
   getDetailsLivraison(idCmnd: number): Observable<any> {
     return this.http.get(`${this.apiUrl}/livraison/${idCmnd}`);
   }
+
+
+  getTotalCommandesByDateRange(dateDebut: string, dateFin: string): Observable<any> {
+    const params = new HttpParams()
+      .set('dateDebut', dateDebut)
+      .set('dateFin', dateFin);
+
+    return this.http.get(`${this.apiUrl}/total-par-jour`, { params });
+  }
 }

@@ -84,6 +84,12 @@ export class CommandeeComponent implements OnInit {
   adminPlatQuantites: any[] = [];
   availablePlats: any[] = [];
 
+  // Propriétés pour les statistiques par date
+  dateDebut: string = '';
+  dateFin: string = '';
+  totalCommandesParJour: any[] = [];
+  isLoadingStats: boolean = false;
+
   constructor(
     private authService: AuthService,
     private commandeService: DashcommandeService
@@ -109,6 +115,15 @@ export class CommandeeComponent implements OnInit {
   ngOnInit(): void {
     this.username = localStorage.getItem('username');
     this.loadCommandes();
+    this.initializeDates();
+  }
+
+  initializeDates(): void {
+    const today = new Date();
+    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    
+    this.dateDebut = firstDayOfMonth.toISOString().split('T')[0];
+    this.dateFin = today.toISOString().split('T')[0];
   }
 
   loadCommandes(): void {
@@ -426,5 +441,115 @@ export class CommandeeComponent implements OnInit {
 
   loadAvailablePlats(): void {
     // À implémenter selon votre service de plats
+  }
+
+  // ===== NOUVELLE MÉTHODE POUR LES STATISTIQUES =====
+
+  /**
+   * Charge les statistiques des commandes par plage de dates
+   */
+  
+loadTotalCommandesByDateRange(): void {
+    if (!this.dateDebut || !this.dateFin) {
+      this.errorMessage = 'Veuillez sélectionner une date de début et une date de fin';
+      return;
+    }
+
+    if (new Date(this.dateDebut) > new Date(this.dateFin)) {
+      this.errorMessage = 'La date de début doit être antérieure à la date de fin';
+      return;
+    }
+
+    this.isLoadingStats = true;
+    this.errorMessage = '';
+
+    console.log('📊 Chargement des statistiques du', this.dateDebut, 'au', this.dateFin);
+
+    this.commandeService.getTotalCommandesByDateRange(this.dateDebut, this.dateFin).subscribe({
+      next: (response) => {
+        console.log('📈 Statistiques reçues:', response);
+        
+        // Adapter la réponse du backend au format attendu par le frontend
+        if (response && typeof response === 'object') {
+          // Si le backend retourne un objet unique, le convertir en tableau
+          this.totalCommandesParJour = [{
+            date: response.dateDebut || this.dateDebut,
+            totalCommandes: response.totalCommandes || 0,
+            chiffresAffaires: response.totalCommandes || 0, // Assumant que totalCommandes est le chiffre d'affaires
+            total: response.totalCommandes || 0,
+            montantTotal: response.totalCommandes || 0
+          }];
+        } else if (Array.isArray(response)) {
+          // Si c'est déjà un tableau
+          this.totalCommandesParJour = response;
+        } else {
+          this.totalCommandesParJour = [];
+        }
+        
+        this.isLoadingStats = false;
+        
+        if (this.totalCommandesParJour.length === 0) {
+          this.errorMessage = 'Aucune commande trouvée pour cette période';
+        }
+      },
+      error: (err) => {
+        console.error('❌ Erreur lors du chargement des statistiques:', err);
+        this.errorMessage = 'Erreur lors du chargement des statistiques: ' + (err.error?.message || err.message || 'Erreur inconnue');
+        this.isLoadingStats = false;
+        this.totalCommandesParJour = [];
+      }
+    });
+  }
+
+  /**
+   * Met à jour la date de début
+   */
+  onDateDebutChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.dateDebut = input.value;
+  }
+
+  /**
+   * Met à jour la date de fin
+   */
+  onDateFinChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.dateFin = input.value;
+  }
+
+  /**
+   * Réinitialise les dates à leurs valeurs par défaut
+   */
+  resetDates(): void {
+    this.initializeDates();
+    this.totalCommandesParJour = [];
+  }
+
+  /**
+   * Calcule le total général des commandes pour la période
+   */
+getTotalGeneral(): number {
+    if (this.totalCommandesParJour.length === 1) {
+      // Si on a un seul élément (réponse du backend actuel)
+      const item = this.totalCommandesParJour[0];
+      return item.totalCommandes || item.total || 0;
+    } else {
+      // Si on a plusieurs jours
+      return this.totalCommandesParJour.reduce((total, item) => {
+        return total + (item.totalCommandes || item.total || 0);
+      }, 0);
+    }
+  }
+
+getChiffresAffairesTotal(): number {
+    if (this.totalCommandesParJour.length === 1) {
+      // Si on a un seul élément, utiliser la même valeur pour le CA
+      const item = this.totalCommandesParJour[0];
+      return item.chiffresAffaires || item.montantTotal || item.totalCommandes || 0;
+    } else {
+      return this.totalCommandesParJour.reduce((total, item) => {
+        return total + (item.chiffresAffaires || item.montantTotal || 0);
+      }, 0);
+    }
   }
 }

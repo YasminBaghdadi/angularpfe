@@ -37,12 +37,13 @@ export class CommandeService {
   private baseUrl = 'http://localhost:8081/commande';
   private commandeEnAttente: CommandeEnAttente | null = null;
   private readonly STORAGE_BASE_KEY = 'commandeEnAttente_user_';
-  private readonly TOTAL_BASE_KEY = 'totalCommandeEnCours_user_';
   
-  // Variables pour stocker le total et les détails de commande
+  // CORRECTION: Map pour gérer les totaux par table
+  private totalCommandeByTable = new Map<number, BehaviorSubject<number>>();
+  
+  // Variables pour la livraison (utilisateur connecté)
   private totalCommandeSubject = new BehaviorSubject<number>(0);
   public totalCommande$ = this.totalCommandeSubject.asObservable();
-  
   private totalCommandeEnCours: number = 0;
 
   constructor(
@@ -66,6 +67,60 @@ export class CommandeService {
     });
   }
 
+  // NOUVELLES MÉTHODES POUR LA GESTION PAR TABLE
+  
+  // Obtenir l'observable du total pour une table spécifique
+  getTotalCommandeObservableForTable(tableNumber: number): Observable<number> {
+    if (!this.totalCommandeByTable.has(tableNumber)) {
+      // Créer un nouveau BehaviorSubject pour cette table avec la valeur stockée
+      const initialValue = this.getStoredTotalForTable(tableNumber);
+      this.totalCommandeByTable.set(tableNumber, new BehaviorSubject<number>(initialValue));
+    }
+    return this.totalCommandeByTable.get(tableNumber)!.asObservable();
+  }
+
+  // Obtenir le total stocké dans localStorage pour une table
+  private getStoredTotalForTable(tableNumber: number): number {
+    const stored = localStorage.getItem(`commandeEnCours_table_${tableNumber}`);
+    return stored ? parseFloat(stored) : 0;
+  }
+
+  // Définir le total de commande pour une table spécifique
+  setTotalCommandeEnCoursForTable(total: number, tableNumber: number): void {
+    if (!this.totalCommandeByTable.has(tableNumber)) {
+      this.totalCommandeByTable.set(tableNumber, new BehaviorSubject<number>(0));
+    }
+    
+    this.totalCommandeByTable.get(tableNumber)!.next(total);
+    
+    // Sauvegarder aussi dans localStorage
+    if (total > 0) {
+      localStorage.setItem(`commandeEnCours_table_${tableNumber}`, total.toString());
+    } else {
+      localStorage.removeItem(`commandeEnCours_table_${tableNumber}`);
+    }
+  }
+
+  // Obtenir le total actuel pour une table
+  getTotalCommandeEnCoursForTable(tableNumber: number): number {
+    if (this.totalCommandeByTable.has(tableNumber)) {
+      return this.totalCommandeByTable.get(tableNumber)!.value;
+    }
+    return this.getStoredTotalForTable(tableNumber);
+  }
+
+  // Vider le total de commande pour une table spécifique
+  clearTotalCommandeForTable(tableNumber: number): void {
+    if (this.totalCommandeByTable.has(tableNumber)) {
+      this.totalCommandeByTable.get(tableNumber)!.next(0);
+    }
+    localStorage.removeItem(`commandeEnCours_table_${tableNumber}`);
+    localStorage.removeItem(`idCommande_table_${tableNumber}`);
+    localStorage.removeItem(`detailsCommande_table_${tableNumber}`);
+  }
+
+  // MÉTHODES EXISTANTES POUR LA LIVRAISON (utilisateurs connectés)
+  
   // Générer les clés uniques pour chaque utilisateur
   private getStorageKey(): string {
     const userId = this.authService.getUserId();
@@ -74,7 +129,7 @@ export class CommandeService {
 
   private getTotalStorageKey(): string {
     const userId = this.authService.getUserId();
-    return userId ? `${this.TOTAL_BASE_KEY}${userId}` : 'totalCommandeEnCours_anonymous';
+    return userId ? `totalCommandeEnCours_user_${userId}` : 'totalCommandeEnCours_anonymous';
   }
 
   private getAuthHeaders(): HttpHeaders {
@@ -148,7 +203,7 @@ export class CommandeService {
     return this.commandeEnAttente;
   }
 
-  // Méthodes pour gérer le total de commande en cours
+  // MÉTHODES EXISTANTES POUR LA LIVRAISON (CONSERVÉES POUR COMPATIBILITÉ)
   setTotalCommandeEnCours(total: number): void {
     this.totalCommandeEnCours = total;
     this.totalCommandeSubject.next(total);
@@ -159,12 +214,17 @@ export class CommandeService {
     return this.totalCommandeEnCours;
   }
 
-  // Observable pour le total
-  getTotalCommandeObservable(): Observable<number> {
-    return this.totalCommande$;
+  // MÉTHODE MODIFIÉE POUR SUPPORTER LES DEUX MODES
+  getTotalCommandeObservable(tableNumber?: number): Observable<number> {
+    if (tableNumber !== undefined) {
+      // Mode table (passager)
+      return this.getTotalCommandeObservableForTable(tableNumber);
+    } else {
+      // Mode livraison (utilisateur connecté)
+      return this.totalCommande$;
+    }
   }
 
-  // Vérifier si il y a un total en cours
   hasTotalEnCours(): boolean {
     return this.totalCommandeEnCours > 0;
   }
@@ -186,7 +246,6 @@ export class CommandeService {
     localStorage.removeItem(storageKey);
   }
 
-  // Nettoyer tout (commande + total) pour l'utilisateur actuel
   clearToutCommande(): void {
     this.commandeEnAttente = null;
     this.totalCommandeEnCours = 0;
@@ -198,7 +257,6 @@ export class CommandeService {
     localStorage.removeItem(totalStorageKey);
   }
 
-  // Nettoyer seulement le total (garder la commande)
   clearTotalCommande(): void {
     this.totalCommandeEnCours = 0;
     this.totalCommandeSubject.next(0);
@@ -206,11 +264,10 @@ export class CommandeService {
     localStorage.removeItem(totalStorageKey);
   }
   
-  // Nettoyer toutes les données de tous les utilisateurs (utile pour maintenance)
   clearAllUsersData(): void {
     const keys = Object.keys(localStorage);
     keys.forEach(key => {
-      if (key.startsWith(this.STORAGE_BASE_KEY) || key.startsWith(this.TOTAL_BASE_KEY)) {
+      if (key.startsWith(this.STORAGE_BASE_KEY) || key.startsWith('totalCommandeEnCours_user_')) {
         localStorage.removeItem(key);
       }
     });
@@ -220,7 +277,6 @@ export class CommandeService {
   }
 
   getCommandeTotal(): number {
-    // Priorité au total stocké séparément, sinon celui de la commande
     return this.totalCommandeEnCours > 0 ? this.totalCommandeEnCours : (this.commandeEnAttente?.montantTotal || 0);
   }
 
@@ -228,6 +284,7 @@ export class CommandeService {
     return this.commandeEnAttente !== null || this.totalCommandeEnCours > 0;
   }
 
+  // MÉTHODES HTTP (CONSERVÉES)
   passerCommandeLivraison(
     idUser: number,
     request: CommandeLivraisonRequest
@@ -255,7 +312,6 @@ export class CommandeService {
   }
 
   setCommandeEnAttente(commande: CommandeEnAttente): void {
-    // Générer un ID temporaire si non fourni
     if (!commande.id) {
       commande.id = Math.floor(Math.random() * 1000000);
     }
@@ -264,71 +320,58 @@ export class CommandeService {
     this.saveToStorage();
   }
 
-
-
-
-
   getCommandesByUser(idUser: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}/user/${idUser}`);
   }
 
+  ajouterPlatsACommande(idCmnd: number, plats: PlatQuantite[]): Observable<any> {
+    console.log('URL appelée:', `${this.baseUrl}/ajouterPlats/${idCmnd}`);
+    console.log('Données envoyées:', plats);
+    console.log('Headers:', this.getAuthHeaders());
 
-// 1. First, update your CommandeService method to better handle the response:
-
-ajouterPlatsACommande(idCmnd: number, plats: PlatQuantite[]): Observable<any> {
-  console.log('URL appelée:', `${this.baseUrl}/ajouterPlats/${idCmnd}`);
-  console.log('Données envoyées:', plats);
-  console.log('Headers:', this.getAuthHeaders());
-
-  return this.http.post<any>(
-    `${this.baseUrl}/ajouterPlats/${idCmnd}`,
-    plats,
-    { 
-      headers: this.getAuthHeaders(),
-      // Add this to see the full response
-      observe: 'response'
-    }
-  ).pipe(
-    catchError(error => {
-      console.error('Erreur détaillée:', {
-        status: error.status,
-        statusText: error.statusText,
-        url: error.url,
-        headers: error.headers,
-        error: error.error,
-        message: error.message
-      });
-      
-      // Check if it's a parsing error
-      if (error.error instanceof ProgressEvent) {
-        return throwError(() => 'Erreur de connexion au serveur. Vérifiez que le serveur est démarré.');
+    return this.http.post<any>(
+      `${this.baseUrl}/ajouterPlats/${idCmnd}`,
+      plats,
+      { 
+        headers: this.getAuthHeaders(),
+        observe: 'response'
       }
-      
-      // Check for specific HTTP status codes
-      if (error.status === 0) {
-        return throwError(() => 'Impossible de joindre le serveur. Vérifiez la connexion.');
-      }
-      
-      if (error.status === 404) {
-        return throwError(() => 'Endpoint non trouvé. Vérifiez l\'URL du serveur.');
-      }
-      
-      return throwError(() => error.error?.message || error.message || 'Erreur lors de l\'ajout de plats');
-    })
-  );
-}
+    ).pipe(
+      catchError(error => {
+        console.error('Erreur détaillée:', {
+          status: error.status,
+          statusText: error.statusText,
+          url: error.url,
+          headers: error.headers,
+          error: error.error,
+          message: error.message
+        });
+        
+        if (error.error instanceof ProgressEvent) {
+          return throwError(() => 'Erreur de connexion au serveur. Vérifiez que le serveur est démarré.');
+        }
+        
+        if (error.status === 0) {
+          return throwError(() => 'Impossible de joindre le serveur. Vérifiez la connexion.');
+        }
+        
+        if (error.status === 404) {
+          return throwError(() => 'Endpoint non trouvé. Vérifiez l\'URL du serveur.');
+        }
+        
+        return throwError(() => error.error?.message || error.message || 'Erreur lors de l\'ajout de plats');
+      })
+    );
+  }
 
-
-
-
-getCommandeById(idCommande: number): Observable<any> {
-  return this.http.get<any>(`${this.baseUrl}/getcommande/${idCommande}`, {
-    headers: this.getAuthHeaders()
-  }).pipe(
-    catchError(error => {
-      console.error('Erreur lors de la récupération de la commande:', error);
-      return throwError(() => error.error?.message || error.message || 'Erreur lors de la récupération de la commande');
-    })
-  );
-}
+  getCommandeById(idCommande: number): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/getcommande/${idCommande}`, {
+      headers: this.getAuthHeaders()
+    }).pipe(
+      catchError(error => {
+        console.error('Erreur lors de la récupération de la commande:', error);
+        return throwError(() => error.error?.message || error.message || 'Erreur lors de la récupération de la commande');
+      })
+    );
+  }
 }
